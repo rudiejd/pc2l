@@ -97,7 +97,7 @@ public:
      * Helper method to send a message (binary blob) to a given
      * destination process.
      *
-     * \param[in] msg The message to be sent. If there isn't a message
+     * \param[in] msgPtr Pointer to the message to be sent. If there isn't a message
      * in he supplied pointer then this method does not perform any
      * operations.
      *

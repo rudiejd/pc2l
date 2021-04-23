@@ -271,11 +271,19 @@ public:
 */
 class MPI_EXCEPTION {
 public:
+    /**
+     * @brief Returns string stating that some MPI error occurred
+     * 
+     * @return String with error message
+     */
     std::string Get_error_string() const { return "MPI error occurred"; }
 };
 
 // Ensure that MPI_CONST is also defined
-/** \def MPI_CONST */
+/**
+ * @brief Constant for checking MPI througout the codebase 
+ * 
+ */
 #define MPI_CONST const
 
 /** \def MPI_TYPE_UNSIGNED

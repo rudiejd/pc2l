@@ -180,7 +180,7 @@ public:
         from where this exception was thrown.  The source file name is
         filled in only in the debug versions.  In the non-debug
         versions, the value returned by this method is an empty string
-        (\i i.e., "\0") but not NULL.
+        (@a i.e., "\0") but not NULL.
 
         \return An optional source file name for the exception.
     */
@@ -259,18 +259,16 @@ private:
     int lineNumber = 0;
 };
 
-/** \fn std::ostream& operator<<(std::ostream&, const pc2l::Exception&)
 
-    Insertion operator to stream exception information to a given
+/**
+* @brief  Insertion operator to stream exception information to a given
     output stream.  This method provides a convenient mechanism to
     dump the complete exception information for debugging purposes.
-
-    \param[out] os The output stream to which the formatted exception
+* 
+* @param os  The output stream to which the formatted exception
     information is to be written.
-    
-    \param[in] de The exception to be written.
-    
-    \return This method returns os as per the API requirements.
+* @param exp @c Exception to be inserted into stream
+* @return Returns os stream with exception contents 
 */
 extern std::ostream& operator<<(std::ostream& os, const pc2l::Exception& exp);
 

@@ -137,49 +137,51 @@
 #define BEGIN_NAMESPACE(x) namespace x {
 #endif
 
-/** \def getTimeStamp
-    
-    \brief Get's the file modification timestamp for a given file
+/**
+ * @brief Get's the file modification timestamp for a given file
     name.
-    
-    This method provides a portable (to Windows and Linux/Unix)
-    implementation for a helper method to obtain the modification
-    timestamp for a given file.
-    
-    \param[in] fileName The file name (with full path) for which the
+ * 
+ * @param [in] fileName The file name (with full path) for which the
     modification time stamp is desired.  If the fileName is NULL then
     this method simply returns the buffer without any modifications.
-    
-    \param[out] buffer The buffer into which the time stamp is to be
-    written.
-    
-    \return A pointer to the buffer that was passed in.  The time
+ * @param [out] buffer The buffer into which the time stamp is to be
+    written. 
+ * @return A pointer to the buffer that was passed in.  The time
     stamp is format is the one returned by the
-    Utilities::getSystemTime method.
+    Utilities::getSystemTime method. 
 */
 char* getTimeStamp(const char *fileName, char *buffer);
 
 /** \def getSystemTime
     
-    \brief Returns the string representation of the supplied time data
+    \brief     
+    \param[out] buffer 
+
+    \param[in] 
+    \return "
+*/
+/**
+ * @brief Returns the string representation of the supplied time data
     structure.
     
     This method provides a portable (to Windows and Linux/Unix)
     implementation for a helper method to obtain the string
     representation of a given encoded time_t datastructure.
-    
-    \param[out] buffer The buffer into which the string representation
-    of the supplied time is to be written.  This pointer must be
-    capable of holding at least 128 characters.  If this pointer is
-    NULL, then this method exits immediately.
 
-    \param[in] codedTime The encoded time_t data structure to be
+ * 
+ * @param [in]  codedTime The encoded time_t data structure to be
     converted to a string representation.  If this parameter is NULL,
     then the current system time is converted to a string and filled
     into the supplied buffer.
 
-    \return The pointer to the buffer passed in.  This method returns
-    the buffer filled with the date in the form "Wed Jun 30 21:49:08 1993"
+ * @param [out] buffer The buffer into which the string representation
+    of the supplied time is to be written.  This pointer must be
+    capable of holding at least 128 characters.  If this pointer is
+    NULL, then this method exits immediately.
+    
+    
+ * @return The pointer to the buffer passed in.  This method returns
+    the buffer filled with the date in the form "Wed Jun 30 21:49:08 1993" 
 */
 char* getSystemTime(char *buffer, const time_t *codedTime = NULL);
 
