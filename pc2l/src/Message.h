@@ -164,9 +164,6 @@ public:
      * message with necessary space at the end to send the data.  Use
      * the getData() method to update the raw reference.
      *
-     * \param[in] size The full size of the buffer including the size
-     * of the payload contained in this message.
-     *
      * \return A message object which is essentially jsut a type-cast
      * of the supplied buffer.
      */
@@ -324,6 +321,11 @@ private:
      */
     class MessageDeleter {
     public:
+        /**
+         * @brief  Deletes message object if message owns this buffer 
+         * 
+         * @param msg Message object to be deleted 
+         */
         void operator()(Message* msg) {
             if (msg->ownBuf) {
                 delete[] reinterpret_cast<char*>(msg);

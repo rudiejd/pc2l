@@ -89,7 +89,6 @@ Exception::Exception(const std::string& errorMessage,
     }
 }
 
-// Convenience stream insertion operator.
 std::ostream&
 operator<<(std::ostream& os, const pc2l::Exception& exp) {
     return (os << exp.what());
