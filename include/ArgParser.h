@@ -37,6 +37,16 @@
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
 
+/**
+ * @file ArgParser.h
+ * @author Dhananjai M. Rao (raodm@miamioh.edu)
+ * @brief Definition of class for parsing user-specified command line
+ * arguments
+ * @version 0.1
+ * @date 2021-04-23
+ * 
+ */
+
 #include <vector>
 #include <iostream>
 #include "Utilities.h"

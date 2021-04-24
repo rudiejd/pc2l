@@ -36,6 +36,13 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file Worker.h
+ * @author Dhananjai M. Rao (raodm@miamioh.edu)
+ * @brief Definition of base class for all workers in PC2L 
+ * @version 0.1
+ * @date 2021-04-23
+ */
 
 #include <vector>
 #include "Message.h"

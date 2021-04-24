@@ -36,6 +36,14 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file System.h
+ * @author Dhananjai M. Rao (raodm@miamioh.edu)
+ * @brief  Definition of our top-level System class that encapsulates
+ * system wide data.
+ * @version 0.1
+ * @date 2021-04-23
+ */
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);

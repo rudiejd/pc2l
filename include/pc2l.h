@@ -47,6 +47,22 @@
     PC2L via pre-compiled headers as well.
 */
 
+/** 
+*   @mainpage PC2L: A Parallel and Cloud Computing Library
+*     
+*   @section intro Introduction
+*   This library was designed by JD Rudie and Dr. Dhananjai Rao as 
+*   part of a thesis project. The library will eventually provide
+*   efficient implementations of distributed data structures that
+*   are listed below. PC2L is currently in alpha stages, and work
+*   will first focus on developing the vector class.
+*   
+*   @section comps Components
+*   @li Vector/String (in progress)
+*   @li Multimap (TODO)
+*   @li Graph/Tree (TODO)
+*   @li Associated algorithms (TODO)
+*/
 #include "ArgParser.h"
 #include "System.h"
 

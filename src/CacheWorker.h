@@ -36,9 +36,18 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file CacheWorker.h
+ * @brief Definition of CacheWorker class which manages cache entries
+ * @author Dhananjai M. Rao
+ * @version 0.1
+ * @date 2020-04-23
+ * 
+ */
 
 #include <unordered_map>
 #include "Worker.h"
+
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
