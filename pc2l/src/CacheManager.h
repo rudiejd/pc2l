@@ -39,6 +39,15 @@
 
 #include "CacheWorker.h"
 
+/**
+ * @file CacheManager.h
+ * @brief Definition of CacheManager class which manages cache entries
+ * in conjunction with worker processes.
+ * @author Dhananjai M. Rao
+ * @version 0.1
+ * @date 2020-04-23
+ * 
+ */
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 

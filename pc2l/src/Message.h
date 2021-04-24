@@ -36,6 +36,14 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file Message.h
+ * @author Dhananjai M. Rao (raodm@miamioh.edu)
+ * @brief Definition of Message class for sharing information between
+ * distributed processes. 
+ * @version 0.1
+ * @date 2021-04-23
+ */
 
 #include <memory>
 #include "Utilities.h"
