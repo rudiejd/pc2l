@@ -41,10 +41,11 @@
 #include "pc2l.h"
 
 int main(int argc, char *argv[]) {
-    pc2l::ArgParser ap;
     auto& pc2l = pc2l::System::get();
     pc2l.initialize(argc, argv);
     pc2l.start();
+    std::vector<int, pc2l::Allocator<int>> v(5);
+    std::cout << v.get_allocator().allo_count()<< std::endl;
 
     // Do some testing here.
     std::cout << "Testing.\n";
