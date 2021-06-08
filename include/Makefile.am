@@ -40,4 +40,5 @@ nobase_include_HEADERS = \
 	Exception.h \
 	ArgParser.h \
 	System.h \
+	Allocator.h \
 	pc2l.h

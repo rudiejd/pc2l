@@ -36,7 +36,7 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
-
+#include "Utilities.h"
 #include "Exception.h"
 #include "Worker.h"
 

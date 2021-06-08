@@ -107,7 +107,7 @@
    \see BEGIN_NAMESPACE
 */
 #ifndef END_NAMESPACE
-#define END_NAMESPACE(x) }
+#define END_NAMESPACE(x) } 
 #endif
 
 /** \def BEGIN_NAMESPACE(pc2l)

@@ -1,6 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
-
+#ifndef ALLOCATOR_H
+#define ALLOCATOR_H
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -34,67 +33,70 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie  rudiejd@miamioh.edu
 //---------------------------------------------------------------------
-
-#include "MPIHelper.h"
-#include <cstring>
-
-// namespace pc2l {
+#include <cstddef>
+#include "Utilities.h"
 BEGIN_NAMESPACE(pc2l);
 
-#ifndef HAVE_LIBMPI
+template <class T>
+class Allocator {
+    public:
+        using value_type = T;
 
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
-}
+        using pointer = T*;
+        using const_pointer = const T*;
 
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
+        using void_pointer = void*;
+        using const_void_pointer = const void *;
 
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
+        using difference_type = std::ptrdiff_t;
+
+        Allocator() {
+            count = 0;
+        }
+
+        template<class U>
+        Allocator(const Allocator<U> &other) {}
+
+        ~Allocator() = default;
+
+        pointer allocate(size_t numObjects) {
+            return static_cast<T*>(operator new(sizeof(T) * numObjects));
+        }
+
+        void deallocate(pointer p, size_t numObjects) {
+            operator delete(p);
+        }
+        
+
+        size_t allo_count() const {
+            return count;
+        }
 
 
-#endif  // _Windows
+    private:
+        size_t count;
+};
 
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
 
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
+template <class T, class U>
+constexpr bool operator== (const Allocator<T>&, const Allocator<U>&) noexcept;
 
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
+template <class T, class U>
+constexpr bool operator!= (const Allocator<T>&, const Allocator<U>&) noexcept; 
 
-#endif  // Don't have MPI
+
+
+
+
+
+
+
+
+
+
+
 
 END_NAMESPACE(pc2l);
-// }   // end namespace pc2l
-
-#endif // MPI_HELPER_CPP
+#endif
