@@ -16,7 +16,7 @@
                       |_|_\___\__,_\__,_|_|_|_\___|
 
 
-LICENSE
+# License
 
 A Parallel & Cloud Computing Library (PC2L) is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -27,7 +27,7 @@ with MUSE.  If not, you may download copies of GPL V3 from
 <http://www.gnu.org/licenses/>.
 
 
-DISCLAIMER
+# Disclaimer
 
 PC2L  is distributed in the hope that it will  be useful,
 but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
@@ -50,9 +50,9 @@ applicable  laws of  the U.S.,  and the terms of the  GNU
 General  Public  License  (version 3).
 
 
-COMPLING
+# Compiling
 
-Downloading and Compiling MUSE:
+Downloading and Compiling PC2L:
 
 $ svn co --username raodm https://pc2lab.csi.miamioh.edu/svn/pc2lab/pc2l pc2l
 $ autoreconf -i
