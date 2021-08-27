@@ -23,7 +23,7 @@ redistribute it and/or modify it under the terms of the GNU General
 Public License (GPL) as published by the Free Software Foundation,
 either version 3 (GPL v3), or (at your option) a later version.  You
 should have received a copy of the GNU General Public License along
-with MUSE.  If not, you may download copies of GPL V3 from
+with PC2L.  If not, you may download copies of GPL V3 from
 <http://www.gnu.org/licenses/>.
 
 
