@@ -51,10 +51,10 @@ General  Public  License  (version 3).
 
 
 # Compiling
+```shell
+git clone https://github.com/rudiejd/pc2l.git
+cd pc2l
+mkdir build
+cd build
+cmake ..```
 
-Downloading and Compiling PC2L:
-
-$ svn co --username raodm https://pc2lab.csi.miamioh.edu/svn/pc2lab/pc2l pc2l
-$ autoreconf -i
-$ ./configure
-$ make
