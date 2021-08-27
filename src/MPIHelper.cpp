@@ -43,7 +43,7 @@
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 
-#ifndef HAVE_LIBMPI
+#ifndef MPI_FOUND
 
 #ifndef _WINDOWS
 // A simple implementation for MPI_WTIME on linux

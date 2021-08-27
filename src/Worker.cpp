@@ -39,6 +39,7 @@
 #include "Utilities.h"
 #include "Exception.h"
 #include "Worker.h"
+#include "MPIHelper.h"
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
