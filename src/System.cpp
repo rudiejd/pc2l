@@ -66,6 +66,7 @@ System::initialize(int& argc, char *argv[], bool initMPI) {
     if (initMPI) {
         MPI_INIT(argc, argv);
     }
+    worldSize = MPI_GET_SIZE();
 }
 
 void
@@ -80,6 +81,10 @@ System::start(const OpMode mode) {
         throw PC2L_EXP("Invalid OpMode in initMPI %d",
                        "Ensure OpMode is valid", mode);
     }    
+}
+
+int worldsize() {
+    return worldSize;
 }
 
 void

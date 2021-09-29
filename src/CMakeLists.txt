@@ -7,6 +7,7 @@ set(HEADER_LIST
 	"${pc2l_SOURCE_DIR}/include/CacheManager.h"
 	"${pc2l_SOURCE_DIR}/include/CacheWorker.h"
 	"${pc2l_SOURCE_DIR}/include/Exception.h"
+	"${pc2l_SOURCE_DIR}/include/Vector.h"
 	)
 set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Message.cpp"
@@ -17,6 +18,7 @@ set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 				   "${pc2l_SOURCE_DIR}/src/System.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Utilities.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Worker.cpp"
+                   "${pc2l_SOURCE_DIR}/src/Vector.cpp"
 	)
 
 add_library(pc2l_lib ${SRCFILES} ${HEADER_LIST})

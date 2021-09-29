@@ -1,6 +1,3 @@
-#ifndef PC2L_H
-#define PC2L_H
-
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -34,37 +31,29 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie               rudiejd@miamioh.edu
 //---------------------------------------------------------------------
-
-/** \file pc2l.h
-
-    \brief A convenience top-level header that includes all of the
-    other key headers constituting pc2l.
-
-    This header file has been introduced to simplify the use of pc2l
-    down to a single-header solution.  This may also ease the use of
-    PC2L via pre-compiled headers as well.
-*/
-
-/** 
-*   @mainpage PC2L: A Parallel and Cloud Computing Library
-*     
-*   @section intro Introduction
-*   This library was designed by JD Rudie and Dr. Dhananjai Rao as 
-*   part of a thesis project. The library will eventually provide
-*   efficient implementations of distributed data structures that
-*   are listed below. PC2L is currently in alpha stages, and work
-*   will first focus on developing the vector class.
-*   
-*   @section comps Components
-*   @li Vector/String (in progress)
-*   @li Multimap (TODO)
-*   @li Graph/Tree (TODO)
-*   @li Associated algorithms (TODO)
-*/
-#include "ArgParser.h"
-#include "System.h"
+/**
+ * @file Vector.h
+ * @brief Implementation of Vector
+ * @author JD Rudie
+ * @version 0.1
+ * @date 2021-08-30
+ * 
+ */
 #include "Vector.h"
+#include "System.h"
+#include "MPIHelper.h"
 
-#endif
+BEGIN_NAMESPACE(pc2l);
+
+int Vector::at(unsigned int index) {
+    int value;
+    MPI_RECV(&value, 1, MPI_INT, index % System::get().worldSize(), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+}
+
+void Vector::insert(unsigned int index, int value) {
+    MPI_SEND(&value, 1, MPI_INT, index % System::get().worldSize(), 0, MPI_COMM_WORLD);
+
+END_NAMESPACE(pc2l);
+

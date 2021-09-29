@@ -168,6 +168,11 @@ public:
      */
     void finalize(bool finMPI = true) noexcept;
 
+    /**
+     * The MPI world size of the current instance of PC2L
+     */
+    int worldsize() noexcept;
+
 protected:
     /**
      * Helper method to facilitate the PC2L system to run in
@@ -184,6 +189,11 @@ protected:
      * operating.  This value is set in the start() method.
      */
     OpMode mode = InvalidMode;
+
+    /**
+     * The MPI world_size of the current instance of PC2L
+     */
+    int worldSize; 
 
     /**
      * The process-wide unique singleton instance of this class.

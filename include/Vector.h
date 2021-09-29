@@ -1,5 +1,5 @@
-#ifndef PC2L_H
-#define PC2L_H
+#ifndef CACHE_WORKER_H
+#define CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,37 +34,53 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie               rudiejd@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file Vector.h
+ * @brief Definition of Vector
+ * @author JD Rudie
+ * @version 0.1
+ * @date 2021-08-30
+ * 
+ */
 
-/** \file pc2l.h
+#include <unordered_map>
+#include "Worker.h"
 
-    \brief A convenience top-level header that includes all of the
-    other key headers constituting pc2l.
 
-    This header file has been introduced to simplify the use of pc2l
-    down to a single-header solution.  This may also ease the use of
-    PC2L via pre-compiled headers as well.
-*/
+// namespace pc2l {
+BEGIN_NAMESPACE(pc2l);
 
-/** 
-*   @mainpage PC2L: A Parallel and Cloud Computing Library
-*     
-*   @section intro Introduction
-*   This library was designed by JD Rudie and Dr. Dhananjai Rao as 
-*   part of a thesis project. The library will eventually provide
-*   efficient implementations of distributed data structures that
-*   are listed below. PC2L is currently in alpha stages, and work
-*   will first focus on developing the vector class.
-*   
-*   @section comps Components
-*   @li Vector/String (in progress)
-*   @li Multimap (TODO)
-*   @li Graph/Tree (TODO)
-*   @li Associated algorithms (TODO)
-*/
-#include "ArgParser.h"
-#include "System.h"
-#include "Vector.h"
+
+/**
+ * A distributed vector that runs across multiple machines
+ * utilizing message passing through MPI. This initial  
+ * implementation does not include any caching.
+ */
+class Vector {
+public:
+    /**
+     * The default constructor.  Currently, the consructor initializes
+     * some of the instance variables in this class.
+     */
+    Vector();
+
+    /**
+     * The destructor.
+     */
+    virtual ~Vector() {}
+    
+    int at(unsigned int index);
+
+    void insert(unsigned int index);
+private:
+    // Map index to process containing index and then to address of index in process
+    std::unordered_map<unsigned int, int*> procMap;
+
+};
+
+END_NAMESPACE(pc2l);
+// }   // end namespace pc2l
 
 #endif
