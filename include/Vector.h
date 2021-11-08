@@ -75,8 +75,8 @@ public:
 
     void insert(unsigned int index, int value);
 private:
-    // Map index to process containing index and then to address of index in process
-    std::unordered_map<unsigned int, int*> procMap;
+    // vectors for each process
+    std::vector<int> localVec;
 
 };
 
