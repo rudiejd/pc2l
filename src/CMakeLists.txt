@@ -32,7 +32,7 @@ if(MPI_C_FOUND)
     target_include_directories(pc2l_lib PRIVATE ${MPI_C_INCLUDE_PATH})
     target_compile_options(pc2l_lib PRIVATE ${MPI_C_COMPILE_FLAGS})
     target_link_libraries(pc2l_lib ${MPI_C_LIBRARIES} ${MPI_C_LINK_FLAGS})
-endif(MPI_CXX_FOUND)
+endif(MPI_C_FOUND)
 
 if(THREADS_HAVE_PTHREAD_ARG)
   target_compile_options(pc2l_lib PUBLIC "-pthread")
