@@ -51,14 +51,14 @@ BEGIN_NAMESPACE(pc2l);
 
 int Vector::at(unsigned int index) {
     int value;
-    MPI_Status status;
-    MPI_RECV(&value, 1, MPI_INT, index % System::get().worldSize(), 0, status);
+    MPI_STATUS status;
+    MPI_RECV(&value, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0, status);
     return value;
 }
 
 void Vector::insert(unsigned int index, int value) {
     int sendingBuffer = value;
-    MPI_SEND(&sendingBuffer, 1, MPI_INT, index % System::get().worldSize(), 0);
+    MPI_SEND(&sendingBuffer, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0);
 }
 
 END_NAMESPACE(pc2l);
