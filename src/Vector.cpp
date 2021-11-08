@@ -1,3 +1,5 @@
+#ifndef VECTOR_CPP
+#define VECTOR_CPP
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -49,11 +51,16 @@ BEGIN_NAMESPACE(pc2l);
 
 int Vector::at(unsigned int index) {
     int value;
-    MPI_RECV(&value, 1, MPI_INT, index % System::get().worldSize(), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Status status;
+    MPI_RECV(&value, 1, MPI_INT, index % System::get().worldSize(), 0, status);
+    return value;
 }
 
 void Vector::insert(unsigned int index, int value) {
-    MPI_SEND(&value, 1, MPI_INT, index % System::get().worldSize(), 0, MPI_COMM_WORLD);
+    int sendingBuffer = value;
+    MPI_SEND(&sendingBuffer, 1, MPI_INT, index % System::get().worldSize(), 0);
+}
 
 END_NAMESPACE(pc2l);
+#endif
 

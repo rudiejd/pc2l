@@ -66,7 +66,7 @@ System::initialize(int& argc, char *argv[], bool initMPI) {
     if (initMPI) {
         MPI_INIT(argc, argv);
     }
-    worldSize = MPI_GET_SIZE();
+    size = MPI_GET_SIZE();
 }
 
 void
@@ -83,8 +83,8 @@ System::start(const OpMode mode) {
     }    
 }
 
-int worldsize() {
-    return worldSize;
+int System::worldSize() {
+    return size;
 }
 
 void

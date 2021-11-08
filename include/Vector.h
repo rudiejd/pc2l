@@ -1,5 +1,5 @@
-#ifndef CACHE_WORKER_H
-#define CACHE_WORKER_H
+#ifndef VECTOR_H
+#define VECTOR_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -64,7 +64,7 @@ public:
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
      */
-    Vector();
+    Vector() { }
 
     /**
      * The destructor.
@@ -73,7 +73,7 @@ public:
     
     int at(unsigned int index);
 
-    void insert(unsigned int index);
+    void insert(unsigned int index, int value);
 private:
     // Map index to process containing index and then to address of index in process
     std::unordered_map<unsigned int, int*> procMap;
@@ -84,3 +84,4 @@ END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif
+

@@ -171,7 +171,7 @@ public:
     /**
      * The MPI world size of the current instance of PC2L
      */
-    int worldsize() noexcept;
+    int worldSize() noexcept;
 
 protected:
     /**
@@ -190,10 +190,6 @@ protected:
      */
     OpMode mode = InvalidMode;
 
-    /**
-     * The MPI world_size of the current instance of PC2L
-     */
-    int worldSize; 
 
     /**
      * The process-wide unique singleton instance of this class.
@@ -201,6 +197,11 @@ protected:
     static System system;
 
 private:
+    /**
+     * The MPI world_size of the current instance of PC2L
+     */
+    int size; 
+
     /**
      * The default constructor has been made private to ensure that
      * this class is never instantiated.  Instead, use the global

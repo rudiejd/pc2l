@@ -48,6 +48,12 @@ int main(int argc, char *argv[]) {
     // Do some testing here.
     std::cout << "Testing.\n";
 
+    pc2l::Vector v;
+    for (int i = 0; i < 100; i++) {
+        v.insert(i, 0);
+        std::cout << v.at(i);
+    }
+
     // Wind-up
     pc2l.stop();
     pc2l.finalize();

@@ -49,7 +49,7 @@ void
 Worker::send(MessagePtr msgPtr, const int destRank) {
     // Send message only if the pointer is set
     if (msgPtr) {
-        MPI_SEND(msgPtr.get(), msgPtr->getSize(), MPI_CHAR, destRank,
+        MPI_SEND(msgPtr.get(), msgPtr->getSize(), MPI_TYPE_CHAR, destRank,
                  msgPtr->tag);
     }
 }

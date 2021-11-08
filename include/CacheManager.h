@@ -38,7 +38,6 @@
 //---------------------------------------------------------------------
 
 #include "CacheWorker.h"
-
 /**
  * @file CacheManager.h
  * @brief Definition of CacheManager class which manages cache entries
