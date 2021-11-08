@@ -51,14 +51,25 @@ BEGIN_NAMESPACE(pc2l);
 
 int Vector::at(unsigned int index) {
     int value;
-    MPI_STATUS status;
-    MPI_RECV(&value, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0, status);
+    int targetRank = index % System::get().worldSize();
+    int rank = MPI_GET_RANK();
+    if (rank == targetRank) {
+        int sendingBuffer = localVec[index / System::get().worldSize()];
+        MPI_SEND(&sendingBuffer, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0);
+    } else {
+        MPI_STATUS status;
+        MPI_RECV(&value, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0, status);
+    }
     return value;
 }
 
 void Vector::insert(unsigned int index, int value) {
-    int sendingBuffer = value;
-    MPI_SEND(&sendingBuffer, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0);
+    int rank = MPI_GET_RANK();
+    int targetRank = index % System::get().worldSize();
+    if (rank == targetRank) {
+        MPI_STATUS status;
+        localVec.push_back(value);
+    } 
 }
 
 END_NAMESPACE(pc2l);
