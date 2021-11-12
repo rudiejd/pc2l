@@ -46,12 +46,11 @@ int main(int argc, char *argv[]) {
     pc2l.start();
 
     // Do some testing here.
-    std::cout << "Testing.\n";
-
+    std::cout << "world size " << pc2l.worldSize() << std::endl;
     pc2l::Vector v;
     for (int i = 0; i < 100; i++) {
-        v.insert(i, 0);
-        std::cout << v.at(i);
+        v.insert(i, i);
+        std::cout << "at index " << i << " " << v.at(i) << std::endl;
     }
 
     // Wind-up

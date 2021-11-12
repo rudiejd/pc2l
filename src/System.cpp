@@ -83,7 +83,7 @@ System::start(const OpMode mode) {
     }    
 }
 
-int System::worldSize() {
+int System::worldSize() noexcept {
     return size;
 }
 

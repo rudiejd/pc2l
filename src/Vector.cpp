@@ -49,16 +49,27 @@
 
 BEGIN_NAMESPACE(pc2l);
 
+constexpr int MANAGER = 0;
+constexpr int DATA_TAG = 1;
+
 int Vector::at(unsigned int index) {
+    const int worldSize = System::get().worldSize();
+    if (worldSize < 2) {
+        return localVec.at(index);
+    }
+
+    // Do distributed caching operations where the data is 
+    // obtained from a remote sender process to rank 0.
+    // note sender cannot have data
     int value;
-    int targetRank = index % System::get().worldSize();
-    int rank = MPI_GET_RANK();
-    if (rank == targetRank) {
+    const int senderRank = index % System::get().worldSize() == 0 ? 1 : index % System::get().worldSize();
+    const int myRank = MPI_GET_RANK();
+    if (myRank != MANAGER) {
         int sendingBuffer = localVec[index / System::get().worldSize()];
-        MPI_SEND(&sendingBuffer, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0);
-    } else {
+        MPI_SEND(&sendingBuffer, 1, MPI_TYPE_INT, MANAGER, DATA_TAG);
+    } else { 
         MPI_STATUS status;
-        MPI_RECV(&value, 1, MPI_TYPE_INT, index % System::get().worldSize(), 0, status);
+        MPI_RECV(&value, 1, MPI_TYPE_INT, senderRank, DATA_TAG, status);
     }
     return value;
 }
