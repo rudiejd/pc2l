@@ -60,26 +60,28 @@ int Vector::at(unsigned int index) {
 
     // Do distributed caching operations where the data is 
     // obtained from a remote sender process to rank 0.
-    // note sender cannot have data
     int value;
-    const int senderRank = index % System::get().worldSize() == 0 ? 1 : index % System::get().worldSize();
-    const int myRank = MPI_GET_RANK();
-    if (myRank != MANAGER) {
+    const int senderRank = index % System::get().worldSize() == index % System::get().worldSize();
+    if (MPI_GET_RANK() == MANAGER && senderRank == MANAGER) {
+        return localVec[index / System::get().worldSize()]; 
+    }
+    MPI_Request request;
+    MPI_STATUS status;
+    if (MPI_GET_RANK() != MANAGER) {
         int sendingBuffer = localVec[index / System::get().worldSize()];
-        MPI_SEND(&sendingBuffer, 1, MPI_TYPE_INT, MANAGER, DATA_TAG);
+        MPI_Isend(&sendingBuffer, 1, MPI_TYPE_INT, MANAGER, DATA_TAG, MPI_COMM_WORLD, &request);
     } else { 
-        MPI_STATUS status;
-        MPI_RECV(&value, 1, MPI_TYPE_INT, senderRank, DATA_TAG, status);
+        MPI_Irecv(&value, 1, MPI_TYPE_INT, senderRank, DATA_TAG, MPI_COMM_WORLD, &request);
     }
     return value;
 }
 
 void Vector::insert(unsigned int index, int value) {
-    int rank = MPI_GET_RANK();
     int targetRank = index % System::get().worldSize();
-    if (rank == targetRank) {
-        MPI_STATUS status;
+    std::cout << " my rank is " << MPI_GET_RANK() << std::endl;
+    if (MPI_GET_RANK() == targetRank) {
         localVec.push_back(value);
+        for (auto v : localVec) std::cout << v << std::endl;
     } 
 }
 

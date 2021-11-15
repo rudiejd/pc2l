@@ -50,7 +50,9 @@ int main(int argc, char *argv[]) {
     pc2l::Vector v;
     for (int i = 0; i < 100; i++) {
         v.insert(i, i);
-        std::cout << "at index " << i << " " << v.at(i) << std::endl;
+    }
+    for (int i = 0; i < 100; i++) {
+        std::cout << "at " << i << " " << v.at(i) << std::endl;
     }
 
     // Wind-up
