@@ -172,6 +172,8 @@ public:
      * message with necessary space at the end to send the data.  Use
      * the getData() method to update the raw reference.
      *
+     * \param[in] tag The message type for the created message
+     *
      * \return A message object which is essentially jsut a type-cast
      * of the supplied buffer.
      */

@@ -47,6 +47,7 @@
 
 #include <unordered_map>
 #include "Worker.h"
+#include "CacheManager.h"
 
 
 // namespace pc2l {
@@ -74,10 +75,6 @@ public:
     int at(unsigned int index);
 
     void insert(unsigned int index, int value);
-private:
-    // vectors for each process
-    std::vector<int> localVec;
-
 };
 
 END_NAMESPACE(pc2l);

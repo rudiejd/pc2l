@@ -46,6 +46,8 @@
  */
 
 // namespace pc2l {
+#include "CacheManager.h"
+
 BEGIN_NAMESPACE(pc2l);
 
 /**
@@ -173,6 +175,8 @@ public:
      */
     int worldSize() noexcept;
 
+    pc2l::CacheManager cacheManager();
+
 protected:
     /**
      * Helper method to facilitate the PC2L system to run in
@@ -227,6 +231,7 @@ private:
      * copied.
      */
     System& operator=(const System& other) = delete;
+
 };
 
 END_NAMESPACE(pc2l);

@@ -59,6 +59,9 @@ System System::system;
  */
 CacheManager manager;
     
+CacheManager System::cacheManager() {
+    return manager;
+}
 
 void
 System::initialize(int& argc, char *argv[], bool initMPI) {

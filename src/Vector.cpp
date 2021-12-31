@@ -46,6 +46,7 @@
 #include "Vector.h"
 #include "System.h"
 #include "MPIHelper.h"
+#include "Message.h"
 
 BEGIN_NAMESPACE(pc2l);
 
@@ -53,36 +54,23 @@ constexpr int MANAGER = 0;
 constexpr int DATA_TAG = 1;
 
 int Vector::at(unsigned int index) {
-    const int worldSize = System::get().worldSize();
-    if (worldSize < 2) {
-        return localVec.at(index);
-    }
+    const unsigned int worldSize = System::get().worldSize();
+    const int sourceRank = index % worldSize;
 
-    // Do distributed caching operations where the data is 
-    // obtained from a remote sender process to rank 0.
-    int value;
-    const int senderRank = index % System::get().worldSize() == index % System::get().worldSize();
-    if (MPI_GET_RANK() == MANAGER && senderRank == MANAGER) {
-        return localVec[index / System::get().worldSize()]; 
-    }
-    MPI_Request request;
-    MPI_STATUS status;
-    if (MPI_GET_RANK() != MANAGER) {
-        int sendingBuffer = localVec[index / System::get().worldSize()];
-        MPI_Isend(&sendingBuffer, 1, MPI_TYPE_INT, MANAGER, DATA_TAG, MPI_COMM_WORLD, &request);
-    } else { 
-        MPI_Irecv(&value, 1, MPI_TYPE_INT, senderRank, DATA_TAG, MPI_COMM_WORLD, &request);
-    }
-    return value;
+    CacheManager cm  = System::get().cacheManager();
+    cm.send(Message::create(1, Message::GET_BLOCK, 0), sourceRank);
+    int ret = atoi(cm.recv(sourceRank)->getPayload());
+    return ret;
 }
 
 void Vector::insert(unsigned int index, int value) {
-    int targetRank = index % System::get().worldSize();
-    std::cout << " my rank is " << MPI_GET_RANK() << std::endl;
-    if (MPI_GET_RANK() == targetRank) {
-        localVec.push_back(value);
-        for (auto v : localVec) std::cout << v << std::endl;
-    } 
+    const int worldSize = System::get().worldSize();
+    const int destRank = index % worldSize;
+    CacheManager cm = System::get().cacheManager();
+    MessagePtr m = Message::create(sizeof(int), Message::STORE_BLOCK, 0);
+    char* buff = m->getPayload();
+    buff = (char*) std::to_string(value).c_str();
+    cm.send(m, destRank);
 }
 
 END_NAMESPACE(pc2l);
