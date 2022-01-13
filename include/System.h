@@ -68,6 +68,8 @@ BEGIN_NAMESPACE(pc2l);
  */
 class System {
 public:
+    // Count of data structures in the system for tagging purposes 
+    int dsCount = 0;
     /**
      * Enumeration to define the global operation mode for a specific
      * run of PC2L.  Currently, the library only supports a single
@@ -175,7 +177,7 @@ public:
      */
     int worldSize() noexcept;
 
-    pc2l::CacheManager cacheManager();
+    pc2l::CacheManager& cacheManager();
 
 protected:
     /**

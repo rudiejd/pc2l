@@ -36,7 +36,7 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
-
+#include <thread>
 #include "CacheManager.h"
 #include "Exception.h"
 
@@ -45,12 +45,18 @@ BEGIN_NAMESPACE(pc2l);
 
 void
 CacheManager::finalize() {
+    bgWorker.join();
     const auto workers = MPI_GET_SIZE();
     auto finMsg = Message::create(0, Message::FINISH);
     // Send finish message to all of the worker-processes
     for (int rank = 1; (rank < workers); rank++) {
         send(finMsg, rank);
     }
+}
+
+
+void CacheManager::run() {
+    // bgWorker = std::thread(CacheManager::runBackgroundWorker);
 }
 
 END_NAMESPACE(pc2l);

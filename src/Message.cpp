@@ -76,7 +76,7 @@ Message::create(const Message& src) {
     MessagePtr msg = Message::create(src.getPayloadSize(),
                                      src.tag, src.srcRank);
     // Copy the data from source to the newly created message
-    std::copy_n(src.getPayload(), src.getPayloadSize(), msg->getPayload());
+    std::copy_n(src.getConstPayload(), src.getPayloadSize(), msg->getPayload());
     // Return the newly created msg
     return msg;
 }

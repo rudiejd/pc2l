@@ -207,7 +207,7 @@ public:
      *
      * \return The raw binary data associated with this message.
      */
-    const char* getPayload() const noexcept { return payload; }
+    const char* getConstPayload() const noexcept { return payload; }
 
     /**
      * Obtain an mutable reference to the raw data associated with
@@ -255,7 +255,42 @@ public:
      * arbitrarly large.
      */
     unsigned int blockTag = -1U;
-    
+
+    /**
+     * A buffer that contains the binary-data blob associated with
+     * this message.  This object either points to the buffer in this
+     * class or points to: <ul>
+     *
+     * <li>The above buffer if the message was constructed via the
+     * \c create(int) method in this class.</li>
+     *
+     * <li>Or, it points to an external buffer using which this
+     * message was created via the create(std::vector<char>) class.
+     *
+     * </ul>
+     */
+    char* payload = nullptr;
+
+    /**
+     * Flag to indicate if this message was created from an external
+     * buffer or from a buffer that must be deleted when this object
+     * goes out of scope.
+     *
+     *
+     * This value is is set to <ul>
+     *
+     * <li>\c true: The above buffer if the message was constructed
+     * via the \c create(int) method in this class and it should be
+     * deleted in the destructor.</li>
+     *
+     * <li>Or, it points to an external buffer using which this
+     * message was created via the create(std::vector<char>) class.
+     * So the buffer should not be deleted.</li>
+     *
+     * </ul>
+     */
+    bool ownBuf = true;
+
 protected:
     /**
      * The constructor is made protected to ensure that this class is
@@ -286,43 +321,10 @@ protected:
      * associated with the payload.  This value is set when a message
      * is created.
      */
-    int size; 
+    int size;
 
 private:
-    /**
-     * Flag to indicate if this message was created from an external
-     * buffer or from a buffer that must be deleted when this object
-     * goes out of scope.
-     *
-     *
-     * This value is is set to <ul>
-     *
-     * <li>\c true: The above buffer if the message was constructed
-     * via the \c create(int) method in this class and it should be
-     * deleted in the destructor.</li>
-     *
-     * <li>Or, it points to an external buffer using which this
-     * message was created via the create(std::vector<char>) class.
-     * So the buffer should not be deleted.</li>
-     *
-     * </ul>
-     */
-    bool ownBuf = true;
 
-    /**
-     * A buffer that contains the binary-data blob associated with
-     * this message.  This object either points to the buffer in this
-     * class or points to: <ul>
-     *
-     * <li>The above buffer if the message was constructed via the
-     * \c create(int) method in this class.</li>
-     *
-     * <li>Or, it points to an external buffer using which this
-     * message was created via the create(std::vector<char>) class.
-     *
-     * </ul>
-     */
-    char* payload = nullptr; 
 
     /** A custom deleter class to correctly delete Message objects.
      * This class is used inconjunction with the shared_ptr to

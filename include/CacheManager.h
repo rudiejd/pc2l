@@ -36,7 +36,7 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
-
+#include <thread>
 #include "CacheWorker.h"
 /**
  * @file CacheManager.h
@@ -75,16 +75,25 @@ public:
     /**
      * The manager does not have a specific task in the run method.
      * The operations of a manager are triggered by data structures to
-     * access information in the manager.  Hence, this run method is
-     * intentionally blank.
+     * access information in the manager. However, in order to utilize the
+     * memory of the manager as well, we run a typical 
+     * CacheWorker thread in the background on the manager node.
+     * 
      */
-    void run() override {}
+    void run() override;
 
     /**
      * The finalize method sends finish messages to all of the workers
      * to let them know they need to wind-up their operation.
      */
     void finalize() override;
+
+    // static void runBackgroundWorker() {
+    //     CacheWorker c;
+    //     c.run();
+    // };
+    private:
+        std::thread bgWorker; 
 };
 
 

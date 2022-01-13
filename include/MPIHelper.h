@@ -532,7 +532,7 @@ public:
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_INIT(argc, argv) MPI_Init(&argc, &argv)
+#define MPI_INIT(argc, argv) MPI_Init(&argc, &argv);
 #else
 // MPI is not available
 void MPI_INIT(int argc, char* argv[]);

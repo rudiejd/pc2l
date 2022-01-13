@@ -55,21 +55,28 @@ constexpr int DATA_TAG = 1;
 
 int Vector::at(unsigned int index) {
     const unsigned int worldSize = System::get().worldSize();
-    const int sourceRank = index % worldSize;
-
-    CacheManager cm  = System::get().cacheManager();
-    cm.send(Message::create(1, Message::GET_BLOCK, 0), sourceRank);
+    const int sourceRank = (index % (worldSize - 1)) + 1;
+    CacheManager& cm  = System::get().cacheManager();
+    auto msg = Message::create(1, Message::GET_BLOCK, 0);
+    msg->dsTag = dsTag;
+    msg->blockTag = index; 
+    cm.send(msg, sourceRank);
     int ret = atoi(cm.recv(sourceRank)->getPayload());
     return ret;
 }
 
 void Vector::insert(unsigned int index, int value) {
     const int worldSize = System::get().worldSize();
-    const int destRank = index % worldSize;
-    CacheManager cm = System::get().cacheManager();
-    MessagePtr m = Message::create(sizeof(int), Message::STORE_BLOCK, 0);
-    char* buff = m->getPayload();
-    buff = (char*) std::to_string(value).c_str();
+    const int destRank = (index % (worldSize - 1)) + 1;
+    CacheManager& cm = System::get().cacheManager();
+    char* strung = const_cast<char*>(std::to_string(value).c_str()); 
+    MessagePtr m = Message::create(strlen(strung)*sizeof(char), Message::STORE_BLOCK, 0);
+    m->ownBuf = false;
+    m->payload = strung;
+    m->tag = Message::STORE_BLOCK;
+    m->srcRank = 0;
+    m->dsTag = dsTag; 
+    m->blockTag = index;
     cm.send(m, destRank);
 }
 

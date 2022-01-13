@@ -59,7 +59,7 @@ System System::system;
  */
 CacheManager manager;
     
-CacheManager System::cacheManager() {
+CacheManager& System::cacheManager() {
     return manager;
 }
 
@@ -111,6 +111,7 @@ System::oneWriterDistribCache() {
     if (MPI_GET_RANK() == 0) {
         // We assume this process is the manager.
         manager.initialize();
+        manager.run();
     } else {
         // Here this process is running as a worker.  So perform the
         // worker's lifecycle activities here.

@@ -86,14 +86,14 @@ CacheWorker::sendCacheBlock(const MessagePtr& msg) {
     // If the entry is found, send it back to the requestor
     if (entry != cache.end()) {
         send(entry->second, msg->srcRank);
-    } else {
-        // When control drops here, that means the requested block was
-        // not found in cache.  In this situation, we send a
-        // block-not-found message back.
-        blockNotFoundMsg->dsTag    = msg->dsTag;
-        blockNotFoundMsg->blockTag = msg->blockTag;
-        send(blockNotFoundMsg, msg->srcRank);
     }
+    //     // When control drops here, that means the requested block was
+    //     // not found in cache.  In this situation, we send a
+    //     // block-not-found message back.
+    //     blockNotFoundMsg->dsTag    = msg->dsTag;
+    //     blockNotFoundMsg->blockTag = msg->blockTag;
+    //     send(blockNotFoundMsg, msg->srcRank);
+    // }
 }
 
 END_NAMESPACE(pc2l);

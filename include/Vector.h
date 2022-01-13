@@ -48,6 +48,7 @@
 #include <unordered_map>
 #include "Worker.h"
 #include "CacheManager.h"
+#include "System.h"
 
 
 // namespace pc2l {
@@ -65,7 +66,9 @@ public:
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
      */
-    Vector() { }
+    Vector() { 
+        dsTag = System::get().dsCount++;
+    }
 
     /**
      * The destructor.
@@ -75,6 +78,8 @@ public:
     int at(unsigned int index);
 
     void insert(unsigned int index, int value);
+
+    int dsTag;  
 };
 
 END_NAMESPACE(pc2l);
