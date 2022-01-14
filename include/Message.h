@@ -207,7 +207,7 @@ public:
      *
      * \return The raw binary data associated with this message.
      */
-    const char* getConstPayload() const noexcept { return payload; }
+    const char* getPayload() const noexcept { return payload; }
 
     /**
      * Obtain an mutable reference to the raw data associated with

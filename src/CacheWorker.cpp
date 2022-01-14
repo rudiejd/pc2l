@@ -70,6 +70,7 @@ CacheWorker::run() {
 void
 CacheWorker::storeCacheBlock(const MessagePtr& msg) {
     // Clone this message for storing into our cache
+    std::cout << "blocktag,dstag " << msg->blockTag << " " << msg->dsTag << std::endl;
     MessagePtr clone = Message::create(*msg);
     // Get the aggregate key for this block.
     const auto key   = getKey(clone);

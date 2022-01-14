@@ -1,6 +1,8 @@
 #ifndef CACHE_WORKER_H
 #define CACHE_WORKER_H
 
+#include <iostream>
+
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 

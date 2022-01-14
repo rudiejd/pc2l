@@ -61,7 +61,9 @@ int Vector::at(unsigned int index) {
     msg->dsTag = dsTag;
     msg->blockTag = index; 
     cm.send(msg, sourceRank);
-    int ret = atoi(cm.recv(sourceRank)->getPayload());
+    // receive a message from cache worker
+    const MessagePtr rec = cm.recv(sourceRank);
+    int ret = *(reinterpret_cast<const int*>(rec->getPayload()));
     return ret;
 }
 
@@ -69,13 +71,10 @@ void Vector::insert(unsigned int index, int value) {
     const int worldSize = System::get().worldSize();
     const int destRank = (index % (worldSize - 1)) + 1;
     CacheManager& cm = System::get().cacheManager();
-    char* strung = const_cast<char*>(std::to_string(value).c_str()); 
-    MessagePtr m = Message::create(strlen(strung)*sizeof(char), Message::STORE_BLOCK, 0);
-    m->ownBuf = false;
-    m->payload = strung;
-    m->tag = Message::STORE_BLOCK;
-    m->srcRank = 0;
-    m->dsTag = dsTag; 
+    MessagePtr m = Message::create(sizeof(int), Message::STORE_BLOCK, 0);
+    int* buff = reinterpret_cast<int*>(m->payload);
+    *buff = value;
+    m->dsTag = dsTag;
     m->blockTag = index;
     cm.send(m, destRank);
 }
