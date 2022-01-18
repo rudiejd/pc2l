@@ -105,7 +105,7 @@ public:
         // maybe some check to see if it is successfully deleted?
     }
 
-    int at(unsigned int index) {
+    T at(unsigned int index) {
         const unsigned int worldSize = System::get().worldSize();
         const int sourceRank = (index % (worldSize - 1)) + 1;
         CacheManager& cm  = System::get().cacheManager();
