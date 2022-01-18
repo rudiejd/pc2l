@@ -49,6 +49,8 @@
 #include "Worker.h"
 #include "CacheManager.h"
 #include "System.h"
+#include "MPIHelper.h"
+#include "Message.h"
 
 
 // namespace pc2l {
@@ -60,6 +62,7 @@ BEGIN_NAMESPACE(pc2l);
  * utilizing message passing through MPI. This initial  
  * implementation does not include any caching.
  */
+template <typename T>
 class Vector {
 public:
     /**
@@ -68,18 +71,84 @@ public:
      */
     Vector() { 
         dsTag = System::get().dsCount++;
+        siz = 0;
     }
 
     /**
      * The destructor.
      */
     virtual ~Vector() {}
-    
-    int at(unsigned int index);
 
-    void insert(unsigned int index, int value);
+    int dsTag;
 
-    int dsTag;  
+    // The number of elements currently in the vector
+    unsigned long long siz;
+
+    unsigned long long size() {
+        return siz;
+    }
+
+    void erase(unsigned int index) {
+        // obtain world size() and compute destination rank for deletion
+        const int worldSize = System::get().worldSize();
+        const int destRank = (index % (worldSize - 1)) + 1;
+        CacheManager& cm = System::get().cacheManager();
+        // move all of the blocks to the right of the index left by one
+        for (int i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
+        // clear the last index which is now junk
+        MessagePtr m = Message::create(1, Message::ERASE_BLOCK, 0);
+        m->dsTag = dsTag;
+        m->blockTag = size() - 1;
+        cm.send(m, destRank);
+        // size() can now be decremented
+        siz--;
+        // maybe some check to see if it is successfully deleted?
+    }
+
+    int at(unsigned int index) {
+        const unsigned int worldSize = System::get().worldSize();
+        const int sourceRank = (index % (worldSize - 1)) + 1;
+        CacheManager& cm  = System::get().cacheManager();
+        auto msg = Message::create(1, Message::GET_BLOCK, 0);
+        msg->dsTag = dsTag;
+        msg->blockTag = index;
+        cm.send(msg, sourceRank);
+        // receive a message from cache worker
+        const MessagePtr rec = cm.recv(sourceRank);
+        T ret = *(reinterpret_cast<const T*>(rec->getPayload()));
+        return ret;
+    }
+
+    void insert(unsigned int index, T value) {
+        // obtain world size and compute destination rank
+        const int worldSize = System::get().worldSize();
+        const int destRank = (index % (worldSize - 1)) + 1;
+        CacheManager& cm = System::get().cacheManager();
+        // construct message and fill the buffer with data to insert
+        MessagePtr m = Message::create(sizeof(T), Message::STORE_BLOCK, 0);
+        T* buff = reinterpret_cast<T*>(m->payload);
+        *buff = value;
+        m->dsTag = dsTag;
+        m->blockTag = index;
+        cm.send(m, destRank);
+        // if the insert isnt at end, we have to move all right elements to right
+        siz++;
+    }
+
+    void replace(unsigned int index, T value) {
+        // obtain world size() and compute destination rank for replacement
+        const int worldSize = System::get().worldSize();
+        const int destRank = (index % (worldSize - 1)) + 1;
+        CacheManager& cm = System::get().cacheManager();
+        // construct message and fill the buffer with new datum
+        MessagePtr m = Message::create(sizeof(T), Message::STORE_BLOCK, 0);
+        T* buff = reinterpret_cast<T*>(m->payload);
+        *buff = value;
+        m->dsTag = dsTag;
+        m->blockTag = index;
+        cm.send(m, destRank);
+        // size() remains the same here
+    }
 };
 
 END_NAMESPACE(pc2l);

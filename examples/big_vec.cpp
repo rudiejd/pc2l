@@ -47,11 +47,22 @@ int main(int argc, char *argv[]) {
 
     // Do some testing here.
     std::cout << "world size " << pc2l.worldSize() << std::endl;
-    pc2l::Vector v;
+    pc2l::Vector<int> v;
     for (int i = 0; i < 100; i++) {
         v.insert(i, i);
     }
     for (int i = 0; i < 100; i++) {
+        std::cout << "at " << i << " " << v.at(i) << std::endl;
+    }
+
+    // delete even indices
+    for (int i = 0; i < 10; i++) {
+        v.erase(0);
+    }
+
+    std::cout << "first ten removed" << std::endl;
+
+    for (int i = 0; i < v.size(); i++) {
         std::cout << "at " << i << " " << v.at(i) << std::endl;
     }
 

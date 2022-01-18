@@ -103,6 +103,13 @@ protected:
      * to be stored.
      */
     void storeCacheBlock(const MessagePtr& msg);
+    /**
+     * Method that computes hash and erases a block of cache data from
+     * a given message.
+     *
+     * \param[in] msg The message that contains information about a block that needs to be erased.
+     */
+    void eraseCacheBlock(const MessagePtr& msg);
 
     /**
      * Method that computes hash and sends the requested block of

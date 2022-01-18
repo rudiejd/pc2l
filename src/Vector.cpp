@@ -44,41 +44,14 @@
  * 
  */
 #include "Vector.h"
-#include "System.h"
-#include "MPIHelper.h"
-#include "Message.h"
 
 BEGIN_NAMESPACE(pc2l);
 
-constexpr int MANAGER = 0;
-constexpr int DATA_TAG = 1;
 
-int Vector::at(unsigned int index) {
-    const unsigned int worldSize = System::get().worldSize();
-    const int sourceRank = (index % (worldSize - 1)) + 1;
-    CacheManager& cm  = System::get().cacheManager();
-    auto msg = Message::create(1, Message::GET_BLOCK, 0);
-    msg->dsTag = dsTag;
-    msg->blockTag = index; 
-    cm.send(msg, sourceRank);
-    // receive a message from cache worker
-    const MessagePtr rec = cm.recv(sourceRank);
-    int ret = *(reinterpret_cast<const int*>(rec->getPayload()));
-    return ret;
-}
 
-void Vector::insert(unsigned int index, int value) {
-    const int worldSize = System::get().worldSize();
-    const int destRank = (index % (worldSize - 1)) + 1;
-    CacheManager& cm = System::get().cacheManager();
-    MessagePtr m = Message::create(sizeof(int), Message::STORE_BLOCK, 0);
-    int* buff = reinterpret_cast<int*>(m->payload);
-    *buff = value;
-    m->dsTag = dsTag;
-    m->blockTag = index;
-    cm.send(m, destRank);
-}
 
-END_NAMESPACE(pc2l);
+
+
+END_NAMESPACE(pc2l)
 #endif
 

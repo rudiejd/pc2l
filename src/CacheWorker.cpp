@@ -60,6 +60,9 @@ CacheWorker::run() {
         case Message::GET_BLOCK:
             sendCacheBlock(msg);
             break;
+        case Message::ERASE_BLOCK:
+            eraseCacheBlock(msg);
+            break;
         default:
             throw PC2L_EXP("Received unhandled message. Tag=%d",
                            "Need to implement?", msg->tag);
@@ -70,7 +73,6 @@ CacheWorker::run() {
 void
 CacheWorker::storeCacheBlock(const MessagePtr& msg) {
     // Clone this message for storing into our cache
-    std::cout << "blocktag,dstag " << msg->blockTag << " " << msg->dsTag << std::endl;
     MessagePtr clone = Message::create(*msg);
     // Get the aggregate key for this block.
     const auto key   = getKey(clone);
@@ -87,6 +89,24 @@ CacheWorker::sendCacheBlock(const MessagePtr& msg) {
     // If the entry is found, send it back to the requestor
     if (entry != cache.end()) {
         send(entry->second, msg->srcRank);
+    }
+    //     // When control drops here, that means the requested block was
+    //     // not found in cache.  In this situation, we send a
+    //     // block-not-found message back.
+    //     blockNotFoundMsg->dsTag    = msg->dsTag;
+    //     blockNotFoundMsg->blockTag = msg->blockTag;
+    //     send(blockNotFoundMsg, msg->srcRank);
+    // }
+}
+void
+CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
+    // Get the aggregate key for the block to be deleted.
+    const auto key = getKey(msg);
+    // Get entry for key, if present in the cache
+    const auto entry = cache.find(key);
+    // If the entry is found, delete the entry
+    if (entry != cache.end()) {
+        cache.erase(entry);
     }
     //     // When control drops here, that means the requested block was
     //     // not found in cache.  In this situation, we send a

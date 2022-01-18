@@ -104,6 +104,7 @@ public:
     enum MsgTag : int {
         STORE_BLOCK = 1, /**< Binary blob with cache data */
         GET_BLOCK,       /**< Send requested cache block back */
+        ERASE_BLOCK,     /**< Send requested cache block back */
         BLOCK_NOT_FOUND, /**< Requested block not found in cache */ 
         FINISH,          /**< Message to ask the worker to finish */
         INVALID_MSG      /**< Just a placeholder */
