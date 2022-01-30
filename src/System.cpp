@@ -102,6 +102,7 @@ System::stop() {
 void
 System::finalize(bool finMPI) noexcept {
     if (finMPI) {
+        std::cerr << "MPI Finalizing" << std::endl;
         MPI_FINALIZE();
     }
 }

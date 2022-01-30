@@ -45,7 +45,6 @@ BEGIN_NAMESPACE(pc2l);
 
 void
 CacheManager::finalize() {
-    bgWorker.join();
     const auto workers = MPI_GET_SIZE();
     auto finMsg = Message::create(0, Message::FINISH);
     // Send finish message to all of the worker-processes

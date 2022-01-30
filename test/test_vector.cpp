@@ -1,6 +1,3 @@
-#ifndef CACHE_MANAGER_H
-#define CACHE_MANAGER_H
-
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -34,63 +31,43 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie                             rudiejd@miamioh.edu
 //---------------------------------------------------------------------
-#include <thread>
-#include "CacheWorker.h"
-/**
- * @file CacheManager.h
- * @brief Definition of CacheManager class which manages cache entries
- * in conjunction with worker processes.
- * @author Dhananjai M. Rao
- * @version 0.1
- * @date 2020-04-23
- * 
- */
-// namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
 
-/**
- * A centralized manager that manages cache entries in coordination
- * with zero-or-more worker processes.  In a distributed run of PC2L,
- * a CacheManager is run only on the manager-processes, i.e.,
- * processes with MPI-rank == 0.  The manager process is responsible
- * for maintaining a local cache and updating caches on distributed
- * worker processes.
- */
-class CacheManager : public CacheWorker {
-public:
-    /**
-     * The default constructor.  Currently, the consructor does not
-     * have much to do but is present for future extensions.
-     */
-    CacheManager() {}
+#include <iostream>
+#include <gtest/gtest.h>
+#include <pc2l.h>
 
-    /**
-     * The polymorphic destructor.  The destructor does not have much
-     * to do but is present for future extensions (if any).
-     */
-    virtual ~CacheManager() {}
+int main(int argc, char *argv[]) {
+    for (int i = 0; i < argc; i++) std::cout << argv[i] << std::endl;
+    ::testing::InitGoogleTest(&argc, argv);
+    auto& pc2l = pc2l::System::get();
+    pc2l.initialize(argc, argv);
+    return RUN_ALL_TESTS();
+}
 
-    /**
-     * The manager does not have a specific task in the run method.
-     * The operations of a manager are triggered by data structures to
-     * access information in the manager. However, in order to utilize the
-     * memory of the manager as well, we run a typical 
-     * CacheWorker thread in the background on the manager node.
-     * 
-     */
-    void run() override;
+// Google Test structure for vector class
+class VectorTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        auto& pc2l = pc2l::System::get();
+        pc2l.start();
+    }
 
-    /**
-     * The finalize method sends finish messages to all of the workers
-     * to let them know they need to wind-up their operation.
-     */
-    void finalize() override;
+    void TearDown() override {
+        auto& pc2l = pc2l::System::get();
+        pc2l.stop();
+        pc2l.finalize();
+    }
+
+    pc2l::Vector<int> intVec;
+    pc2l::Vector<char*> cStrVec;
+    pc2l::Vector<double> dblVec;
 };
 
-
-END_NAMESPACE(pc2l);
-// }   // end namespace pc2l
-
-#endif
+TEST_F(VectorTest, test_insert_int) {
+    // Test inserting 100 integers
+    for (int i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, i));
+    }
+}
