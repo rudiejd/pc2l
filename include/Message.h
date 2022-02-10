@@ -38,7 +38,7 @@
 //---------------------------------------------------------------------
 /**
  * @file Message.h
- * @author Dhananjai M. Rao (raodm@miamioh.edu)
+ * @author Dhananjai M. Rao (raodm@miamioh.edu) and JD Rudie (rudiejd@miamioh.edu)
  * @brief Definition of Message class for sharing information between
  * distributed processes. 
  * @version 0.1
@@ -107,6 +107,7 @@ public:
         ERASE_BLOCK,     /**< Send requested cache block back */
         BLOCK_NOT_FOUND, /**< Requested block not found in cache */ 
         FINISH,          /**< Message to ask the worker to finish */
+        PROBE_BLOCK,     /**< Check whether block is full without sending anything */
         INVALID_MSG      /**< Just a placeholder */
     };
 
