@@ -88,7 +88,7 @@ public:
 
     int dsTag;
 
-    void insert(T key, T value) {
+    void insert(T key, U value) {
         // obtain world size and compute destination rank
         const int worldSize = System::get().worldSize();
         unsigned int index = mapHash(key) % index;
