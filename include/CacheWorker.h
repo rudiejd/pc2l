@@ -94,6 +94,28 @@ public:
      */
     virtual void run() override;
 
+    /**
+     * Convenience helper method to get an aggregate key for a given
+     * message. This method combines Message::dsTag (32-bits) and
+     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
+     *
+     * \param[in] msg The message from where the dsTag and blockTag
+     * are to be obtained to create a composite key.
+     *
+     * \return The a 64-bit key associated with this message.
+     */
+    size_t getKey(const MessagePtr& msg) const noexcept {
+        size_t key = msg->dsTag;
+        key <<= sizeof(msg->dsTag);
+        key  |= msg->blockTag;
+        return key;
+    }
+
+    /**
+     * The in-memory data cache managed by this worker process.
+     */
+    DataCache cache;
+
 protected:
     /**
      * Method that computes hash and stores a block of cache data from
@@ -103,6 +125,7 @@ protected:
      * to be stored.
      */
     void storeCacheBlock(const MessagePtr& msg);
+
     /**
      * Method that computes hash and erases a block of cache data from
      * a given message.
@@ -120,29 +143,7 @@ protected:
      */
     void sendCacheBlock(const MessagePtr& msg);
 
-    /**
-     * Convenience helper method to get an aggregate key for a given
-     * message. This method combines Message::dsTag (32-bits) and
-     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
-     *
-     * \param[in] msg The message from where the dsTag and blockTag
-     * are to be obtained to create a composite key.
-     *
-     * \return The a 64-bit key associated with this message.
-     */
-    size_t getKey(const MessagePtr& msg) const noexcept {
-        size_t key = msg->dsTag;
-        key <<= sizeof(msg->dsTag);
-        key  |= msg->blockTag;
-        return key;
-    }
-    
 private:
-    /**
-     * The in-memory data cache managed by this worker process.
-     */
-    DataCache cache;
-
     /**
      * This is a convenience message that is created in the
      * constructor.  This is used to quickly send a "block-not-found"

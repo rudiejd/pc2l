@@ -66,26 +66,40 @@ template <typename T>
 class Vector {
 public:
     /**
-     * The default constructor.  Currently, the consructor initializes
-     * some of the instance variables in this class.
+     * The default constructor.  Currently, the constructor calls the
+     * workhorse
      */
-    Vector() { 
-        dsTag = System::get().dsCount++;
-        siz = 0;
-    }
+    Vector() : Vector(32) { }
 
+    /**
+     *  Construct a vector by specifying the block size. Currently the
+     *  workhorse constructor
+     * @param bSize size in bytes of a block
+     */
+    explicit Vector(unsigned int bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
     /**
      * The destructor.
      */
-    virtual ~Vector() {}
+    virtual ~Vector() = default;
 
     int dsTag;
+
+    unsigned int blockSize;
 
     // The number of elements currently in the vector
     unsigned long long siz;
 
     unsigned long long size() {
         return siz;
+    }
+
+    /**
+     * Remove all elements from a vector
+     */
+    void clear() {
+        for (unsigned int i = 0; i < siz; i++) {
+            erase(i);
+        }
     }
 
     void erase(unsigned int index) {
@@ -112,9 +126,15 @@ public:
         auto msg = Message::create(1, Message::GET_BLOCK, 0);
         msg->dsTag = dsTag;
         msg->blockTag = index;
+        MessagePtr rec;
+        if (cm.cache.find(cm.getKey(msg)) != cm.cache.end()) {
+            rec = cm.cache[cm.getKey(msg)];
+        } else {
+            rec = cm.recv(sourceRank);
+        }
         cm.send(msg, sourceRank);
         // receive a message from cache worker
-        const MessagePtr rec = cm.recv(sourceRank);
+
         T ret = *(reinterpret_cast<const T*>(rec->getPayload()));
         return ret;
     }
