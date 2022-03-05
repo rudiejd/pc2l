@@ -100,22 +100,30 @@ public:
         }
     }
 
-    // TODO: make it work with changes to caching scheme
     void erase(unsigned int index) {
         // obtain world size() and compute destination rank for deletion
         const int worldSize = System::get().worldSize();
         const int destRank = (index % (worldSize - 1)) + 1;
+
         CacheManager& cm = System::get().cacheManager();
         // move all of the blocks to the right of the index left by one
-        for (int i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
+        for (unsigned int i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
         // clear the last index which is now junk
-        MessagePtr m = Message::create(1, Message::ERASE_BLOCK, 0);
-        m->dsTag = dsTag;
-        m->blockTag = size() - 1;
-        cm.send(m, destRank);
+        auto& mgrCache = cm.managerCache();
+        size_t blockTag = index * sizeof(T) / blockSize;
+        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
+            // if last index on cache manager, remove it there
+            mgrCache.erase(mgrCache.find(CacheWorker::getKey(dsTag, blockTag)));
+        } else {
+            // otherwise send a message to remove it from remote CW
+            MessagePtr m = Message::create(1, Message::ERASE_BLOCK, 0);
+            m->dsTag = dsTag;
+            m->blockTag = size() - 1;
+            cm.send(m, destRank);
+        }
         // size() can now be decremented
         siz--;
-        // maybe some check to see if it is successfully deleted?
+        //TODO: maybe some check to see if it is successfully deleted?
     }
 
     T at(unsigned int index) {
@@ -139,6 +147,7 @@ public:
         // offset into this array and extract correct portion
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char serializedObj[sizeof(T)];
+        // copy the block we need into a character array then reinterpret and deref it
         std::copy(&payload[inBlockIdx], &payload[inBlockIdx + sizeof(T)], &serializedObj[0]);
         auto ret = reinterpret_cast<T*>(serializedObj);
         return *ret;
@@ -146,42 +155,52 @@ public:
 
     void insert(unsigned int index, T value) {
         CacheManager& cm = System::get().cacheManager();
-        // construct message and fill the buffer with data to insert
-        MessagePtr m = Message::create(blockSize, Message::STORE_BLOCK, 0);
-        m->dsTag = dsTag;
-        m->blockTag = index*sizeof(T)  / blockSize;
         // always insert into the cache manager's local cache - only move to cache worker on eviction
         auto& mgrCache = System::get().cacheManager().managerCache();
-        // if there is already a block in the CM cache, just put the value into that one
-        if (mgrCache.find(CacheWorker::getKey(m)) != mgrCache.end()) {
-            m = mgrCache[CacheWorker::getKey(m)];
+        MessagePtr m;
+        size_t blockTag = index * sizeof(T) / blockSize;
+        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
+            // if there is already a block in the CM cache, just put the value into that one
+            m = mgrCache[CacheWorker::getKey(dsTag, blockTag)];
+        } else {
+            // otherwise construct message and fill the buffer with data to insert
+            m = Message::create(blockSize, Message::STORE_BLOCK, 0);
+            m->dsTag = dsTag;
+            m->blockTag = blockTag;
         }
         char* block = m->getPayload();
         // offset into the block array of serializations and insert val
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
-        // modified block goes back to cache manager
         mgrCache[CacheWorker::getKey(m)] = m;
 
-        // if the insert isnt at end, we have to move all right elements to right
+        // TODO: if the insert isnt at end, we have to move all right elements to right
         siz++;
     }
 
-    // TODO: make it work with changes to caching scheme
     void replace(unsigned int index, T value) {
         // obtain world size() and compute destination rank for replacement
         const int worldSize = System::get().worldSize();
-        const int destRank = (index % (worldSize - 1)) + 1;
         CacheManager& cm = System::get().cacheManager();
-        // construct message and fill the buffer with new datum
-        MessagePtr m = Message::create(sizeof(T), Message::STORE_BLOCK, 0);
-        T* buff = reinterpret_cast<T*>(m->payload);
-        *buff = value;
-        m->dsTag = dsTag;
-        m->blockTag = index;
-        cm.send(m, destRank);
-        // size() remains the same here
+        auto& mgrCache = cm.managerCache();
+        size_t blockTag = index * sizeof(T) / blockSize;
+        MessagePtr m;
+        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
+            // if the block with this element is in CM cache, change it in there
+            m = mgrCache[CacheWorker::getKey(dsTag, blockTag)];
+        } else {
+            // otherwise fetch from remote CM
+            const int rank = (index % (worldSize - 1)) + 1;
+            cm.send(msg, rank);
+            m = cm.recv(rank);
+        }
+        char* block = m->getPayload();
+        // fill the buffer with new datum at correct in-blok offset
+        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        char* serialized = reinterpret_cast<char*>(&value);
+        std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+        mgrCache[CacheWorker::getKey(m)] = m;
     }
 };
 

@@ -105,9 +105,23 @@ public:
      * \return The a 64-bit key associated with this message.
      */
     static size_t getKey(const MessagePtr& msg) noexcept {
-        size_t key = msg->dsTag;
-        key <<= sizeof(msg->dsTag);
-        key  |= msg->blockTag;
+        return getKey(msg->dsTag, msg->blockTag);
+    }
+
+    /**
+     * Convenience helper method to get an aggregate key for a given
+     * message. This method combines Message::dsTag (32-bits) and
+     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
+     *
+     * \param[in] dsTag tag associated with given data structure
+     * \param[in] blockTag tag associated with selected block
+     *
+     * \return The a 64-bit key associated with this message.
+     */
+    static size_t getKey(size_t dsTag, size_t blockTag) noexcept {
+        size_t key = dsTag;
+        key <<= sizeof(dsTag);
+        key  |= blockTag;
         return key;
     }
 

@@ -54,20 +54,36 @@ protected:
         pc2l.start();
     }
 
-    void TearDown() override {
-        auto& pc2l = pc2l::System::get();
-        pc2l.stop();
-        pc2l.finalize();
-    }
-
-    pc2l::Vector<int> intVec;
-    pc2l::Vector<char*> cStrVec;
-    pc2l::Vector<double> dblVec;
+//    void TearDown() override {
+//        auto& pc2l = pc2l::System::get();
+//        pc2l.stop();
+//        pc2l.finalize();
+//    }
 };
 
 TEST_F(VectorTest, test_insert_int) {
     // Test inserting 100 integers
+    pc2l::Vector<int> intVec;
     for (int i = 0; i < 100; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
     }
+    // intVec.clear();
 }
+
+TEST_F(VectorTest, test_at) {
+    pc2l::Vector<int> intVec;
+    for (int i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, i));
+    }
+    // check to see if data is correct (tests deserializtion)
+    for (int i = 0; i < 100; i++) {
+        ASSERT_EQ(i, intVec.at(i));
+    }
+}
+
+/*TEST_F(VectorTest, test_caching) {
+    // Test caching on the vector
+    for (int i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, i));
+    }
+}*/
