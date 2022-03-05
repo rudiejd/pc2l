@@ -192,7 +192,7 @@ public:
         } else {
             // otherwise fetch from remote CM
             const int rank = (index % (worldSize - 1)) + 1;
-            cm.send(msg, rank);
+            cm.send(m, rank);
             m = cm.recv(rank);
         }
         char* block = m->getPayload();
