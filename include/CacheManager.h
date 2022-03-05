@@ -87,6 +87,16 @@ public:
      * to let them know they need to wind-up their operation.
      */
     void finalize() override;
+
+    /**
+     * Gives a reference to the manager's cache for use in insertion
+     * logic
+     * @return reference to manager's cache
+     */
+    DataCache& managerCache() {
+        return cache;
+    }
+
 };
 
 

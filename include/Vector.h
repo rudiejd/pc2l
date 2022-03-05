@@ -69,7 +69,7 @@ public:
      * The default constructor.  Currently, the constructor calls the
      * workhorse
      */
-    Vector() : Vector(32) { }
+    Vector() : Vector(32000) { }
 
     /**
      *  Construct a vector by specifying the block size. Currently the
@@ -93,15 +93,14 @@ public:
         return siz;
     }
 
-    /**
-     * Remove all elements from a vector
-     */
+    // TODO: make it work with changes to caching scheme
     void clear() {
         for (unsigned int i = 0; i < siz; i++) {
             erase(i);
         }
     }
 
+    // TODO: make it work with changes to caching scheme
     void erase(unsigned int index) {
         // obtain world size() and compute destination rank for deletion
         const int worldSize = System::get().worldSize();
@@ -120,41 +119,56 @@ public:
     }
 
     T at(unsigned int index) {
-        const unsigned int worldSize = System::get().worldSize();
-        const int sourceRank = (index % (worldSize - 1)) + 1;
         CacheManager& cm  = System::get().cacheManager();
         auto msg = Message::create(1, Message::GET_BLOCK, 0);
         msg->dsTag = dsTag;
-        msg->blockTag = index;
+        msg->blockTag = index*sizeof(T)  / blockSize;
         MessagePtr rec;
-        if (cm.cache.find(cm.getKey(msg)) != cm.cache.end()) {
-            rec = cm.cache[cm.getKey(msg)];
+        // if the CacheManager's cache contains this block, just get it
+        if (cm.managerCache().find(CacheWorker::getKey(msg)) != cm.managerCache().end()) {
+            rec = cm.managerCache()[CacheWorker::getKey(msg)];
         } else {
+            // otherwise, we have to get it from a remote cacheworker
+            const unsigned int worldSize = System::get().worldSize();
+            const int sourceRank = (index % (worldSize - 1)) + 1;
+            cm.send(msg, sourceRank);
             rec = cm.recv(sourceRank);
         }
-        cm.send(msg, sourceRank);
-        // receive a message from cache worker
-
-        T ret = *(reinterpret_cast<const T*>(rec->getPayload()));
-        return ret;
+        // get array of concatenated T-serializations
+        char* payload = rec->getPayload();
+        // offset into this array and extract correct portion
+        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        char serializedObj[sizeof(T)];
+        std::copy(&payload[inBlockIdx], &payload[inBlockIdx + sizeof(T)], &serializedObj[0]);
+        auto ret = reinterpret_cast<T*>(serializedObj);
+        return *ret;
     }
 
     void insert(unsigned int index, T value) {
-        // obtain world size and compute destination rank
-        const int worldSize = System::get().worldSize();
-        const int destRank = (index % (worldSize - 1)) + 1;
         CacheManager& cm = System::get().cacheManager();
         // construct message and fill the buffer with data to insert
-        MessagePtr m = Message::create(sizeof(T), Message::STORE_BLOCK, 0);
-        T* buff = reinterpret_cast<T*>(m->payload);
-        *buff = value;
+        MessagePtr m = Message::create(blockSize, Message::STORE_BLOCK, 0);
         m->dsTag = dsTag;
-        m->blockTag = index;
-        cm.send(m, destRank);
+        m->blockTag = index*sizeof(T)  / blockSize;
+        // always insert into the cache manager's local cache - only move to cache worker on eviction
+        auto& mgrCache = System::get().cacheManager().managerCache();
+        // if there is already a block in the CM cache, just put the value into that one
+        if (mgrCache.find(CacheWorker::getKey(m)) != mgrCache.end()) {
+            m = mgrCache[CacheWorker::getKey(m)];
+        }
+        char* block = m->getPayload();
+        // offset into the block array of serializations and insert val
+        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        char* serialized = reinterpret_cast<char*>(&value);
+        std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+        // modified block goes back to cache manager
+        mgrCache[CacheWorker::getKey(m)] = m;
+
         // if the insert isnt at end, we have to move all right elements to right
         siz++;
     }
 
+    // TODO: make it work with changes to caching scheme
     void replace(unsigned int index, T value) {
         // obtain world size() and compute destination rank for replacement
         const int worldSize = System::get().worldSize();

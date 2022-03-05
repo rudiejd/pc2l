@@ -104,17 +104,12 @@ public:
      *
      * \return The a 64-bit key associated with this message.
      */
-    size_t getKey(const MessagePtr& msg) const noexcept {
+    static size_t getKey(const MessagePtr& msg) noexcept {
         size_t key = msg->dsTag;
         key <<= sizeof(msg->dsTag);
         key  |= msg->blockTag;
         return key;
     }
-
-    /**
-     * The in-memory data cache managed by this worker process.
-     */
-    DataCache cache;
 
 protected:
     /**
@@ -143,6 +138,10 @@ protected:
      */
     void sendCacheBlock(const MessagePtr& msg);
 
+    /**
+     * The in-memory data cache managed by this worker process.
+     */
+    DataCache cache;
 private:
     /**
      * This is a convenience message that is created in the
