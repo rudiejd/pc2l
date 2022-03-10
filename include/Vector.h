@@ -182,7 +182,7 @@ public:
             cm.evictCacheBlock();
         }
         // then put the object at retrieved index into cache
-        cm.managerCache()[CacheWorker::getKey(m)];
+        cm.managerCache()[CacheWorker::getKey(m)] = m;
 
         // TODO: if the insert isnt at end, we have to move all right elements to right
         siz++;
