@@ -128,22 +128,26 @@ public:
 
     T at(unsigned int index) {
         CacheManager& cm  = System::get().cacheManager();
-        auto msg = Message::create(1, Message::GET_BLOCK, 0);
-        msg->dsTag = dsTag;
-        msg->blockTag = index*sizeof(T)  / blockSize;
-        MessagePtr rec;
+        MessagePtr msg;
+        size_t blockTag = index*sizeof(T)  / blockSize;
         // if the CacheManager's cache contains this block, just get it
-        if (cm.managerCache().find(CacheWorker::getKey(msg)) != cm.managerCache().end()) {
-            rec = cm.managerCache()[CacheWorker::getKey(msg)];
+        if (cm.managerCache().find(CacheWorker::getKey(dsTag, blockTag)) != cm.managerCache().end()) {
+            msg = cm.managerCache()[CacheWorker::getKey(dsTag, blockTag)];
         } else {
             // otherwise, we have to get it from a remote cacheworker
             const unsigned int worldSize = System::get().worldSize();
             const int sourceRank = (index % (worldSize - 1)) + 1;
             cm.send(msg, sourceRank);
-            rec = cm.recv(sourceRank);
+            msg = cm.recv(sourceRank);
+            // if the cache is full, use eviction strategy
+            if (cm.managerCache().size() * sizeof(T) > cm.cacheSize) {
+                cm.evictCacheBlock();
+            }
+            // then put the object at retrieved index into cache
+            cm.managerCache()[CacheWorker::getKey(dsTag, blockTag)];
         }
         // get array of concatenated T-serializations
-        char* payload = rec->getPayload();
+        char* payload = msg->getPayload();
         // offset into this array and extract correct portion
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char serializedObj[sizeof(T)];
@@ -173,7 +177,12 @@ public:
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
-        mgrCache[CacheWorker::getKey(m)] = m;
+        // if the cache is full, use eviction strategy
+        if (cm.managerCache().size() * sizeof(T) > cm.cacheSize) {
+            cm.evictCacheBlock();
+        }
+        // then put the object at retrieved index into cache
+        cm.managerCache()[CacheWorker::getKey(m)];
 
         // TODO: if the insert isnt at end, we have to move all right elements to right
         siz++;
@@ -181,7 +190,6 @@ public:
 
     void replace(unsigned int index, T value) {
         // obtain world size() and compute destination rank for replacement
-        const int worldSize = System::get().worldSize();
         CacheManager& cm = System::get().cacheManager();
         auto& mgrCache = cm.managerCache();
         size_t blockTag = index * sizeof(T) / blockSize;
@@ -190,8 +198,8 @@ public:
             // if the block with this element is in CM cache, change it in there
             m = mgrCache[CacheWorker::getKey(dsTag, blockTag)];
         } else {
-            // otherwise fetch from remote CM
-            const int rank = (index % (worldSize - 1)) + 1;
+            // otherwise fetch from remote CW
+            const int rank = (index % (System::get().worldSize() - 1)) + 1;
             cm.send(m, rank);
             m = cm.recv(rank);
         }

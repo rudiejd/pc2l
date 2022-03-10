@@ -48,6 +48,7 @@
  */
 
 #include <unordered_map>
+#include <queue>
 #include "Worker.h"
 
 
@@ -75,6 +76,16 @@ using DataCache = std::unordered_map<size_t, MessagePtr>;
  */
 class CacheWorker : public Worker {
 public:
+    enum EvictionStrategy : int {
+        LRU = 1,
+        MRU,
+        LFU
+    };
+
+    // Cache size in bytes - currently set low (100 bytes) for testing
+    unsigned int cacheSize = 100;
+    // Eviction strategy used to remove from the cache when cache size exceeded
+    EvictionStrategy evictionStrategy = EvictionStrategy::LRU;
     /**
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
@@ -125,6 +136,11 @@ public:
         return key;
     }
 
+    /*
+     * Evict a block from the worker's cache according to defined eviction strategy
+     */
+    void evictCacheBlock();
+
 protected:
     /**
      * Method that computes hash and stores a block of cache data from
@@ -164,6 +180,7 @@ private:
      * This message is reused to minimize message creation overheads.
      */
     MessagePtr blockNotFoundMsg;
+    std::queue<size_t> lruBlock;
 };
 
 END_NAMESPACE(pc2l);

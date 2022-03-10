@@ -48,6 +48,7 @@
  * 
  */
 // namespace pc2l {
+#include <queue>
 BEGIN_NAMESPACE(pc2l);
 
 /**
@@ -61,7 +62,7 @@ BEGIN_NAMESPACE(pc2l);
 class CacheManager : public CacheWorker {
 public:
     /**
-     * The default constructor.  Currently, the consructor does not
+     * The default constructor.  Currently, the constructor does not
      * have much to do but is present for future extensions.
      */
     CacheManager() {}
@@ -96,7 +97,6 @@ public:
     DataCache& managerCache() {
         return cache;
     }
-
 };
 
 

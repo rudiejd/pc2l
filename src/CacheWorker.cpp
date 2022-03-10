@@ -117,6 +117,21 @@ CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
     // }
 }
 
+void CacheWorker::evictCacheBlock() {
+    switch(evictionStrategy) {
+        case LRU: {
+            auto back = lruBlock.back();
+            lruBlock.pop();
+            cache.erase(back);
+            break;
+        }
+        case MRU:
+            break;
+        default:
+            break;
+    }
+}
+
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
