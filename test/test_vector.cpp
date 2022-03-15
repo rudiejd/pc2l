@@ -81,6 +81,25 @@ TEST_F(VectorTest, test_at) {
     }
 }
 
+TEST_F(VectorTest, test_lru_caching) {
+    pc2l::Vector<int> intVec;
+    // set block size to 5 integers
+    for (int i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, 100));
+    }
+    auto& pc2l = pc2l::System::get();
+    // cache should contain 3 blocks 85-90, 90-95, 95-100
+    ASSERT_EQ(pc2l.cacheManager().managerCache().size(), 3);
+    // cache should now be the last 3 blocks inserted
+    // front of cache is the last block, rear of cache is the third-last (LRU)
+    // now retrieve another block
+    intVec.at(0);
+    // cache should be size 3
+    ASSERT_EQ(pc2l.cacheManager().managerCache().size(), 3);
+    // the third to last block should be removed from cache (contains 85-90)
+    // the 0-5 block should be in the cache
+}
+
 /*TEST_F(VectorTest, test_caching) {
     // Test caching on the vector
     for (int i = 0; i < 100; i++) {
