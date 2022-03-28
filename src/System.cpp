@@ -123,6 +123,18 @@ System::oneWriterDistribCache() {
     }
 }
 
+void System::setCacheSize(unsigned long long cSize) noexcept {
+    manager.cacheSize = cSize;
+}
+
+void System::setBlockSize(unsigned int bSize) noexcept {
+    blockSize = bSize;
+}
+
+unsigned int System::getBlockSize() noexcept {
+    return blockSize;
+}
+
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 

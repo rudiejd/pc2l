@@ -55,8 +55,7 @@ BEGIN_NAMESPACE(pc2l);
  * properties. This class includes information that is common to many
  * of the data structures and alogrithms in PC2L.  It also
  * encapsulates any caches that are shared between multiple data
- * structures.  Note that each data structure has its own caches (to
- * fine tune to their specific access patterns).
+ * structures.  Note that each data structure has its own caches (to * fine tune to their specific access patterns).
  *
  * This class is currently meant to be used as a singleton class,
  * (without having the need to create an instance of this class). You
@@ -70,6 +69,9 @@ class System {
 public:
     // Count of data structures in the system for tagging purposes 
     int dsCount = 0;
+
+    // default block size is 32MB
+    unsigned int blockSize = 32000000;
     /**
      * Enumeration to define the global operation mode for a specific
      * run of PC2L.  Currently, the library only supports a single
@@ -177,6 +179,25 @@ public:
      */
     int worldSize() noexcept;
 
+    /**
+     * Size of a block in the current instance of pc2l
+     * @return size of block in byte
+     */
+    unsigned int getBlockSize() noexcept;
+
+
+    /**
+     * Set the cache size of the System's cache manager
+     * @param cSize maximum size in bytes of CCM's cache
+     */
+    void setCacheSize(unsigned long long cSize) noexcept;
+
+    /**
+     * Set the block size system-wide
+     * @param bSize size of block in bytes
+     */
+    void setBlockSize(unsigned int bSize) noexcept;
+
     pc2l::CacheManager& cacheManager();
 
 protected:
@@ -188,7 +209,6 @@ protected:
      * method just initializes the CacheManager object in this class.
      */
     void oneWriterDistribCache();
-    
 protected:
     /**
      * The current mode of operation in which the system is currently

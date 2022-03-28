@@ -69,7 +69,7 @@ public:
      * The default constructor.  Currently, the constructor calls the
      * workhorse
      */
-    Vector() : Vector(32000) { }
+    Vector() : blockSize(System::get().getBlockSize()), siz(0), dsTag(System::get().dsCount++){ }
 
     /**
      *  Construct a vector by specifying the block size. Currently the
@@ -116,7 +116,7 @@ public:
             mgrCache.erase(mgrCache.find(CacheWorker::getKey(dsTag, blockTag)));
         } else {
             // otherwise send a message to remove it from remote CW
-            MessagePtr m = Message::create(1, Message::ERASE_BLOCK, 0);
+            MessagePtr m = Message::create(0, Message::ERASE_BLOCK, 0);
             m->dsTag = dsTag;
             m->blockTag = size() - 1;
             cm.send(m, destRank);
@@ -131,20 +131,18 @@ public:
         MessagePtr msg;
         size_t blockTag = index*sizeof(T)  / blockSize;
         // if the CacheManager's cache contains this block, just get it
-        if (cm.managerCache().find(CacheWorker::getKey(dsTag, blockTag)) != cm.managerCache().end()) {
-            msg = cm.managerCache()[CacheWorker::getKey(dsTag, blockTag)];
-        } else {
+        msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+        if (msg == nullptr) {
             // otherwise, we have to get it from a remote cacheworker
             const unsigned int worldSize = System::get().worldSize();
-            const int sourceRank = (index % (worldSize - 1)) + 1;
-            cm.send(msg, sourceRank);
-            msg = cm.recv(sourceRank);
-            // if the cache is full, use eviction strategy
-            if (cm.managerCache().size() * sizeof(T) > cm.cacheSize) {
-                cm.evictCacheBlock();
-            }
+            const int storedRank = (blockTag % (worldSize - 1)) + 1;
+            msg = Message::create(0, Message::GET_BLOCK, 0);
+            msg->dsTag = dsTag;
+            msg->blockTag = blockTag;
+            cm.send(msg, storedRank);
+            msg = cm.recv(storedRank);
             // then put the object at retrieved index into cache
-            cm.managerCache()[CacheWorker::getKey(dsTag, blockTag)];
+            cm.storeCacheBlock(msg);
         }
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
@@ -160,13 +158,9 @@ public:
     void insert(unsigned int index, T value) {
         CacheManager& cm = System::get().cacheManager();
         // always insert into the cache manager's local cache - only move to cache worker on eviction
-        auto& mgrCache = System::get().cacheManager().managerCache();
-        MessagePtr m;
         size_t blockTag = index * sizeof(T) / blockSize;
-        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
-            // if there is already a block in the CM cache, just put the value into that one
-            m = mgrCache[CacheWorker::getKey(dsTag, blockTag)];
-        } else {
+        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+        if (m == nullptr) {
             // otherwise construct message and fill the buffer with data to insert
             m = Message::create(blockSize, Message::STORE_BLOCK, 0);
             m->dsTag = dsTag;
@@ -177,12 +171,8 @@ public:
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
-        // if the cache is full, use eviction strategy
-        if (cm.managerCache().size() * sizeof(T) > cm.cacheSize) {
-            cm.evictCacheBlock();
-        }
         // then put the object at retrieved index into cache
-        cm.managerCache()[CacheWorker::getKey(m)] = m;
+        cm.storeCacheBlock(m);
 
         // TODO: if the insert isnt at end, we have to move all right elements to right
         siz++;
@@ -208,7 +198,7 @@ public:
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
-        mgrCache[CacheWorker::getKey(m)] = m;
+        cm.storeCacheBlock(m);
     }
 };
 

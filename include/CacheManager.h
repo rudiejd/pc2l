@@ -90,6 +90,13 @@ public:
     void finalize() override;
 
     /**
+     * Retrieve a block from the manager cache
+     * @param key the key of a given block calculated via block and DS tag
+     * @return message associated with @param key
+     */
+    MessagePtr getBlock(size_t key);
+
+    /**
      * Gives a reference to the manager's cache for use in insertion
      * logic
      * @return reference to manager's cache

@@ -53,6 +53,15 @@ CacheManager::finalize() {
     }
 }
 
+MessagePtr CacheManager::getBlock(size_t key) {
+    MessagePtr ret = nullptr;
+    if (cache.find(key) != cache.end()) {
+        ret = cache[key];
+        refer(cache[key]);
+    }
+    return ret;
+}
+
 
 void CacheManager::run() {
     // bgWorker = std::thread(CacheManager::runBackgroundWorker);

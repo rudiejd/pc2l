@@ -48,7 +48,7 @@
  */
 
 #include <unordered_map>
-#include <queue>
+#include <list>
 #include "Worker.h"
 
 
@@ -82,8 +82,8 @@ public:
         LFU
     };
 
-    // Cache size in bytes - currently set low (100 bytes) for testing
-    unsigned int cacheSize = 100;
+    // Maximum cache size in bytes of this cacheworker
+    unsigned long long cacheSize = 16000000000;
     // Eviction strategy used to remove from the cache when cache size exceeded
     EvictionStrategy evictionStrategy = EvictionStrategy::LRU;
     /**
@@ -136,12 +136,6 @@ public:
         return key;
     }
 
-    /*
-     * Evict a block from the worker's cache according to defined eviction strategy
-     */
-    void evictCacheBlock();
-
-protected:
     /**
      * Method that computes hash and stores a block of cache data from
      * a given message.
@@ -169,9 +163,21 @@ protected:
     void sendCacheBlock(const MessagePtr& msg);
 
     /**
+     * Refer the key for a block to our eviction scheme
+     * @param key the key to place into eviction scheme
+     */
+     void refer(const MessagePtr& msg);
+protected:
+    /**
      * The in-memory data cache managed by this worker process.
      */
     DataCache cache;
+
+    // Queue: front is block to remove
+    std::list<size_t> lruBlock;
+
+    // Stores a key and a reference to that key's place in the LRU/MRU/etc queue
+    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
 private:
     /**
      * This is a convenience message that is created in the
@@ -180,7 +186,6 @@ private:
      * This message is reused to minimize message creation overheads.
      */
     MessagePtr blockNotFoundMsg;
-    std::queue<size_t> lruBlock;
 };
 
 END_NAMESPACE(pc2l);

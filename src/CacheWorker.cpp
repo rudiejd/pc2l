@@ -70,13 +70,38 @@ CacheWorker::run() {
     }
 }
 
+void CacheWorker::refer(const MessagePtr& msg) {
+    const auto key = getKey(msg);
+    if (cache.find(key) == cache.end()) {
+        // Use eviction strategy if cache is overfull
+        if (msg->getPayloadSize() * cache.size() >= cacheSize) {
+            auto last = lruBlock.back();
+            lruBlock.pop_back();
+            placeInQ.erase(last);
+            // send evicted block to remote cacheworker
+            MessagePtr evicted = cache[last];
+            cache.erase(last);
+            const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+            send(evicted, destRank);
+        }
+    }else {
+        // If the block is present in the cache, we need to update its place in the queue
+        lruBlock.erase(placeInQ[key]);
+    }
+    // Update the reference in the order queue
+    lruBlock.push_front(key);
+    placeInQ[key] = lruBlock.begin();
+}
+
 void
 CacheWorker::storeCacheBlock(const MessagePtr& msg) {
     // Clone this message for storing into our cache
     MessagePtr clone = Message::create(*msg);
     // Get the aggregate key for this block.
     const auto key   = getKey(clone);
-    // Store into our cache
+    // Refer to our eviction structure
+    refer(msg);
+    // Put a clone of the message in the cache
     cache[key] = clone;
 }
 
@@ -88,6 +113,7 @@ CacheWorker::sendCacheBlock(const MessagePtr& msg) {
     const auto entry = cache.find(key);
     // If the entry is found, send it back to the requestor
     if (entry != cache.end()) {
+        refer(entry->second);
         send(entry->second, msg->srcRank);
     }
     //     // When control drops here, that means the requested block was
@@ -115,21 +141,6 @@ CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
     //     blockNotFoundMsg->blockTag = msg->blockTag;
     //     send(blockNotFoundMsg, msg->srcRank);
     // }
-}
-
-void CacheWorker::evictCacheBlock() {
-    switch(evictionStrategy) {
-        case LRU: {
-            auto back = lruBlock.back();
-            lruBlock.pop();
-            cache.erase(back);
-            break;
-        }
-        case MRU:
-            break;
-        default:
-            break;
-    }
 }
 
 END_NAMESPACE(pc2l);
