@@ -5,7 +5,7 @@ set(HEADER_LIST
 	"${pc2l_SOURCE_DIR}/include/ArgParser.h"
 	"${pc2l_SOURCE_DIR}/include/Worker.h"
 	"${pc2l_SOURCE_DIR}/include/CacheWorker.h"
-	"${pc2l_SOURCE_DIR}/include/CacheManager.h"
+	"${pc2l_SOURCE_DIR}/include/CacheManager.h
 	"${pc2l_SOURCE_DIR}/include/Exception.h"
 	"${pc2l_SOURCE_DIR}/include/Vector.h"
 	)
