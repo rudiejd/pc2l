@@ -67,6 +67,10 @@ class Matrix : public Vec {
      */
     friend std::istream& operator>>(std::istream& is, Matrix& matrix);
 
+    size_t rows;
+
+    size_t cols;
+
 public:
     /**
      * Constructor to create and initialize a matrix.
@@ -87,14 +91,14 @@ public:
      *
      * \return Returns the height or number of rows in this matrix.
      */
-    size_t height() const { return size(); }
+    size_t height() const { return rows; };
 
     /**
      * Returns the width or number of columns in this matrix.
      *
      * \return Returns the width or number of columns in this matrix.
      */
-    size_t width() const { return (height() > 0) ? front().size() : 0; }
+    size_t width() const { return cols; };
 
     /**
      * Creates a new matrix in which each value is obtained by
@@ -108,10 +112,25 @@ public:
         Matrix ret(this->height(), this->width());
         for (size_t row = 0; row < ret.height(); row++) {
             for (size_t col = 0; col < ret.width(); col++) {
-                ret[row][col] = operation(this->at(row)[col]);
+//                ret[row][col] = operation(this->at(row)[col])
+                ret.insert(row*width() + col, operation(this->at(row * cols + col)));
             }
         }
         return ret;
+    }
+
+    void Matrix::insert() {
+
+    }
+
+    /**
+     * Convenience method for getting the value in matrix cell (\p row, \p col).
+     * @param row the row number of cell, 0 indexed
+     * @param col column number of cell, 0 indexed
+     * @return the data at (\p row, \p col)
+     */
+    Val at(size_t row, size_t col) {
+        return this->at(row * width() + col);
     }
 
     /**

@@ -6,10 +6,12 @@
 #include <cassert>
 #include <vector>
 #include <string>
+#include "pc2l.h"
 #include "Matrix.h"
 
 Matrix::Matrix(const size_t row, const size_t col, const Val initVal) :
-        std::vector<std::vector<Val>>(row, std::vector<Val>(col, initVal)) {
+// TODO: Add initialization with value for PC2L vectors. perhaps faster init?
+        pc2l::Vector<Val>(), rows(row), cols(col){
 }
 
 // Operator to write the matrix to a given output stream
@@ -17,9 +19,9 @@ std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
     // Print the number of rows and columns to ease reading
     os << matrix.height() << " " << matrix.width() << '\n';
     // Print each entry to the output stream.
-    for (auto& row : matrix) {
-        for (auto& val : row) {
-            os << val << " ";
+    for (size_t row = 0; row < matrix.height(); row++) {
+        for (size_t col = 0; col < matrix.width(); col++) {
+            os << matrix.at(matrix.width() * row + col) << " ";
         }
         // Print a new line at the end of each row just to format the
         // output a bit nicely.
@@ -37,7 +39,8 @@ std::istream& operator>>(std::istream& is, Matrix& matrix) {
     for (size_t i = 0; i < row; i++) {
         for (size_t j = 0; j < col; j++) {
             is >> cur;
-            matrix[i][j] = cur;
+//            matrix[i][j] = cur;
+            matrix.insert(matrix.width() * i + j, cur);
         }
     }
     return is;
@@ -51,7 +54,9 @@ Matrix Matrix::operator-(const Matrix& rhs) const {
     Matrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret[row][col] = this->at(row)[col] - rhs[row][col];
+//            ret[row][col] = this->at(row)[col] - rhs[row][col];
+            ret.insert(row * this->width() + col, this->at(row*this->width()))
+
         }
     }
     return ret;

@@ -109,24 +109,24 @@ public:
         // move all of the blocks to the right of the index left by one
         for (unsigned int i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
         // clear the last index which is now junk
-        auto& mgrCache = cm.managerCache();
         size_t blockTag = index * sizeof(T) / blockSize;
-        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
-            // if last index on cache manager, remove it there
-            mgrCache.erase(mgrCache.find(CacheWorker::getKey(dsTag, blockTag)));
-        } else {
+        MessagePtr msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+        if (msg == nullptr) {
             // otherwise send a message to remove it from remote CW
             MessagePtr m = Message::create(0, Message::ERASE_BLOCK, 0);
             m->dsTag = dsTag;
             m->blockTag = size() - 1;
             cm.send(m, destRank);
+        } else {
+            // if last index on cache manager, remove it there
+            cm.eraseCacheBlock(msg);
         }
         // size() can now be decremented
         siz--;
         //TODO: maybe some check to see if it is successfully deleted?
     }
 
-    T at(unsigned int index) {
+    T at(unsigned int index) const {
         CacheManager& cm  = System::get().cacheManager();
         MessagePtr msg;
         size_t blockTag = index*sizeof(T)  / blockSize;
@@ -183,12 +183,9 @@ public:
         CacheManager& cm = System::get().cacheManager();
         auto& mgrCache = cm.managerCache();
         size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m;
-        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
-            // if the block with this element is in CM cache, change it in there
-            m = mgrCache[CacheWorker::getKey(dsTag, blockTag)];
-        } else {
-            // otherwise fetch from remote CW
+        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+        if (m == nullptr) {
+            // if the block with this element is not in CM cache, get from remote CW
             const int rank = (index % (System::get().worldSize() - 1)) + 1;
             cm.send(m, rank);
             m = cm.recv(rank);

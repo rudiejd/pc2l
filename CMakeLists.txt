@@ -24,7 +24,6 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 find_package(Threads REQUIRED)
-
 enable_testing()
 # function for adding a unit test that utilizes MPI
 function(add_mpi_test name no_mpi_proc)
