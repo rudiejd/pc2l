@@ -119,9 +119,35 @@ public:
         return ret;
     }
 
-    void Matrix::insert() {
+    /**
+     * Convenience method for inserting the value into matrix cell (\p row, \p cell)
+     * @param row row of cell to insert into
+     * @param col column number of cell to insert into
+     * @param val value to insert into cell
+     */
+    void insert(size_t row, size_t col, Val val) {
+        pc2l::Vector<Val>::insert(row * rows + col, val);
+    };
 
-    }
+    /**
+     * Convenience method for replacing the value in matrix cell (\p row, \p cell)
+     * @param row row of cell to replace
+     * @param col column number of cell to replace
+     * @param val value to replace into cell
+     */
+    void replace(size_t row, size_t col, Val val) {
+        pc2l::Vector<Val>::replace(row * rows + col, val);
+    };
+
+    /**
+     * Convenience method for erasing the value in matrix cell (\p row, \p cell)
+     * @param row row of cell to replace
+     * @param col column number of cell to replace
+     * @param val value to replace into cell
+     */
+    void erase(size_t row, size_t col) {
+        pc2l::Vector<Val>::erase(row * rows + col);
+    };
 
     /**
      * Convenience method for getting the value in matrix cell (\p row, \p col).
@@ -129,8 +155,8 @@ public:
      * @param col column number of cell, 0 indexed
      * @return the data at (\p row, \p col)
      */
-    Val at(size_t row, size_t col) {
-        return this->at(row * width() + col);
+    Val at(size_t row, size_t col) const {
+        return pc2l::Vector<Val>::at(row * width() + col);
     }
 
     /**

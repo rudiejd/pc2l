@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
     // Print each entry to the output stream.
     for (size_t row = 0; row < matrix.height(); row++) {
         for (size_t col = 0; col < matrix.width(); col++) {
-            os << matrix.at(matrix.width() * row + col) << " ";
+            os << matrix.at(row, col) << " ";
         }
         // Print a new line at the end of each row just to format the
         // output a bit nicely.
@@ -40,7 +40,7 @@ std::istream& operator>>(std::istream& is, Matrix& matrix) {
         for (size_t j = 0; j < col; j++) {
             is >> cur;
 //            matrix[i][j] = cur;
-            matrix.insert(matrix.width() * i + j, cur);
+            matrix.insert(row, col, cur);
         }
     }
     return is;
@@ -55,7 +55,7 @@ Matrix Matrix::operator-(const Matrix& rhs) const {
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
 //            ret[row][col] = this->at(row)[col] - rhs[row][col];
-            ret.insert(row * this->width() + col, this->at(row*this->width()))
+            ret.insert(row, col, at(row, col) - rhs.at(row, col));
 
         }
     }
@@ -70,7 +70,7 @@ Matrix Matrix::operator*(const Matrix& rhs) const {
     Matrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret[row][col] = this->at(row)[col] * rhs[row][col];
+            ret.insert(at(row, col) * rhs.at(row, col));
         }
     }
     return ret;
@@ -81,7 +81,7 @@ Matrix Matrix::operator*(const Val val) const {
     Matrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret[row][col] = this->at(row)[col] * val;
+            ret.insert(row, col, at(row, col) * val);
         }
     }
     return ret;
@@ -95,7 +95,8 @@ Matrix Matrix::operator+(const Matrix& rhs) const {
     Matrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret[row][col] = this->at(row)[col] + rhs[row][col];
+//            ret[row][col] = this->at(row)[col] + rhs[row][col];
+            ret.insert(row, col, at(row, col) + rhs.at(row, col));
         }
     }
     return ret;
@@ -111,7 +112,8 @@ Matrix Matrix::dot(const Matrix& rhs) const {
     for (size_t i = 0; i < this->height(); i++) {
         for (size_t j = 0; j < rhs.width(); j++) {
             for (size_t k = 0; k < rhs.height(); k++) {
-                ret[i][j] += this->at(i)[k] * rhs[k][j];
+//                ret[i][j] += this->at(i)[k] * rhs[k][j];
+                ret.insert(i, j, at(i, k) + rhs.at(k, j));
             }
         }
     }
@@ -122,7 +124,8 @@ Matrix Matrix::transpose() const {
     Matrix ret(this->width(), this->height());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret[row][col] = this->at(col)[row];
+//            ret[row][col] = this->at(col)[row];
+            ret.insert(row, col, at(col, row));
         }
     }
     return ret;
