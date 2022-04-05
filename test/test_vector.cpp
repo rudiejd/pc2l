@@ -78,8 +78,6 @@ int main(int argc, char *argv[]) {
     env->argc = argc;
     env->argv = argv;
     ::testing::AddGlobalTestEnvironment(env);
-//    auto& pc2l = pc2l::System::get();
-//    pc2l.initialize(argc, argv);
     return RUN_ALL_TESTS();
 }
 TEST_F(VectorTest, test_insert_int) {
