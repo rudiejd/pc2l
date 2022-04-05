@@ -70,7 +70,7 @@ Matrix Matrix::operator*(const Matrix& rhs) const {
     Matrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret.insert(at(row, col) * rhs.at(row, col));
+            ret.insert(row, col, at(row, col) * rhs.at(row, col));
         }
     }
     return ret;
