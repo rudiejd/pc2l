@@ -3,15 +3,18 @@
 #define MATRIX_CPP
 
 
-#include <cassert>
-#include <vector>
 #include <string>
 #include "pc2l.h"
 #include "Matrix.h"
 
 Matrix::Matrix(const size_t row, const size_t col, const Val initVal) :
 // TODO: Add initialization with value for PC2L vectors. perhaps faster init?
-        pc2l::Vector<Val>(), rows(row), cols(col){
+        pc2l::Vector<Val>(), rows(row), cols(col) {
+    for (size_t i = 0; i < row; i++) {
+        for(size_t j = 0; j < col; j++) {
+            insert(i, j, initVal);
+        }
+    }
 }
 
 // Operator to write the matrix to a given output stream
@@ -40,7 +43,7 @@ std::istream& operator>>(std::istream& is, Matrix& matrix) {
         for (size_t j = 0; j < col; j++) {
             is >> cur;
 //            matrix[i][j] = cur;
-            matrix.insert(row, col, cur);
+            matrix.replace(row, col, cur);
         }
     }
     return is;
@@ -55,8 +58,7 @@ Matrix Matrix::operator-(const Matrix& rhs) const {
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
 //            ret[row][col] = this->at(row)[col] - rhs[row][col];
-            ret.insert(row, col, at(row, col) - rhs.at(row, col));
-
+            ret.replace(row, col, at(row, col) - rhs.at(row, col));
         }
     }
     return ret;

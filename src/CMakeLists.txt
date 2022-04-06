@@ -19,7 +19,7 @@ set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Utilities.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Worker.cpp"
                    "${pc2l_SOURCE_DIR}/src/Vector.cpp"
-	)
+		../test/Environment.h)
 
 add_library(pc2l_lib ${SRCFILES} ${HEADER_LIST})
 target_include_directories(pc2l_lib PUBLIC ${pc2l_SOURCE_DIR}/include)

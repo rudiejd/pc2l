@@ -10,6 +10,7 @@
 #include <functional>
 #include <pc2l.h>
 #include <cassert>
+#include <gtest/gtest.h>
 
 /** Shortcut for the value of each element in the matrix */
 using Val = double;
@@ -113,7 +114,7 @@ public:
         for (size_t row = 0; row < ret.height(); row++) {
             for (size_t col = 0; col < ret.width(); col++) {
 //                ret[row][col] = operation(this->at(row)[col])
-                ret.insert(row*width() + col, operation(this->at(row * cols + col)));
+                ret.insert(row, col, operation(at(row, col)));
             }
         }
         return ret;
