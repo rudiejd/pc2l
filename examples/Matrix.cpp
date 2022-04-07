@@ -8,7 +8,6 @@
 #include "Matrix.h"
 
 Matrix::Matrix(const size_t row, const size_t col, const Val initVal) :
-// TODO: Add initialization with value for PC2L vectors. perhaps faster init?
         pc2l::Vector<Val>(), rows(row), cols(col) {
     for (size_t i = 0; i < row; i++) {
         for(size_t j = 0; j < col; j++) {

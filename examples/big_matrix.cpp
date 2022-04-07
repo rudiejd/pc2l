@@ -1,3 +1,6 @@
+#ifndef BIG_MATRIX_CPP
+#define BIG_MATRIX_CPP
+
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -31,29 +34,25 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   JD Rudie                             rudiejd@miamioh.edu
+// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
 
 #include <iostream>
+#include <pc2l.h>
 #include "Matrix.h"
-#include "Environment.h"
-
-
-class MatrixTest : public ::testing::Test {
-
-};
 
 int main(int argc, char *argv[]) {
-    for (int i = 0; i < argc; i++) std::cout << argv[i] << std::endl;
-    ::testing::InitGoogleTest(&argc, argv);
-    auto env = new PC2LEnvironment();
-    env->argc = argc;
-    env->argv = argv;
-    ::testing::AddGlobalTestEnvironment(env);
-    return RUN_ALL_TESTS();
-}
-TEST_F(MatrixTest, test_big_matrix) {
-    Matrix m1(1000000, 1000000, 1);
-    Matrix m2(1000000, 1000000, 2);
+    auto& pc2l = pc2l::System::get();
+    pc2l.initialize(argc, argv);
+    pc2l.start();
+
+    Matrix m1(10000, 10000, 1);
+    Matrix m2(10000, 10000, 2);
     std::cout << m1 * m2;
+
+    // Wind-up
+    pc2l.stop();
+    pc2l.finalize();
 }
+
+#endif

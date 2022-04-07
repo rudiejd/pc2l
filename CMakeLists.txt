@@ -32,7 +32,6 @@ function(add_mpi_test name no_mpi_proc)
 	add_executable(${name} test_${name}.cpp)
 	# link with the pc2l library
 	target_link_libraries(${name} pc2l_lib)
-	target_link_libraries(${name} pc2l_lib)
 	# Make sure to link MPI here too:
 	target_link_libraries(${name} ${MPI_CXX_LIBRARY})
 	# and link with testing library, discover tests??

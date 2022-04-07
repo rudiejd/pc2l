@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <functional>
-#include <pc2l.h>
+#include "pc2l.h"
 #include <cassert>
 #include <gtest/gtest.h>
 

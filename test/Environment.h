@@ -5,6 +5,8 @@
 #ifndef PC2L_ENVIRONMENT_H
 #include <gtest/gtest.h>
 #include <pc2l.h>
+#include <mpi.h>
+
 class PC2LEnvironment : public ::testing::Environment {
 public:
     int argc;

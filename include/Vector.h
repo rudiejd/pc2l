@@ -121,6 +121,14 @@ public:
             // if last index on cache manager, remove it there
             cm.eraseCacheBlock(msg);
         }
+        // if we're not erasing at end of list
+        if (index < size()) {
+            // all values to the right of index shifted left by one
+            for (auto i = size() - 1; i > index; i--) {
+                replace(i - 1, at(i));
+            }
+            // now we can insert
+        }
         // size() can now be decremented
         siz--;
         //TODO: maybe some check to see if it is successfully deleted?
@@ -167,6 +175,16 @@ public:
             m->blockTag = blockTag;
         }
         char* block = m->getPayload();
+        // if we're not inserting at end of list
+        if (index < size()) {
+            // last value moves up one index
+            insert(size(), at(size()-1));
+            // all other values shifted right one index
+            for (auto i = index; i < size(); i++) {
+                replace(i, at(i-1));
+            }
+            // now we can insert
+        }
         // offset into the block array of serializations and insert val
         unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
@@ -174,7 +192,6 @@ public:
         // then put the object at retrieved index into cache
         cm.storeCacheBlock(m);
 
-        // TODO: if the insert isnt at end, we have to move all right elements to right
         siz++;
     }
 
