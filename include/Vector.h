@@ -76,7 +76,7 @@ public:
      *  workhorse constructor
      * @param bSize size in bytes of a block
      */
-    explicit Vector(unsigned int bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
+    explicit Vector(unsigned long long bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
     /**
      * The destructor.
      */
@@ -84,7 +84,7 @@ public:
 
     int dsTag;
 
-    unsigned int blockSize;
+    unsigned long long blockSize;
 
     // The number of elements currently in the vector
     unsigned long long siz;
@@ -95,19 +95,19 @@ public:
 
     // TODO: make it work with changes to caching scheme
     void clear() {
-        for (unsigned int i = 0; i < siz; i++) {
+        for (unsigned long long i = 0; i < siz; i++) {
             erase(i);
         }
     }
 
-    void erase(unsigned int index) {
+    void erase(unsigned long long index) {
         // obtain world size() and compute destination rank for deletion
         const int worldSize = System::get().worldSize();
         const int destRank = (index % (worldSize - 1)) + 1;
 
         CacheManager& cm = System::get().cacheManager();
         // move all of the blocks to the right of the index left by one
-        for (unsigned int i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
+        for (unsigned long long i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
         // clear the last index which is now junk
         size_t blockTag = index * sizeof(T) / blockSize;
         MessagePtr msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
@@ -134,7 +134,7 @@ public:
         //TODO: maybe some check to see if it is successfully deleted?
     }
 
-    T at(unsigned int index) const {
+    T at(unsigned long long index) const {
         CacheManager& cm  = System::get().cacheManager();
         MessagePtr msg;
         size_t blockTag = index*sizeof(T)  / blockSize;
@@ -142,7 +142,7 @@ public:
         msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
         if (msg == nullptr) {
             // otherwise, we have to get it from a remote cacheworker
-            const unsigned int worldSize = System::get().worldSize();
+            const unsigned long long worldSize = System::get().worldSize();
             const int storedRank = (blockTag % (worldSize - 1)) + 1;
             msg = Message::create(0, Message::GET_BLOCK, 0);
             msg->dsTag = dsTag;
@@ -155,7 +155,7 @@ public:
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
-        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char serializedObj[sizeof(T)];
         // copy the block we need into a character array then reinterpret and deref it
         std::copy(&payload[inBlockIdx], &payload[inBlockIdx + sizeof(T)], &serializedObj[0]);
@@ -163,7 +163,7 @@ public:
         return *ret;
     }
 
-    void insert(unsigned int index, T value) {
+    void insert(unsigned long long index, T value) {
         CacheManager& cm = System::get().cacheManager();
         // always insert into the cache manager's local cache - only move to cache worker on eviction
         size_t blockTag = index * sizeof(T) / blockSize;
@@ -186,7 +186,7 @@ public:
             // now we can insert
         }
         // offset into the block array of serializations and insert val
-        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
@@ -195,7 +195,7 @@ public:
         siz++;
     }
 
-    void replace(unsigned int index, T value) {
+    void replace(unsigned long long index, T value) {
         // obtain world size() and compute destination rank for replacement
         CacheManager& cm = System::get().cacheManager();
         auto& mgrCache = cm.managerCache();
@@ -209,7 +209,7 @@ public:
         }
         char* block = m->getPayload();
         // fill the buffer with new datum at correct in-blok offset
-        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         cm.storeCacheBlock(m);
