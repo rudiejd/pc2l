@@ -1,5 +1,5 @@
-#ifndef BIG_MATRIX_CPP
-#define BIG_MATRIX_CPP
+#ifndef BIG_MATRIX_CPP_TEST
+#define STD_MATRIX_CPP_TEST
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -38,21 +38,12 @@
 //---------------------------------------------------------------------
 
 #include <iostream>
-#include <pc2l.h>
-#include "Matrix.h"
+#include "STDMatrix.h"
 
-int main(int argc, char *argv[]) {
-    auto& pc2l = pc2l::System::get();
-    pc2l.initialize(argc, argv);
-    pc2l.start();
-
-    Matrix m1(10000, 10000, 1);
-    Matrix m2(10000, 10000, 2);
+int main() {
+    STDMatrix m1(10000, 10000, 1);
+    STDMatrix m2(10000, 10000, 2);
     std::cout << m1 * m2;
-
-    // Wind-up
-    pc2l.stop();
-    pc2l.finalize();
 }
 
 #endif
