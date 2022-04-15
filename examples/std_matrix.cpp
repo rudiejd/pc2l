@@ -41,8 +41,8 @@
 #include "STDMatrix.h"
 
 int main() {
-    STDMatrix m1(10000, 10000, 1);
-    STDMatrix m2(10000, 10000, 2);
+    STDMatrix m1(50000, 50000, 1);
+    STDMatrix m2(50000, 50000, 2);
     std::cout << m1 * m2;
 }
 
