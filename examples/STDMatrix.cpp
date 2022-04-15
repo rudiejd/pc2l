@@ -3,17 +3,13 @@
 #define STD_MATRIX_CPP
 
 
+#include <cassert>
+#include <vector>
 #include <string>
-#include "pc2l.h"
 #include "STDMatrix.h"
 
 STDMatrix::STDMatrix(const size_t row, const size_t col, const Val initVal) :
-        pc2l::Vector<Val>(), rows(row), cols(col) {
-    for (size_t i = 0; i < row; i++) {
-        for(size_t j = 0; j < col; j++) {
-            insert(i, j, initVal);
-        }
-    }
+        std::vector<std::vector<Val>>(row, std::vector<Val>(col, initVal)) {
 }
 
 // Operator to write the matrix to a given output stream
@@ -21,9 +17,9 @@ std::ostream& operator<<(std::ostream& os, const STDMatrix& matrix) {
     // Print the number of rows and columns to ease reading
     os << matrix.height() << " " << matrix.width() << '\n';
     // Print each entry to the output stream.
-    for (size_t row = 0; row < matrix.height(); row++) {
-        for (size_t col = 0; col < matrix.width(); col++) {
-            os << matrix.at(row, col) << " ";
+    for (auto& row : matrix) {
+        for (auto& val : row) {
+            os << val << " ";
         }
         // Print a new line at the end of each row just to format the
         // output a bit nicely.
@@ -41,8 +37,7 @@ std::istream& operator>>(std::istream& is, STDMatrix& matrix) {
     for (size_t i = 0; i < row; i++) {
         for (size_t j = 0; j < col; j++) {
             is >> cur;
-//            matrix[i][j] = cur;
-            matrix.replace(row, col, cur);
+            matrix[i][j] = cur;
         }
     }
     return is;
@@ -56,8 +51,7 @@ STDMatrix STDMatrix::operator-(const STDMatrix& rhs) const {
     STDMatrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-//            ret[row][col] = this->at(row)[col] - rhs[row][col];
-            ret.replace(row, col, at(row, col) - rhs.at(row, col));
+            ret[row][col] = this->at(row)[col] - rhs[row][col];
         }
     }
     return ret;
@@ -71,7 +65,7 @@ STDMatrix STDMatrix::operator*(const STDMatrix& rhs) const {
     STDMatrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret.insert(row, col, at(row, col) * rhs.at(row, col));
+            ret[row][col] = this->at(row)[col] * rhs[row][col];
         }
     }
     return ret;
@@ -82,7 +76,7 @@ STDMatrix STDMatrix::operator*(const Val val) const {
     STDMatrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-            ret.insert(row, col, at(row, col) * val);
+            ret[row][col] = this->at(row)[col] * val;
         }
     }
     return ret;
@@ -96,8 +90,7 @@ STDMatrix STDMatrix::operator+(const STDMatrix& rhs) const {
     STDMatrix ret(this->height(), this->width());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-//            ret[row][col] = this->at(row)[col] + rhs[row][col];
-            ret.insert(row, col, at(row, col) + rhs.at(row, col));
+            ret[row][col] = this->at(row)[col] + rhs[row][col];
         }
     }
     return ret;
@@ -113,8 +106,7 @@ STDMatrix STDMatrix::dot(const STDMatrix& rhs) const {
     for (size_t i = 0; i < this->height(); i++) {
         for (size_t j = 0; j < rhs.width(); j++) {
             for (size_t k = 0; k < rhs.height(); k++) {
-//                ret[i][j] += this->at(i)[k] * rhs[k][j];
-                ret.insert(i, j, at(i, k) + rhs.at(k, j));
+                ret[i][j] += this->at(i)[k] * rhs[k][j];
             }
         }
     }
@@ -125,11 +117,14 @@ STDMatrix STDMatrix::transpose() const {
     STDMatrix ret(this->width(), this->height());
     for (size_t row = 0; row < ret.height(); row++) {
         for (size_t col = 0; col < ret.width(); col++) {
-//            ret[row][col] = this->at(col)[row];
-            ret.insert(row, col, at(col, row));
+            ret[row][col] = this->at(col)[row];
         }
     }
     return ret;
 }
 
+
+
+
 #endif
+

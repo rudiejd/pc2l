@@ -97,6 +97,27 @@ TEST_F(VectorTest, test_lru_caching) {
     ASSERT_TRUE(pc2l.cacheManager().managerCache().find(pc2l.cacheManager().getKey(intVec.dsTag, 0)) != pc2l.cacheManager().managerCache().end());
 }
 
+TEST_F(VectorTest, test_delete) {
+    auto& pc2l = pc2l::System::get();
+    pc2l::Vector<int> intVec;
+    // this produces 20 blocks of integers
+    for (size_t i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, i));
+    }
+    // delete at index 42
+    ASSERT_NO_THROW(intVec.erase(42));
+    // size should be 99
+    ASSERT_EQ(intVec.size(), 99);
+    for (size_t i = 0; i < 42; i++) {
+        // up to modified index it should be the same
+        ASSERT_EQ(intVec.at(i), i);
+    }
+    for (size_t i = 42; i < intVec.size(); i++) {
+        // every other value should be one bigger than it was
+        ASSERT_EQ(intVec.at(i), i+1);
+    }
+}
+
 /*TEST_F(VectorTest, test_caching) {
     // Test caching on the vector
     for (int i = 0; i < 100; i++) {

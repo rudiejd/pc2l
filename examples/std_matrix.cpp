@@ -1,4 +1,4 @@
-#ifndef BIG_MATRIX_CPP_TEST
+#ifndef STD_MATRIX_CPP_TEST
 #define STD_MATRIX_CPP_TEST
 
 //---------------------------------------------------------------------

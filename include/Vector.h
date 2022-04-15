@@ -204,6 +204,9 @@ public:
         if (m == nullptr) {
             // if the block with this element is not in CM cache, get from remote CW
             const int rank = (index % (System::get().worldSize() - 1)) + 1;
+            m = Message::create(0, Message::GET_BLOCK, 0);
+            m->dsTag = dsTag;
+            m->blockTag = blockTag;
             cm.send(m, rank);
             m = cm.recv(rank);
         }
