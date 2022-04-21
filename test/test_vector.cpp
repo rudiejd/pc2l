@@ -35,37 +35,8 @@
 //---------------------------------------------------------------------
 
 #include <iostream>
-#include <gtest/gtest.h>
-#include <pc2l.h>
-#include <mpi.h>
+#include "Environment.h"
 
-class PC2LEnvironment : public ::testing::Environment {
-public:
-    int argc;
-    char** argv;
-    ~PC2LEnvironment() override {};
-    void SetUp() override {
-        // set block size to 5 integers
-        auto& pc2l = pc2l::System::get();
-        pc2l.setBlockSize(sizeof(int) * 5);
-        // set cache size to 3 blocks
-        pc2l.setCacheSize(3*5*sizeof(int));
-        pc2l.initialize(argc, argv);
-        pc2l.start();
-        ::testing::TestEventListeners& listeners =
-                ::testing::UnitTest::GetInstance()->listeners();
-        int rank;
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        if (rank != 0) {
-            delete listeners.Release(listeners.default_result_printer());
-        }
-    }
-    void TearDown() override {
-        auto& pc2l = pc2l::System::get();
-        pc2l.stop();
-        pc2l.finalize();
-    }
-};
 
 class VectorTest : public ::testing::Test {
 
@@ -78,8 +49,6 @@ int main(int argc, char *argv[]) {
     env->argc = argc;
     env->argv = argv;
     ::testing::AddGlobalTestEnvironment(env);
-//    auto& pc2l = pc2l::System::get();
-//    pc2l.initialize(argc, argv);
     return RUN_ALL_TESTS();
 }
 TEST_F(VectorTest, test_insert_int) {
@@ -126,6 +95,27 @@ TEST_F(VectorTest, test_lru_caching) {
     ASSERT_EQ(pc2l.cacheManager().managerCache().find(pc2l.cacheManager().getKey(intVec.dsTag, 17)), pc2l.cacheManager().managerCache().end());
     // the 0-5 block should be in the cache
     ASSERT_TRUE(pc2l.cacheManager().managerCache().find(pc2l.cacheManager().getKey(intVec.dsTag, 0)) != pc2l.cacheManager().managerCache().end());
+}
+
+TEST_F(VectorTest, test_delete) {
+    auto& pc2l = pc2l::System::get();
+    pc2l::Vector<int> intVec;
+    // this produces 20 blocks of integers
+    for (size_t i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, i));
+    }
+    // delete at index 42
+    ASSERT_NO_THROW(intVec.erase(42));
+    // size should be 99
+    ASSERT_EQ(intVec.size(), 99);
+    for (size_t i = 0; i < 42; i++) {
+        // up to modified index it should be the same
+        ASSERT_EQ(intVec.at(i), i);
+    }
+    for (size_t i = 42; i < intVec.size(); i++) {
+        // every other value should be one bigger than it was
+        ASSERT_EQ(intVec.at(i), i+1);
+    }
 }
 
 /*TEST_F(VectorTest, test_caching) {

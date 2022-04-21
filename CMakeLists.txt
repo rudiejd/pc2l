@@ -24,7 +24,6 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 find_package(Threads REQUIRED)
-
 enable_testing()
 # function for adding a unit test that utilizes MPI
 function(add_mpi_test name no_mpi_proc)
@@ -32,7 +31,6 @@ function(add_mpi_test name no_mpi_proc)
 	# My test are all called name_test.cpp
 	add_executable(${name} test_${name}.cpp)
 	# link with the pc2l library
-	target_link_libraries(${name} pc2l_lib)
 	target_link_libraries(${name} pc2l_lib)
 	# Make sure to link MPI here too:
 	target_link_libraries(${name} ${MPI_CXX_LIBRARY})

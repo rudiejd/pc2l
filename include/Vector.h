@@ -76,7 +76,7 @@ public:
      *  workhorse constructor
      * @param bSize size in bytes of a block
      */
-    explicit Vector(unsigned int bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
+    explicit Vector(unsigned long long bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
     /**
      * The destructor.
      */
@@ -84,49 +84,67 @@ public:
 
     int dsTag;
 
-    unsigned int blockSize;
+    // the size (in bytes) of each block in vector. Potentially offer heterogeneous
+    // block sizes on different data structures later, but for now it is uniform
+    unsigned long long blockSize;
 
     // The number of elements currently in the vector
     unsigned long long siz;
 
+    /**
+     * Returns size (in values, not blocks) of vector
+     * @return size (in values) of vector
+     */
     unsigned long long size() {
         return siz;
     }
 
-    // TODO: make it work with changes to caching scheme
+    /**
+     * Erase all values from vector
+     */
     void clear() {
-        for (unsigned int i = 0; i < siz; i++) {
+        for (unsigned long long i = 0; i < siz; i++) {
             erase(i);
         }
     }
 
-    void erase(unsigned int index) {
-        // obtain world size() and compute destination rank for deletion
-        const int worldSize = System::get().worldSize();
-        const int destRank = (index % (worldSize - 1)) + 1;
-
-        CacheManager& cm = System::get().cacheManager();
+    /**
+     * Erase the value at \p index
+     * @param index the index of the value to be erased
+     */
+    void erase(unsigned long long index) {
         // move all of the blocks to the right of the index left by one
-        for (unsigned int i = index; i < size() - 1; i++) { replace(i, at(i + 1)); }
+        for (unsigned long long i = index; i < size() - 1; i++) { swap(i, i + 1); }
         // clear the last index which is now junk
-        auto& mgrCache = cm.managerCache();
-        size_t blockTag = index * sizeof(T) / blockSize;
-        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
-            // if last index on cache manager, remove it there
-            mgrCache.erase(mgrCache.find(CacheWorker::getKey(dsTag, blockTag)));
-        } else {
-            // otherwise send a message to remove it from remote CW
-            MessagePtr m = Message::create(0, Message::ERASE_BLOCK, 0);
-            m->dsTag = dsTag;
-            m->blockTag = size() - 1;
-            cm.send(m, destRank);
-        }
+//        size_t blockTag = index * sizeof(T) / blockSize;
+//        MessagePtr msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+//        if (msg == nullptr) {
+//            // if block on remote cw, we have to fetch it
+//            const unsigned long long worldSize = System::get().worldSize();
+//            const int storedRank = (blockTag % (worldSize - 1)) + 1;
+//            MessagePtr m = Message::create(0, Message::GET_BLOCK, 0);
+//            m->dsTag = dsTag;
+//            m->blockTag = size() - 1;
+//            cm.send(m, destRank);
+//            msg = cm.recv(storedRank);
+//
+//        }
+        // I think I actually don't need to clear the last block
+        // if it's outside of size it's never going to be used
+        // double check with Dr. Rao
+
         // size() can now be decremented
         siz--;
         //TODO: maybe some check to see if it is successfully deleted?
     }
 
-    T at(unsigned int index) {
+    /**
+     * Returns value at \p index. Note that this only returns a value, not a reference
+     * (for now)
+     * @param index
+     * @return The value at \p index
+     */
+    T at(unsigned long long index) const {
         CacheManager& cm  = System::get().cacheManager();
         MessagePtr msg;
         size_t blockTag = index*sizeof(T)  / blockSize;
@@ -134,7 +152,7 @@ public:
         msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
         if (msg == nullptr) {
             // otherwise, we have to get it from a remote cacheworker
-            const unsigned int worldSize = System::get().worldSize();
+            const unsigned long long worldSize = System::get().worldSize();
             const int storedRank = (blockTag % (worldSize - 1)) + 1;
             msg = Message::create(0, Message::GET_BLOCK, 0);
             msg->dsTag = dsTag;
@@ -147,7 +165,7 @@ public:
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
-        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char serializedObj[sizeof(T)];
         // copy the block we need into a character array then reinterpret and deref it
         std::copy(&payload[inBlockIdx], &payload[inBlockIdx + sizeof(T)], &serializedObj[0]);
@@ -155,7 +173,12 @@ public:
         return *ret;
     }
 
-    void insert(unsigned int index, T value) {
+    /**
+     * Insert \p value at vector index \p index.
+     * @param index index where insert should occur
+     * @param value value to be inserted
+     */
+    void insert(unsigned long long index, T value) {
         CacheManager& cm = System::get().cacheManager();
         // always insert into the cache manager's local cache - only move to cache worker on eviction
         size_t blockTag = index * sizeof(T) / blockSize;
@@ -167,38 +190,63 @@ public:
             m->blockTag = blockTag;
         }
         char* block = m->getPayload();
+        // if we're not inserting at end of list
+        if (index < size()) {
+            // last value moves up one index
+            insert(size(), at(size()-1));
+            // all other values shifted right one index
+            for (auto i = index; i < size(); i++) {
+                replace(i, at(i-1));
+            }
+            // now we can insert
+        }
         // offset into the block array of serializations and insert val
-        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
         cm.storeCacheBlock(m);
 
-        // TODO: if the insert isnt at end, we have to move all right elements to right
         siz++;
     }
 
-    void replace(unsigned int index, T value) {
+    /**
+     * Replace value at \p index with \p value
+     * @param index
+     * @param value
+     */
+    void replace(unsigned long long index, T value) {
         // obtain world size() and compute destination rank for replacement
         CacheManager& cm = System::get().cacheManager();
         auto& mgrCache = cm.managerCache();
         size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m;
-        if (mgrCache.find(CacheWorker::getKey(dsTag, blockTag)) != mgrCache.end()) {
-            // if the block with this element is in CM cache, change it in there
-            m = mgrCache[CacheWorker::getKey(dsTag, blockTag)];
-        } else {
-            // otherwise fetch from remote CW
+        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+        if (m == nullptr) {
+            // if the block with this element is not in CM cache, get from remote CW
             const int rank = (index % (System::get().worldSize() - 1)) + 1;
+            m = Message::create(0, Message::GET_BLOCK, 0);
+            m->dsTag = dsTag;
+            m->blockTag = blockTag;
             cm.send(m, rank);
             m = cm.recv(rank);
         }
         char* block = m->getPayload();
         // fill the buffer with new datum at correct in-blok offset
-        unsigned int inBlockIdx = ((index * sizeof(T)) % blockSize);
+        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         cm.storeCacheBlock(m);
+    }
+
+    /**
+     * Swap value at index \p i with value at index \j
+     * @param i first index of swap
+     * @param j second index of swap
+     */
+    void swap(size_t i, size_t j) {
+        auto oldI = at(i);
+        replace(i, at(j));
+        replace(j, oldI);
     }
 };
 
