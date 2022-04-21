@@ -195,7 +195,7 @@ public:
             // last value moves up one index
             insert(size(), at(size()-1));
             // all other values shifted right one index
-            for (auto i = index; i < size(); i++) {
+            for (auto i = index + 1; i < size(); i++) {
                 replace(i, at(i-1));
             }
             // now we can insert

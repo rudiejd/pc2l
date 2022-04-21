@@ -14,6 +14,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
+# add project's local CMake module files to CMAKE_MODULE_PATH
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 include(FetchContent)
 FetchContent_Declare(
 		googletest

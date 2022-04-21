@@ -57,6 +57,27 @@ TEST_F(VectorTest, test_insert_int) {
     for (int i = 0; i < 100; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
     }
+
+    // Insert at the beginning - everything should be moved over by 1
+    intVec.insert(0, 0);
+    ASSERT_EQ(intVec.at(0), 0);
+    for (size_t i =  1; i < intVec.size(); i++) {
+       ASSERT_EQ(i-1, intVec.at(i));
+    }
+
+    // Insert at index 50 - everything after 50 should be moved, before 50 should stay same
+    intVec.insert(50, 0);
+    ASSERT_EQ(intVec.at(0), 0);
+    for (size_t i =  1; i < 50; i++) {
+        ASSERT_EQ(i-1, intVec.at(i));
+    }
+    ASSERT_EQ(intVec.at(50), 50);
+    for (size_t i =  51; i < intVec.size(); i++) {
+        ASSERT_EQ(i-2, intVec.at(i));
+    }
+
+
+
     // intVec.clear();
 }
 

@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
     pc2l.initialize(argc, argv);
     pc2l.start();
 
-    Matrix m1(50000, 50000, 1);
-    Matrix m2(50000, 50000, 2);
+    Matrix m1(5, 5, 1);
+    Matrix m2(5, 5, 2);
     std::cout << m1 * m2;
 
     // Wind-up
