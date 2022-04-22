@@ -61,6 +61,9 @@ TEST_F(VectorTest, test_insert_int) {
     // Insert at the beginning - everything should be moved over by 1
     intVec.insert(0, 0);
     ASSERT_EQ(intVec.at(0), 0);
+    for (size_t i = 0; i < intVec.size(); i++) {
+        std::cout << intVec.at(i) << std::endl;
+    }
     for (size_t i =  1; i < intVec.size(); i++) {
        ASSERT_EQ(i-1, intVec.at(i));
     }

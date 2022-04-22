@@ -48,7 +48,8 @@ int main(int argc, char *argv[]) {
 
     Matrix m1(5, 5, 1);
     Matrix m2(5, 5, 2);
-    std::cout << m1 * m2;
+    if (MPI_GET_RANK() == 0)
+        std::cout << m1 * m2;
 
     // Wind-up
     pc2l.stop();

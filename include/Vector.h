@@ -115,25 +115,6 @@ public:
     void erase(unsigned long long index) {
         // move all of the blocks to the right of the index left by one
         for (unsigned long long i = index; i < size() - 1; i++) { swap(i, i + 1); }
-        // clear the last index which is now junk
-//        size_t blockTag = index * sizeof(T) / blockSize;
-//        MessagePtr msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-//        if (msg == nullptr) {
-//            // if block on remote cw, we have to fetch it
-//            const unsigned long long worldSize = System::get().worldSize();
-//            const int storedRank = (blockTag % (worldSize - 1)) + 1;
-//            MessagePtr m = Message::create(0, Message::GET_BLOCK, 0);
-//            m->dsTag = dsTag;
-//            m->blockTag = size() - 1;
-//            cm.send(m, destRank);
-//            msg = cm.recv(storedRank);
-//
-//        }
-        // I think I actually don't need to clear the last block
-        // if it's outside of size it's never going to be used
-        // double check with Dr. Rao
-
-        // size() can now be decremented
         siz--;
         //TODO: maybe some check to see if it is successfully deleted?
     }
@@ -192,13 +173,20 @@ public:
         char* block = m->getPayload();
         // if we're not inserting at end of list
         if (index < size()) {
-            // last value moves up one index
-            insert(size(), at(size()-1));
+            // save last value
+            T last = at(size()-1);
             // all other values shifted right one index
+            T oldVal = at(index);
             for (auto i = index + 1; i < size(); i++) {
-                replace(i, at(i-1));
+                T newOldVal = at(i);
+                replace(i, oldVal);
+                oldVal = newOldVal;
+                for(size_t j = 0; j < size(); j++) {
+                    T p = at(j);
+                }
             }
-            // now we can insert
+            // insert last value at new index
+            insert(size(), at(size()-1));
         }
         // offset into the block array of serializations and insert val
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
