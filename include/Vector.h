@@ -161,41 +161,49 @@ public:
      */
     void insert(unsigned long long index, T value) {
         CacheManager& cm = System::get().cacheManager();
-        // always insert into the cache manager's local cache - only move to cache worker on eviction
+        if (index < size()) {
+            // all other values shifted right one index (size incremented here)
+            // we have to do this BEFORE the (potentially evicted) message with
+            // this value in it is retrieved
+            insert(size(), at(size()-1));
+            for (auto i = size()-2; i > index; i--) {
+                replace(i, at(i-1));
+//                for(size_t j = 0; j < size(); j++) {
+//                    if (MPI_GET_RANK() == 0)
+//                        std::cout << at(j) << std::endl;
+//                }
+            }
+        }
         size_t blockTag = index * sizeof(T) / blockSize;
         MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
+        // if it's an insert at the end of the vector
         if (m == nullptr) {
-            // otherwise construct message and fill the buffer with data to insert
-            m = Message::create(blockSize, Message::STORE_BLOCK, 0);
-            m->dsTag = dsTag;
-            m->blockTag = blockTag;
+            if (index == size()) {
+                // if insert at end, make new block
+                m = Message::create(blockSize, Message::STORE_BLOCK, 0);
+                m->dsTag = dsTag;
+                m->blockTag = blockTag;
+            } else {
+               // otherwise insert into existing block
+               // have to retrieve from remote CW
+                const unsigned long long worldSize = System::get().worldSize();
+                const int storedRank = (blockTag % (worldSize - 1)) + 1;
+                m = Message::create(0, Message::GET_BLOCK, 0);
+                m->dsTag = dsTag;
+                m->blockTag = blockTag;
+                cm.send(m, storedRank);
+                m = cm.recv(storedRank);
+            }
         }
         char* block = m->getPayload();
-        // if we're not inserting at end of list
-        if (index < size()) {
-            // save last value
-            T last = at(size()-1);
-            // all other values shifted right one index
-            T oldVal = at(index);
-            for (auto i = index + 1; i < size(); i++) {
-                T newOldVal = at(i);
-                replace(i, oldVal);
-                oldVal = newOldVal;
-                for(size_t j = 0; j < size(); j++) {
-                    T p = at(j);
-                }
-            }
-            // insert last value at new index
-            insert(size(), at(size()-1));
-        }
         // offset into the block array of serializations and insert val
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
         cm.storeCacheBlock(m);
-
-        siz++;
+        // if it's an insert at the end, we haven't yet incremented size. otherwise we have
+        if (index == size()) siz++;
     }
 
     /**

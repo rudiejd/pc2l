@@ -5,8 +5,8 @@ project(
 	DESCRIPTION "PC2L: A Parallel and Cloud Computing Library"
 	LANGUAGES CXX
 	)
-# Declare minimum C++ standard of 11
-set(CMAKE_CXX_STANDARD 11)
+# Declare minimum C++ standard of 14
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
