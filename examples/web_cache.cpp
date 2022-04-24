@@ -1,16 +1,15 @@
 // Copyright 2020 JD Rudie <rudiejd@miamioh.edu>
-#include <boost/asio.hpp>
+#include "HTTPFile.h"
+#include "ChildProcess.h"
 #include <vector>
 #include <string>
 #include <iostream>
-#include "HTTPFile.h"
-#include "ChildProcess.h"
+#include <boost/asio.hpp>
 
 
 // Convenience namespace to streamline the code below.
 using namespace boost::asio;
 using namespace boost::asio::ip;
-using namespace std;
 // Forward declaration for url_decode method defined below.  We need
 // this declaration this just to organize the starter code into
 // sections that students should not modify (to minimize problems for
@@ -40,7 +39,7 @@ std::string url_decode(std::string url);
  * to the client (or web-browser).
  */
 void serveClient(std::istream& is, std::ostream& os) {
-    string url, path;
+    std::string url, path;
     // Get url from get parameter
     is >> url >> url;
     // Decode URL. If no encoded text, leaves url unchanged
@@ -49,17 +48,17 @@ void serveClient(std::istream& is, std::ostream& os) {
                           && hdr != "\r"; ) {
     }
     // check if we are executing a command from user
-    if (path.find("cgi-bin") != string::npos) {
+    if (path.find("cgi-bin") != std::string::npos) {
         // get actual command from path, then split command
         ChildProcess cp;
         int cmdStart = path.find("=");
-        vector<string> args = cp.split(
+        std::vector<std::string> args = cp.split(
                 path.substr(cmdStart+1, path.length()-cmdStart+1));
         // Fork and execute command in a new process
         cp.forkNexecIO(args);
         // Make a temporary file and the command output to it
-        ofstream fs("out.txt");
-        for (string line; getline(cp.getChildOutput(), line);) {
+        std::ofstream fs("out.txt");
+        for (std::string line; getline(cp.getChildOutput(), line);) {
             fs << line << "\n";
         }
         fs.close();
@@ -109,18 +108,18 @@ void runServer(int port) {
     }
 }
 
-/** Convenience method to decode HTML/URL encoded strings.
+/** Convenience method to decode HTML/URL encoded std::strings.
 
-    This method must be used to decode query string parameters
+    This method must be used to decode query std::string parameters
     supplied along with GET request.  This method converts URL encoded
     entities in the from %nn (where 'n' is a hexadecimal digit) to
     corresponding ASCII characters.
 
-    \param[in] str The string to be decoded.  If the string does not
-    have any URL encoded characters then this original string is
+    \param[in] str The std::string to be decoded.  If the std::string does not
+    have any URL encoded characters then this original std::string is
     returned.  So it is always safe to call this method!
 
-    \return The decoded string.
+    \return The decoded std::string.
 */
 std::string url_decode(std::string str) {
     // Decode entities in the from "%xx"

@@ -37,7 +37,7 @@
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
 
-#include <time.h>
+#include <ctime>
 #include <cstring>
 
 /** \file Utilities.h

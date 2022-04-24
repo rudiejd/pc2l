@@ -38,7 +38,6 @@
 //---------------------------------------------------------------------
 
 #include "MPIHelper.h"
-#include <cstring>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);

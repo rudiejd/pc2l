@@ -45,11 +45,12 @@ int main(int argc, char *argv[]) {
     auto& pc2l = pc2l::System::get();
     pc2l.initialize(argc, argv);
     pc2l.start();
-
-    Matrix m1(5, 5, 1);
-    Matrix m2(5, 5, 2);
-    if (MPI_GET_RANK() == 0)
-        std::cout << m1 * m2;
+    unsigned int size = atoi(argv[1]);
+    Matrix m1(size, size, 1);
+    Matrix m2(size, size, 1);
+    Matrix res = m1.dot(m2);
+    if (pc2l::MPI_GET_RANK() == 0)
+        std::cout << res << std::endl;
 
     // Wind-up
     pc2l.stop();

@@ -9,8 +9,6 @@
 #include <iostream>
 #include <functional>
 #include "pc2l.h"
-#include <cassert>
-#include <gtest/gtest.h>
 
 /** Shortcut for the value of each element in the matrix */
 using Val = double;
