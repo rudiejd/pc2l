@@ -40,10 +40,11 @@
 #include <iostream>
 #include "STDMatrix.h"
 
-int main() {
-    STDMatrix m1(50000, 50000, 1);
-    STDMatrix m2(50000, 50000, 2);
-    std::cout << m1 * m2;
+int main(int argc, char* argv[]) {
+    unsigned int size = atoi(argv[1]);
+    STDMatrix m1(size, size, 1);
+    STDMatrix m2(size, size, 1);
+    std::cout << m1 * m2 << std::endl;
 }
 
 #endif
