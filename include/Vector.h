@@ -165,9 +165,9 @@ public:
             // all other values shifted right one index (size incremented here)
             // we have to do this BEFORE the (potentially evicted) message with
             // this value in it is retrieved
-            insert(size(), at(size()-1));
-            for (auto i = size()-2; i > index; i--) {
-                replace(i, at(i-1));
+            insert(size(), at(size() - 1));
+            for (auto i = size() - 2; i > index; i--) {
+                replace(i, at(i - 1));
 //                for(size_t j = 0; j < size(); j++) {
 //                    if (MPI_GET_RANK() == 0)
 //                        std::cout << at(j) << std::endl;
