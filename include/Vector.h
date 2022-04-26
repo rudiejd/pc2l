@@ -207,6 +207,14 @@ public:
     }
 
     /**
+     * Alias for inserting at "back" (largest index) of vector
+     * @param value value to be inserted
+     */
+    void push_back(T value) {
+       insert(size(), value);
+    }
+
+    /**
      * Replace value at \p index with \p value
      * @param index
      * @param value

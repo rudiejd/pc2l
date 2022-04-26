@@ -1,176 +1,145 @@
-// Copyright 2020 JD Rudie <rudiejd@miamioh.edu>
-#include "HTTPFile.h"
-#include "ChildProcess.h"
-#include <vector>
-#include <string>
-#include <iostream>
+#include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
+#include <boost/beast.hpp>
+#include <iostream>
+#include <unordered_map>
+#include "pc2l.h"
 
+boost::asio::io_service& io_service()
+{
+    static boost::asio::io_service svc;
+    return svc;
+}
 
-// Convenience namespace to streamline the code below.
-using namespace boost::asio;
-using namespace boost::asio::ip;
-// Forward declaration for url_decode method defined below.  We need
-// this declaration this just to organize the starter code into
-// sections that students should not modify (to minimize problems for
-// students).
-std::string url_decode(std::string url);
+char local_data[1024] = {0};
+char remote_data[1024] = {0};
 
+void handle_read(boost::asio::ip::tcp::socket &read_from, boost::asio::ip::tcp::socket &write_to, char *read_buffer,
+                 size_t bytes, const boost::system::error_code &e, pc2l::Vector<char *> &cachedPages,
+                 std::unordered_map<std::string, size_t> &urlIndexMap,
+                 std::unordered_map<std::string, bool> completeMap, bool isLocal)
+{
+    // this function is called whenever data is received
 
+    // for debugging purposes, show the data in the console window
+    // or write to file, or whatever...
+    std::string data(read_buffer, read_buffer + bytes);
 
-
-/**
- * Process HTTP request (from first line & headers) and provide
- * suitable HTTP response back to the client.  This method handles
- * program execution requests in which the URL starts with
- * "/cgi-bin/exec?cmd=".  All other URLs are assumed to be file
- * requests.
- *
- * \note For running commands this method uses ChildProcess class from
- * prior exercises/projects.
- *
- * \note For file requests this method uses the HTTPFile convenience
- * class supplied as starter code.
- *
- * @param is The input stream to read HTTP reqeust data from client
- * (or web-browser).
- *
- * @param os The output stream to send chunked HTTP response data back
- * to the client (or web-browser).
- */
-void serveClient(std::istream& is, std::ostream& os) {
-    std::string url, path;
-    // Get url from get parameter
-    is >> url >> url;
-    // Decode URL. If no encoded text, leaves url unchanged
-    path = url_decode(url);
-    for (std::string hdr; std::getline(is, hdr) && !hdr.empty()
-                          && hdr != "\r"; ) {
-    }
-    // check if we are executing a command from user
-    if (path.find("cgi-bin") != std::string::npos) {
-        // get actual command from path, then split command
-        ChildProcess cp;
-        int cmdStart = path.find("=");
-        std::vector<std::string> args = cp.split(
-                path.substr(cmdStart+1, path.length()-cmdStart+1));
-        // Fork and execute command in a new process
-        cp.forkNexecIO(args);
-        // Make a temporary file and the command output to it
-        std::ofstream fs("out.txt");
-        for (std::string line; getline(cp.getChildOutput(), line);) {
-            fs << line << "\n";
+    // Parse HTTP request so we can store URL
+    boost::beast::error_code ec;
+    boost::beast::http::request_parser<boost::beast::http::string_body> parser;
+    parser.put(boost::asio::buffer(data), ec);
+    boost::beast::http::request<boost::beast::http::string_body> rq = parser.get();
+    std::string identifier = rq[boost::beast::http::field::host].to_string() + rq[boost::beast::http::field::uri].to_string();
+    // Check unordered map to see if this page is cached
+    if (!isLocal && urlIndexMap.find(identifier) != urlIndexMap.end()) {
+        char* cached = cachedPages.at(urlIndexMap[identifier]);
+        if (completeMap[identifier]) {
+            std::cout << "Sending data: " << cached << std::endl;
+            auto pageSize = strlen(cached);
+            // Send cached page
+            write_to.send(boost::asio::buffer(cached, pageSize));
+            return;
+        } else {
+            char* retrieved = new char[data.size() + 1];
+            strcpy(retrieved, data.c_str());
+           strcat(cached, retrieved);
+           cachedPages.replace(urlIndexMap[identifier], cached);
         }
-        fs.close();
-        os << http::file("out.txt");
-        // Delete the file the command output is displayed for user
-        cp.forkNexec({"rm", "out.txt"});
-    } else {
-        // if the path is not for a command, just send the file
-        os << http::file(path);
     }
-}
 
+    // forward the received data on to "the other side"
+        write_to.send(
+                boost::asio::buffer(read_buffer, bytes));
 
-
-
-//------------------------------------------------------------------
-//  DO  NOT  MODIFY  CODE  BELOW  THIS  LINE
-//------------------------------------------------------------------
-
-/**
- * Runs the program as a server.  It accepts connections and listens
- * to incoming connections.
- *
- * @param port The port number on which the server should listen.
- */
-void runServer(int port) {
-    // Setup a server socket to accept connections on the socket
-    io_service service;
-    // Create end point.  If the port number is zero, then myEndpoint
-    // uses a port automatically assigned to it by the operating
-    // system.
-    tcp::endpoint myEndpoint(tcp::v4(), port);
-    // Create a socket that accepts connections
-    tcp::acceptor server(service, myEndpoint);
-    std::cout << "Server is listening on "
-              << server.local_endpoint().port()
-              << " & ready to process clients...\n";
-    // Process client connections one-by-one...forever
-    while (true) {
-        // Wait for a client to connect.
-        tcp::iostream client;
-        // The following method calls waits (could wait forever) until
-        // a client connects.
-        server.accept(*client.rdbuf());
-        // Have helper method process the client connection.
-        serveClient(client, client);
-    }
-}
-
-/** Convenience method to decode HTML/URL encoded std::strings.
-
-    This method must be used to decode query std::string parameters
-    supplied along with GET request.  This method converts URL encoded
-    entities in the from %nn (where 'n' is a hexadecimal digit) to
-    corresponding ASCII characters.
-
-    \param[in] str The std::string to be decoded.  If the std::string does not
-    have any URL encoded characters then this original std::string is
-    returned.  So it is always safe to call this method!
-
-    \return The decoded std::string.
-*/
-std::string url_decode(std::string str) {
-    // Decode entities in the from "%xx"
-    size_t pos = 0;
-    while ((pos = str.find_first_of("%+", pos)) != std::string::npos) {
-        switch (str.at(pos)) {
-            case '+': str.replace(pos, 1, " ");
-                break;
-            case '%': {
-                std::string hex = str.substr(pos + 1, 2);
-                char ascii = std::stoi(hex, nullptr, 16);
-                str.replace(pos, 3, 1, ascii);
-            }
+        if (!isLocal && read_from.available() == 0) {
+            completeMap[identifier] = true;
+        } else {
+            completeMap[identifier] = false;
         }
-        pos++;
-    }
-    return str;
-}
-
-/**
- * The main function that serves as a test harness based on
- * command-line arguments.
- *
- * \param[in] argc The number of command-line arguments.  This test
- * harness can work with zero or one command-line argument.
- *
- * \param[in] argv The actual command-line arguments.  If this is an
- * number it is assumed to be a port number.  Otherwise it is assumed
- * to be an file name that contains inputs for testing.
- */
-int main(int argc, char *argv[]) {
-    // Check and use first command-line argument if any as port or file
-    std::string arg = (argc > 1 ? argv[1] : "0");
-
-    // Check and use a given input data file for testing.
-    if (arg.find_first_not_of("1234567890") == std::string::npos) {
-        // All characters are digits. So we assume this is a port
-        // number and run as a standard web-server
-        runServer(std::stoi(arg));
-    } else {
-        // In this situation, this program processes inputs from a
-        // given data file for testing.  That is, instead of a
-        // web-browser we just read inputs from a data file.
-        std::ifstream getReq(arg);
-        if (!getReq.good()) {
-            std::cerr << "Unable to open " << arg << ". Aborting.\n";
-            return 2;
+        if (!isLocal && urlIndexMap.find(identifier) == urlIndexMap.end()) {
+            char* retrieved = new char[data.size() + 1];
+            strcpy(retrieved, data.c_str());
+            cachedPages.push_back(retrieved);
+            urlIndexMap[identifier] = cachedPages.size() - 1;
         }
-        // Have the serveClient method process the inputs from a given
-        // file for testing.
-        serveClient(getReq, std::cout);
+        // read more data from "this side"
+        read_from.async_read_some(
+                boost::asio::buffer(read_buffer, 1024),
+                boost::bind(handle_read, boost::ref(read_from), boost::ref(write_to),
+                            read_buffer, boost::asio::placeholders::bytes_transferred, boost::asio::placeholders::error,
+                            cachedPages, urlIndexMap, completeMap, isLocal));
+        // cache retrieved page
     }
+
+
+int main(int argc, char** argv)
+{
+    if(argc == 3)
+    {
+
+        auto& pc2l = pc2l::System::get();
+        pc2l.initialize(argc, argv);
+        pc2l.start();
+
+
+
+        pc2l::Vector<char*> cachedPages;
+        std::unordered_map<std::string, size_t> urlIndexMap;
+        std::unordered_map<std::string, bool> completeMap;
+        while (true) {
+            std::string remoteAddr, remotePort;
+            std::cout << "Enter remote address: " << std::endl;
+            std::getline(std::cin, remoteAddr);
+            std::cout << "Enter remote port: " << std::endl;
+            std::getline(std::cin, remotePort);
+            boost::asio::io_service::work w(io_service());
+            boost::thread t(boost::bind(&boost::asio::io_service::run, (&io_service())));
+
+            // extract the connection information from the command line
+            boost::asio::ip::address local_address = boost::asio::ip::address::from_string(argv[1]);
+            uint16_t local_port = boost::lexical_cast<uint16_t>(argv[2]);
+            boost::asio::ip::address remote_address = boost::asio::ip::address::from_string(remoteAddr);
+            uint16_t remote_port = boost::lexical_cast<uint16_t>(remotePort);
+
+            boost::asio::ip::tcp::endpoint local_ep(local_address, local_port);
+            boost::asio::ip::tcp::endpoint remote_ep(remote_address, remote_port);
+
+            // start listening on the "local" socket -- note this does not
+            // have to be local, you could in theory forward through a remote device
+            // it's called "local" in the logical sense
+            boost::asio::ip::tcp::acceptor listen(io_service(), local_ep);
+            boost::asio::ip::tcp::socket local_socket(io_service());
+            listen.accept(local_socket);
+
+            // open the remote connection
+            boost::asio::ip::tcp::socket remote_socket(io_service());
+            remote_socket.open(remote_ep.protocol());
+            remote_socket.connect(remote_ep);
+
+            // start listening for data on the "local" connection
+            local_socket.async_receive(
+                    boost::asio::buffer(local_data, 1024),
+                    boost::bind(handle_read, boost::ref(local_socket), boost::ref(remote_socket), local_data,
+                                boost::asio::placeholders::bytes_transferred, boost::asio::placeholders::error,
+                                cachedPages, urlIndexMap, completeMap, true));
+
+            // also listen for data on the "remote" connection
+            remote_socket.async_receive(
+                    boost::asio::buffer(remote_data, 1024),
+                    boost::bind(handle_read, boost::ref(remote_socket), boost::ref(local_socket), remote_data,
+                                boost::asio::placeholders::bytes_transferred, boost::asio::placeholders::error,
+                                cachedPages, urlIndexMap, completeMap, false));
+
+            t.join();
+        }
+    }
+    else
+    {
+        std::cout << "proxy <local ip> <port> <remote ip> <port>\n";
+    }
+
+    return 0;
 }
-// All done.
