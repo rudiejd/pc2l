@@ -46,6 +46,7 @@ BEGIN_NAMESPACE(pc2l);
 CacheWorker::CacheWorker() {
     // Do not perform MPI-related operation in the constructor.
     // Instead do them in the initialize method.
+    cacheSize = System::get().cacheManager().cacheSize;
     blockNotFoundMsg = Message::create(0, Message::BLOCK_NOT_FOUND);
 }
 

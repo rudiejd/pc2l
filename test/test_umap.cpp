@@ -1,6 +1,3 @@
-#ifndef PC2L_H
-#define PC2L_H
-
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -34,38 +31,40 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie                             rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
-/** \file pc2l.h
+#include <iostream>
+#include "Environment.h"
 
-    \brief A convenience top-level header that includes all of the
-    other key headers constituting pc2l.
 
-    This header file has been introduced to simplify the use of pc2l
-    down to a single-header solution.  This may also ease the use of
-    PC2L via pre-compiled headers as well.
-*/
+class UnorderedMapTest : public ::testing::Test {
 
-/** 
-*   @mainpage PC2L: A Parallel and Cloud Computing Library
-*     
-*   @section intro Introduction
-*   This library was designed by JD Rudie and Dr. Dhananjai Rao as 
-*   part of a thesis project. The library will eventually provide
-*   efficient implementations of distributed data structures that
-*   are listed below. PC2L is currently in alpha stages, and work
-*   will first focus on developing the vector class.
-*   
-*   @section comps Components
-*   @li Vector/String (in progress)
-*   @li Multimap (TODO)
-*   @li Graph/Tree (TODO)
-*   @li Associated algorithms (TODO)
-*/
-#include "ArgParser.h"
-#include "System.h"
-#include "Vector.h"
-#include "UnorderedMap.h"
+};
 
-#endif
+int main(int argc, char *argv[]) {
+    for (int i = 0; i < argc; i++) std::cout << argv[i] << std::endl;
+    ::testing::InitGoogleTest(&argc, argv);
+    auto env = new PC2LEnvironment();
+    env->argc = argc;
+    env->argv = argv;
+    ::testing::AddGlobalTestEnvironment(env);
+    return RUN_ALL_TESTS();
+}
+TEST_F(UnorderedMapTest, test_insert) {
+    pc2l::UnorderedMap<char*, int> map;
+    ASSERT_NO_THROW(map.insert("apple", 1));
+    ASSERT_NO_THROW(map.insert("banana", 2));
+    ASSERT_NO_THROW(map.insert("carrot", 3));
+}
+
+TEST_F(UnorderedMapTest, test_at) {
+    pc2l::UnorderedMap<const char*, int> map;
+    for (int i = 0; i < 100; i++) {
+        map.insert(static_cast<char>('0' + i) + "i", i);
+    }
+    // check to see if data is correct (tests deserializtion)
+    for (int i = 0; i < 100; i++) {
+        ASSERT_EQ(i, map.at(static_cast<char>('0' + i) + "i"));
+    }
+}

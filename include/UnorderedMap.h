@@ -37,8 +37,8 @@
 // Authors:   JD Rudie               rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 /**
- * @file unordered_map.h
- * @brief Definition of unordered_map
+ * @file UnorderedMap.h
+ * @brief Definition of UnorderedMap
  * @author JD Rudie
  * @version 0.1
  * @date 2021-08-30
@@ -64,7 +64,7 @@ BEGIN_NAMESPACE(pc2l);
  */
  // T is key type, U is value type
 template <typename T, typename U>
-class unordered_map {
+class UnorderedMap {
 public:
     // underlying vector representation of the hashmap
     Vector<U> vec;
@@ -76,15 +76,14 @@ public:
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
      */
-    unordered_map() {
+    UnorderedMap() {
         dsTag = System::get().dsCount++;
-        siz = 0;
     }
 
     /**
      * The destructor.
      */
-    virtual ~unordered_map() {}
+    virtual ~UnorderedMap() {}
 
     int dsTag;
 
@@ -101,13 +100,17 @@ public:
             MessagePtr probePtr = Message::create(1, Message::PROBE_BLOCK, index);
             probePtr->dsTag = vec.dsTag;
             probePtr->blockTag = index;
-            cm.send(m, destRank);
+            cm.send(probePtr, destRank);
             MessagePtr probeRes = cm.recv();
             full = reinterpret_cast<bool*>(probeRes->getPayload());
             if (full) index++;
         }
         vec.insert(index, value);
     }
+
+    U at(T key) {
+
+    };
 };
 
 END_NAMESPACE(pc2l);
