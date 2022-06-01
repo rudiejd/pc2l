@@ -72,12 +72,6 @@ public:
     Vector() : blockSize(System::get().getBlockSize()), siz(0), dsTag(System::get().dsCount++){ }
 
     /**
-     *  Construct a vector by specifying the block size. Currently the
-     *  workhorse constructor
-     * @param bSize size in bytes of a block
-     */
-    explicit Vector(unsigned long long bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
-    /**
      * The destructor.
      */
     virtual ~Vector() = default;
@@ -95,7 +89,7 @@ public:
      * Returns size (in values, not blocks) of vector
      * @return size (in values) of vector
      */
-    unsigned long long size() {
+    unsigned long long size() const {
         return siz;
     }
 
@@ -106,6 +100,17 @@ public:
         for (unsigned long long i = 0; i < siz; i++) {
             erase(i);
         }
+    }
+
+    /**
+     * Swap value at index \p i with value at index \j
+     * @param i first index of swap
+     * @param j second index of swap
+     */
+    void swap(size_t i, size_t j) {
+        auto oldI = at(i);
+        replace(i, at(j));
+        replace(j, oldI);
     }
 
     /**
@@ -160,7 +165,7 @@ public:
      * @param value value to be inserted
      */
     void insert(unsigned long long index, T value) {
-        CacheManager& cm = System::get().cacheManager();
+        CacheManager &cm = System::get().cacheManager();
         if (index < size()) {
             // all other values shifted right one index (size incremented here)
             // we have to do this BEFORE the (potentially evicted) message with
@@ -184,8 +189,8 @@ public:
                 m->dsTag = dsTag;
                 m->blockTag = blockTag;
             } else {
-               // otherwise insert into existing block
-               // have to retrieve from remote CW
+                // otherwise insert into existing block
+                // have to retrieve from remote CW
                 const unsigned long long worldSize = System::get().worldSize();
                 const int storedRank = (blockTag % (worldSize - 1)) + 1;
                 m = Message::create(0, Message::GET_BLOCK, 0);
@@ -195,10 +200,10 @@ public:
                 m = cm.recv(storedRank);
             }
         }
-        char* block = m->getPayload();
+        char *block = m->getPayload();
         // offset into the block array of serializations and insert val
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
-        char* serialized = reinterpret_cast<char*>(&value);
+        char *serialized = reinterpret_cast<char *>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
         cm.storeCacheBlock(m);
@@ -242,15 +247,59 @@ public:
         cm.storeCacheBlock(m);
     }
 
+
+
     /**
-     * Swap value at index \p i with value at index \j
-     * @param i first index of swap
-     * @param j second index of swap
+     * Sort vector in ascending order using mergesort
      */
-    void swap(size_t i, size_t j) {
-        auto oldI = at(i);
-        replace(i, at(j));
-        replace(j, oldI);
+    void sort() {
+        mergesort(0, size() - 1);
+    }
+private:
+    void merge(int low, int mid, int high) {
+        auto secondLow = mid + 1;
+
+        // if merge already sorted
+        if (at(mid) <= at(secondLow)) {
+           return;
+        }
+
+        while (low <= mid && secondLow <= high) {
+            // first element is in right place
+            if (at(low) <= at(secondLow)) {
+                low++;
+            } else {
+                auto val = at(secondLow);
+                auto idx = secondLow;
+
+                // Shift all shit between low and 2nd low right by one
+               while (idx != low) {
+                   replace(idx, at(idx -1));
+                   idx--;
+               }
+               replace(low, val);
+
+               // update indices
+               low++;
+               mid++;
+               secondLow++;
+            }
+        }
+    }
+
+// Iteratively sort subarray `A[low…high]` using a temporary array
+    void mergesort(unsigned long long low, unsigned long long high) {
+        if (low < high) {
+
+            // avoid overflow for large low/high indices
+            auto mid = low + (high - low)  / 2;
+
+            mergesort(low, mid);
+            mergesort(mid + 1, high);
+
+            merge(low, mid, high);
+
+        }
     }
 };
 

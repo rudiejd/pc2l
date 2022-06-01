@@ -35,6 +35,7 @@
 //---------------------------------------------------------------------
 
 #include <iostream>
+#include <random>
 #include "Environment.h"
 
 
@@ -43,7 +44,6 @@ class VectorTest : public ::testing::Test {
 };
 
 int main(int argc, char *argv[]) {
-    for (int i = 0; i < argc; i++) std::cout << argv[i] << std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     auto env = new PC2LEnvironment();
     env->argc = argc;
@@ -136,6 +136,22 @@ TEST_F(VectorTest, test_delete) {
     for (size_t i = 42; i < intVec.size(); i++) {
         // every other value should be one bigger than it was
         ASSERT_EQ(intVec.at(i), i+1);
+    }
+}
+
+TEST_F(VectorTest, test_sort) {
+    pc2l::Vector<int> intVec;
+
+    // push 100 random numbers 0 - 99
+    for (unsigned int i = 0; i < 100; i++) {
+        intVec.push_back(rand() % 100);
+    }
+
+    intVec.sort();
+
+    // assert sorted order
+    for (unsigned int i = 1; i < 100; i++) {
+        ASSERT_TRUE(intVec.at(i) >= intVec.at(i - 1));
     }
 }
 

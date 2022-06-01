@@ -72,6 +72,8 @@ CacheWorker::run() {
 }
 
 void CacheWorker::refer(const MessagePtr& msg) {
+    // for now, only do eviction stuff on MANAGER
+    if (MPI_GET_RANK() != 0) return;
     const auto key = getKey(msg);
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
