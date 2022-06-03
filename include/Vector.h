@@ -132,22 +132,9 @@ public:
      */
     T at(unsigned long long index) const {
         CacheManager& cm  = System::get().cacheManager();
-        MessagePtr msg;
         size_t blockTag = index*sizeof(T)  / blockSize;
+        MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
         // if the CacheManager's cache contains this block, just get it
-        msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-        if (msg == nullptr) {
-            // otherwise, we have to get it from a remote cacheworker
-            const unsigned long long worldSize = System::get().worldSize();
-            const int storedRank = (blockTag % (worldSize - 1)) + 1;
-            msg = Message::create(0, Message::GET_BLOCK, 0);
-            msg->dsTag = dsTag;
-            msg->blockTag = blockTag;
-            cm.send(msg, storedRank);
-            msg = cm.recv(storedRank);
-            // then put the object at retrieved index into cache
-            cm.storeCacheBlock(msg);
-        }
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
@@ -180,25 +167,15 @@ public:
             }
         }
         size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-        // if it's an insert at the end of the vector
-        if (m == nullptr) {
-            if (index == size()) {
-                // if insert at end, make new block
-                m = Message::create(blockSize, Message::STORE_BLOCK, 0);
-                m->dsTag = dsTag;
-                m->blockTag = blockTag;
-            } else {
-                // otherwise insert into existing block
-                // have to retrieve from remote CW
-                const unsigned long long worldSize = System::get().worldSize();
-                const int storedRank = (blockTag % (worldSize - 1)) + 1;
-                m = Message::create(0, Message::GET_BLOCK, 0);
-                m->dsTag = dsTag;
-                m->blockTag = blockTag;
-                cm.send(m, storedRank);
-                m = cm.recv(storedRank);
-            }
+        MessagePtr m;
+        if (index == size()) {
+            // if insert at end, make new block
+            m = Message::create(blockSize, Message::STORE_BLOCK, 0);
+            m->dsTag = dsTag;
+            m->blockTag = blockTag;
+        } else {
+            // otherwise fetch from cache manager or remote CW
+            m = cm.getBlockFallbackRemote(dsTag, blockTag);
         }
         char *block = m->getPayload();
         // offset into the block array of serializations and insert val
@@ -229,16 +206,7 @@ public:
         CacheManager& cm = System::get().cacheManager();
         auto& mgrCache = cm.managerCache();
         size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-        if (m == nullptr) {
-            // if the block with this element is not in CM cache, get from remote CW
-            const int rank = (index % (System::get().worldSize() - 1)) + 1;
-            m = Message::create(0, Message::GET_BLOCK, 0);
-            m->dsTag = dsTag;
-            m->blockTag = blockTag;
-            cm.send(m, rank);
-            m = cm.recv(rank);
-        }
+        MessagePtr m = cm.getBlockFallbackRemote(dsTag, blockTag);
         char* block = m->getPayload();
         // fill the buffer with new datum at correct in-blok offset
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);

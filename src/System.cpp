@@ -73,7 +73,9 @@ System::initialize(int& argc, char *argv[], bool initMPI) {
 }
 
 void
-System::start(const OpMode mode) {
+System::start(const OpMode mode, bool doProfile) {
+    // Set profiling mode
+    profile = doProfile;
     // Next, based on our operation mode, perform different initialization.
     switch (mode) {
     case OneWriter_DistributedCache:

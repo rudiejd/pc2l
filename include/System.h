@@ -70,6 +70,9 @@ public:
     // Count of data structures in the system for tagging purposes 
     int dsCount = 0;
 
+    // Whether we should collect profiling data
+    bool profile;
+
     // default block size is 32MB
     unsigned int blockSize = 32000000;
     /**
@@ -141,8 +144,9 @@ public:
      *
      * \param[in] mode The gloabl operation mode to be used by pc2l
      * for this run.  The default value is OneWriter_DistributedCache;
+     * \param[in] enable
      */
-    void start(const OpMode mode = pc2l::System::OneWriter_DistributedCache);
+    void start(const OpMode mode = pc2l::System::OneWriter_DistributedCache, bool doProfile = false);
 
     /**
      * This method can be be used to shutdown the PC2L cache and

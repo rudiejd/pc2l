@@ -53,18 +53,35 @@ CacheManager::finalize() {
     }
 }
 
-MessagePtr CacheManager::getBlock(size_t key) {
+MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
     MessagePtr ret = nullptr;
+    size_t key = getKey(dsTag, blockTag);
     if (cache.find(key) != cache.end()) {
         ret = cache[key];
-        refer(cache[key]);
+    } else {
+        // otherwise, we have to get it from a remote cacheworker
+        // if we're in profiling mode, note this
+        if (System::get().profile) {
+            std::cout << "miss," << dsTag << ',' << blockTag << std::endl;
+        }
+        const unsigned long long worldSize = System::get().worldSize();
+        const int storedRank = (blockTag % (worldSize - 1)) + 1;
+        ret = Message::create(0, Message::GET_BLOCK, 0);
+        ret->dsTag = dsTag;
+        ret->blockTag = blockTag;
+        send(ret, storedRank);
+        ret = recv(storedRank);
+        // then put the object at retrieved index into cache
+        storeCacheBlock(ret);
     }
+    refer(cache[key]);
+
     return ret;
 }
 
 
 void CacheManager::run() {
-    // bgWorker = std::thread(CacheManager::runBackgroundWorker);
+        // bgWorker = std::thread(CacheManager::runBackgroundWorker);
 }
 
 END_NAMESPACE(pc2l);

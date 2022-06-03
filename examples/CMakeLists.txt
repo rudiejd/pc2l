@@ -36,3 +36,11 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 # link boost, curl, curlpp for web cache example
 target_link_libraries(web_cache ${BOOST_LIBRARIES})
 target_link_libraries(web_cache Boost::thread)
+
+#Web Cache example
+
+add_executable(terrasort terrasort.cpp)
+
+target_compile_features(terrasort PRIVATE cxx_std_11)
+
+target_link_libraries(terrasort pc2l_lib)

@@ -1,5 +1,5 @@
-#ifndef BIG_VEC_CPP
-#define BIG_VEC_CPP
+#ifndef TERRASORT_CPP
+#define TERRASORT_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,37 +34,33 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   JD Rudie          rudiejd@miamioh.edu
+// Authors:   JD Rudie                            rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
 #include <iostream>
 #include <pc2l.h>
+#include <climits>
+#include <ctime>
 
 int main(int argc, char *argv[]) {
     auto& pc2l = pc2l::System::get();
+    pc2l.setBlockSize(atoi(argv[2]));
+    pc2l.setCacheSize(atoi(argv[3]));
     pc2l.initialize(argc, argv);
-    pc2l.start();
-
-    // Do some testing here.
-    std::cout << "world size " << pc2l.worldSize() << std::endl;
-    pc2l::Vector<char*> v;
-    char* data = (char*) "String test";
-    for (int i = 0; i < 100; i++) {
-        v.insert(i, data);
+    pc2l.start(pc2l.OneWriter_DistributedCache, true);
+    std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
+    std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
+    pc2l::Vector<int> terraVec;
+    auto start = clock();
+    while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
+        // create one terrabyte of pseudo random ints
+        terraVec.push_back(rand() % INT_MAX);
     }
-    for (int i = 0; i < 100; i++) {
-        std::cout << "at " << i << " " << v.at(i) << std::endl;
-    }
-
-    // delete even indices
-    for (int i = 0; i < 10; i++) {
-        v.erase(0);
-    }
-
-    std::cout << "first ten removed" << std::endl;
-
-    for (int i = 0; i < v.size(); i++) {
-        std::cout << "at " << i << " " << v.at(i) << std::endl;
+    if (pc2l::MPI_GET_RANK() == 0) {
+        std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
+        auto sortStart = clock();
+        terraVec.sort();
+        std::cout << "Sorting of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
     }
 
     // Wind-up

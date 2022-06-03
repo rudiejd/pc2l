@@ -90,11 +90,12 @@ public:
     void finalize() override;
 
     /**
-     * Retrieve a block from the manager cache
-     * @param key the key of a given block calculated via block and DS tag
-     * @return message associated with @param key
+     * Retrieve a block from the manager cache. If it's not there, fallback to remote CacheWorker
+     * \param[in] dsTag the data structure tag associated with this message
+     * \param[in] blockTag the block tag associated with this message
+     * \return message associated with the key formed by combining these tags
      */
-    MessagePtr getBlock(size_t key);
+    MessagePtr getBlockFallbackRemote(size_t dsTag, size_t blockTag);
 
     /**
      * Gives a reference to the manager's cache for use in insertion
