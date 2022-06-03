@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
         auto sortStart = clock();
         terraVec.sort();
-        std::cout << "Sorting of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
+        std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
     }
 
     // Wind-up
