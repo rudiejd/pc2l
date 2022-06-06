@@ -104,9 +104,9 @@ TEST_F(VectorTest, test_lru_caching) {
     // cache should contain 3 blocks 85-90, 90-95, 95-100
     ASSERT_EQ(pc2l.cacheManager().managerCache().size(), 3);
     // cache should now be the last 3 blocks inserted
-    ASSERT_TRUE(pc2l.cacheManager().managerCache().find(pc2l::CacheWorker::getKey(intVec.dsTag, 17)) != nullptr);
-    ASSERT_TRUE(pc2l.cacheManager().managerCache().find(pc2l::CacheWorker::getKey(intVec.dsTag, 18)) != nullptr);
-    ASSERT_TRUE(pc2l.cacheManager().managerCache().find(pc2l::CacheWorker::getKey(intVec.dsTag, 19)) != nullptr);
+    ASSERT_NE(pc2l.cacheManager().managerCache().find(pc2l::CacheWorker::getKey(intVec.dsTag, 17)), pc2l.cacheManager().managerCache().end());
+    ASSERT_NE(pc2l.cacheManager().managerCache().find(pc2l::CacheWorker::getKey(intVec.dsTag, 18)), pc2l.cacheManager().managerCache().end());
+    ASSERT_NE(pc2l.cacheManager().managerCache().find(pc2l::CacheWorker::getKey(intVec.dsTag, 19)), pc2l.cacheManager().managerCache().end());
     // front of cache is the last block, rear of cache is the third-last (LRU)
     // now retrieve another block
     intVec.at(0);
