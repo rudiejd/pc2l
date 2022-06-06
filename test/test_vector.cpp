@@ -115,7 +115,7 @@ TEST_F(VectorTest, test_lru_caching) {
     // the 17th (third to last) block should be removed from cache (contains 85-90)
     ASSERT_EQ(pc2l.cacheManager().managerCache().find(pc2l.cacheManager().getKey(intVec.dsTag, 17)), pc2l.cacheManager().managerCache().end());
     // the 0-5 block should be in the cache
-    ASSERT_TRUE(pc2l.cacheManager().managerCache().find(pc2l.cacheManager().getKey(intVec.dsTag, 0)) != pc2l.cacheManager().managerCache().end());
+    ASSERT_NE(pc2l.cacheManager().managerCache().find(pc2l.cacheManager().getKey(intVec.dsTag, 0)), pc2l.cacheManager().managerCache().end());
 }
 
 TEST_F(VectorTest, test_delete) {
