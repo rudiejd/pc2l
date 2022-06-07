@@ -43,6 +43,10 @@
 #include <ctime>
 
 int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
+        return 1; 
+    }
     auto& pc2l = pc2l::System::get();
     pc2l.setBlockSize(atoi(argv[2]));
     pc2l.setCacheSize(atoi(argv[3]));
