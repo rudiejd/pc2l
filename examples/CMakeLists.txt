@@ -37,10 +37,14 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 target_link_libraries(web_cache ${BOOST_LIBRARIES})
 target_link_libraries(web_cache Boost::thread)
 
-#Web Cache example
-
+# terrasort
 add_executable(terrasort terrasort.cpp)
 
 target_compile_features(terrasort PRIVATE cxx_std_11)
 
 target_link_libraries(terrasort pc2l_lib)
+
+# terrasort with std::vector
+add_executable(std_terrasort std_terrasort.cpp)
+
+

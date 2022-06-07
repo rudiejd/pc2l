@@ -139,10 +139,7 @@ public:
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
-        char serializedObj[sizeof(T)];
-        // copy the block we need into a character array then reinterpret and deref it
-        std::copy(&payload[inBlockIdx], &payload[inBlockIdx + sizeof(T)], &serializedObj[0]);
-        auto ret = reinterpret_cast<T*>(serializedObj);
+        auto ret = reinterpret_cast<T*>(payload + inBlockIdx);
         return *ret;
     }
 

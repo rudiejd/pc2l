@@ -1,5 +1,5 @@
-#ifndef TERRASORT_CPP
-#define TERRASORT_CPP
+#ifndef STD_TERRASORT_CPP
+#define STD_TERRASORT_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -38,38 +38,26 @@
 //---------------------------------------------------------------------
 
 #include <iostream>
-#include <pc2l.h>
 #include <climits>
+#include <vector>
+#include <algorithm>
 #include <ctime>
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
+    if (argc != 2) {
+        std::cout << "Usage: ./std_terrasort <bytes>";
         return 1;
     }
-    auto& pc2l = pc2l::System::get();
-    pc2l.setBlockSize(atoi(argv[2]));
-    pc2l.setCacheSize(atoi(argv[3]));
-    pc2l.initialize(argc, argv);
-    pc2l.start(pc2l.OneWriter_DistributedCache, true);
-    std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
-    std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
-    pc2l::Vector<int> terraVec;
+    std::vector<int> terraVec;
     auto start = clock();
     while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
         // create one terrabyte of pseudo random ints
         terraVec.push_back(rand() % INT_MAX);
     }
-    if (pc2l::MPI_GET_RANK() == 0) {
-        std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
-        auto sortStart = clock();
-        terraVec.sort();
-        std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
-    }
-
-    // Wind-up
-    pc2l.stop();
-    pc2l.finalize();
+    std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
+    auto sortStart = clock();
+    sort(terraVec.begin(), terraVec.end());
+    std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
 }
 
 #endif
