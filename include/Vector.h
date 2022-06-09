@@ -139,8 +139,7 @@ public:
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
-        auto ret = reinterpret_cast<T*>(payload + inBlockIdx);
-        return *ret;
+        return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
     /**
