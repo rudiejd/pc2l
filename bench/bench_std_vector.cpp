@@ -40,8 +40,19 @@ static void BM_insert(benchmark::State& state) {
     }
 }
 
+BENCHMARK(BM_insert)->DenseRange(0, 10);
 
-BENCHMARK(BM_insert)->DenseRange(0, 100);
+static void BM_insert_at_beginning(benchmark::State& state) {
+    std::vector<int> v;
+    for (int i = 0; i < 100; i++) {
+        v.push_back(i);
+    }
+    while (state.KeepRunning()) {
+        v.insert(v.begin(), state.range(0));
+    }
+}
+
+BENCHMARK(BM_insert_at_beginning)->DenseRange(0, 10);
 
 int main(int argc, char** argv) {
     benchmark::Initialize(&argc, argv);
