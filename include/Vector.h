@@ -45,6 +45,7 @@
  * 
  */
 
+#include <iterator>
 #include <unordered_map>
 #include "Worker.h"
 #include "CacheManager.h"
@@ -65,6 +66,9 @@ BEGIN_NAMESPACE(pc2l);
 template <typename T>
 class Vector {
 public:
+    struct Iterator {
+
+    };
     /**
      * The default constructor.  Currently, the constructor calls the
      * workhorse
@@ -76,7 +80,8 @@ public:
      */
     virtual ~Vector() = default;
 
-    int dsTag;
+    // unique identifier for this data structure
+    size_t dsTag;
 
     // the size (in bytes) of each block in vector. Potentially offer heterogeneous
     // block sizes on different data structures later, but for now it is uniform
@@ -84,6 +89,13 @@ public:
 
     // The number of elements currently in the vector
     unsigned long long siz;
+
+    // block tag of last retrieved block
+   mutable size_t prevBlockTag;
+
+    // reference to message containing last retrieved block
+    mutable MessagePtr prevMsg;
+
 
     /**
      * Returns size (in values, not blocks) of vector
@@ -131,14 +143,25 @@ public:
      * @return The value at \p index
      */
     T at(unsigned long long index) const {
+        // instead of div, prefer bitwise operations eventually
+        // but this will require moving to powers of 2 only
+        const auto ret = std::lldiv(index*sizeof(T), blockSize);
+        const size_t blockTag = ret.quot;
+        unsigned long long inBlockIdx = ret.rem;
+        if (blockTag == prevBlockTag) {
+            // if the CacheManager's cache contains this block, just get it
+            // get array of concatenated T-serializations
+            char* payload = prevMsg->getPayload();
+            return *reinterpret_cast<T*>(payload + inBlockIdx);
+        }
         CacheManager& cm  = System::get().cacheManager();
-        size_t blockTag = index*sizeof(T)  / blockSize;
         MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        prevBlockTag = blockTag;
+        prevMsg = msg;
         // if the CacheManager's cache contains this block, just get it
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
-        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
@@ -166,9 +189,7 @@ public:
         MessagePtr m;
         if (index == size()) {
             // if insert at end, make new block
-            m = Message::create(blockSize, Message::STORE_BLOCK, 0);
-            m->dsTag = dsTag;
-            m->blockTag = blockTag;
+            m = Message::create(blockSize, Message::STORE_BLOCK, 0, m->dsTag, m->blockTag);
         } else {
             // otherwise fetch from cache manager or remote CW
             m = cm.getBlockFallbackRemote(dsTag, blockTag);

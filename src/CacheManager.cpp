@@ -53,12 +53,24 @@ CacheManager::finalize() {
     }
 }
 
+MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
+    MessagePtr ret = nullptr;
+    size_t key = Message::getKey(dsTag, blockTag);
+    try {
+        ret = cache.at(key);
+    } catch (const std::out_of_range& e) {
+        return nullptr;
+    }
+
+    return ret;
+}
+
 MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
     MessagePtr ret = nullptr;
-    size_t key = getKey(dsTag, blockTag);
-    if (cache.find(key) != cache.end()) {
-        ret = cache[key];
-    } else {
+    size_t key = Message::getKey(dsTag, blockTag);
+    try {
+        ret = cache.at(key);
+    } catch (const std::out_of_range& e) {
         // otherwise, we have to get it from a remote cacheworker
         // if we're in profiling mode, note this
         if (System::get().profile) {
@@ -66,9 +78,7 @@ MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
         }
         const unsigned long long worldSize = System::get().worldSize();
         const int storedRank = (blockTag % (worldSize - 1)) + 1;
-        ret = Message::create(0, Message::GET_BLOCK, 0);
-        ret->dsTag = dsTag;
-        ret->blockTag = blockTag;
+        ret = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
         send(ret, storedRank);
         ret = recv(storedRank);
         // then put the object at retrieved index into cache

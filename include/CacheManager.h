@@ -90,6 +90,14 @@ public:
     void finalize() override;
 
     /**
+     * Retrieve a block from the manager cache. If it's not there, return nullptr
+     * \param[in] dsTag the data structure tag associated with this message
+     * \param[in] blockTag the block tag associated with this message
+     * \return message associated with the key formed by combining these tags
+     */
+    MessagePtr getBlock(size_t dsTag, size_t blockTag);
+
+    /**
      * Retrieve a block from the manager cache. If it's not there, fallback to remote CacheWorker
      * \param[in] dsTag the data structure tag associated with this message
      * \param[in] blockTag the block tag associated with this message

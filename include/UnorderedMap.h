@@ -97,9 +97,7 @@ public:
         CacheManager& cm = System::get().cacheManager();
         bool full = true;
         while (full) {
-            MessagePtr probePtr = Message::create(1, Message::PROBE_BLOCK, index);
-            probePtr->dsTag = vec.dsTag;
-            probePtr->blockTag = index;
+            MessagePtr probePtr = Message::create(1, Message::PROBE_BLOCK, index, vec.dsTag, index);
             cm.send(probePtr, destRank);
             MessagePtr probeRes = cm.recv();
             full = reinterpret_cast<bool*>(probeRes->getPayload());

@@ -74,7 +74,7 @@ CacheWorker::run() {
 void CacheWorker::refer(const MessagePtr& msg) {
     // for now, only do eviction stuff on MANAGER
     if (MPI_GET_RANK() != 0) return;
-    const auto key = getKey(msg);
+    const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
         if (msg->getPayloadSize() * cache.size() >= cacheSize) {
@@ -100,20 +100,16 @@ void
 CacheWorker::storeCacheBlock(const MessagePtr& msg) {
     // Clone this message for storing into our cache
     MessagePtr clone = Message::create(*msg);
-    // Get the aggregate key for this block.
-    const auto key   = getKey(clone);
     // Refer to our eviction structure
     refer(msg);
     // Put a clone of the message in the cache
-    cache[key] = clone;
+    cache[clone->key] = clone;
 }
 
 void
 CacheWorker::sendCacheBlock(const MessagePtr& msg) {
-    // Get the aggregate key for the requested block.
-    const auto key = getKey(msg);
     // Get entry for key, if present in the cache
-    const auto entry = cache.find(key);
+    const auto entry = cache.find(msg->key);
     // If the entry is found, send it back to the requestor
     if (entry != cache.end()) {
         refer(entry->second);
@@ -129,10 +125,8 @@ CacheWorker::sendCacheBlock(const MessagePtr& msg) {
 }
 void
 CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
-    // Get the aggregate key for the block to be deleted.
-    const auto key = getKey(msg);
     // Get entry for key, if present in the cache
-    const auto entry = cache.find(key);
+    const auto entry = cache.find(msg->key);
     // If the entry is found, delete the entry
     if (entry != cache.end()) {
         cache.erase(entry);

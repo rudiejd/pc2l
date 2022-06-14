@@ -44,11 +44,20 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+size_t Message::getKey(const MessagePtr& msg) noexcept {
+    return getKey(msg->dsTag, msg->blockTag);
+}
 
+size_t Message::getKey(size_t dsTag, size_t blockTag) noexcept {
+    size_t key = dsTag;
+    key <<= sizeof(dsTag);
+    key |= blockTag;
+    return key;
+}
 // Create a message from scratch using dynamic memory
 MessagePtr
 Message::create(const int dataSize, const MsgTag tag,
-                const int srcRank) {
+                const int srcRank, size_t dsTag, size_t blockTag) {
     // First create a dynamic memory block for this message, even
     // though we are going to return it as if it were an object.
     char* rawBuf = new char[dataSize + sizeof(Message)];
@@ -56,6 +65,7 @@ Message::create(const int dataSize, const MsgTag tag,
     Message *msg = new(rawBuf) Message(tag, srcRank,
                                        dataSize + sizeof(Message), true,
                                        rawBuf   + sizeof(Message));
+    msg->key = getKey(dsTag, blockTag);
     // Return the newly created object
     return MessagePtr(msg, MessageDeleter());
 }
@@ -79,6 +89,7 @@ Message::create(const Message& src) {
                                      src.tag, src.srcRank);
     msg->blockTag = src.blockTag;
     msg->dsTag = src.dsTag;
+    msg->key = src.key;
     // Copy the data from source to the newly created message
     std::copy_n(src.getPayload(), src.getPayloadSize(), msg->getPayload());
     // Return the newly created msg
