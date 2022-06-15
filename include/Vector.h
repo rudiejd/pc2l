@@ -186,21 +186,25 @@ public:
             }
         }
         size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m;
-        if (index == size()) {
-            // if insert at end, make new block
-            m = Message::create(blockSize, Message::STORE_BLOCK, 0, m->dsTag, m->blockTag);
+        MessagePtr msg;
+        if (prevBlockTag == blockTag) {
+            msg = prevMsg;
+        } else if (index < size()) {
+            // fetch from cache manager or remote CW
+            msg = cm.getBlockFallbackRemote(dsTag, blockTag);
         } else {
-            // otherwise fetch from cache manager or remote CW
-            m = cm.getBlockFallbackRemote(dsTag, blockTag);
+            // if insert at end, make new block+
+            msg = Message::create(blockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
         }
-        char *block = m->getPayload();
+        char *block = msg->getPayload();
         // offset into the block array of serializations and insert val
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char *serialized = reinterpret_cast<char *>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
-        cm.storeCacheBlock(m);
+        prevMsg = msg;
+        prevBlockTag = blockTag;
+        cm.storeCacheBlock(msg);
         // if it's an insert at the end, we haven't yet incremented size. otherwise we have
         if (index == size()) siz++;
     }
@@ -219,17 +223,25 @@ public:
      * @param value
      */
     void replace(unsigned long long index, T value) {
-        // obtain world size() and compute destination rank for replacement
+        // instead of div, prefer bitwise operations eventually
+        // but this will require moving to powers of 2 only
+        const auto ret = std::lldiv(index*sizeof(T), blockSize);
+        const size_t blockTag = ret.quot;
+        unsigned long long inBlockIdx = ret.rem;
+        MessagePtr msg;
         CacheManager& cm = System::get().cacheManager();
-        auto& mgrCache = cm.managerCache();
-        size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m = cm.getBlockFallbackRemote(dsTag, blockTag);
-        char* block = m->getPayload();
+        if (blockTag == prevBlockTag) {
+            msg = prevMsg;
+        } else {
+            msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        }
+        char* block = msg->getPayload();
         // fill the buffer with new datum at correct in-blok offset
-        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
-        cm.storeCacheBlock(m);
+        prevMsg = msg;
+        prevBlockTag = blockTag;
+        cm.storeCacheBlock(msg);
     }
 
 

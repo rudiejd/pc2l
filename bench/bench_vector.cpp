@@ -42,6 +42,7 @@ static void BM_insert(benchmark::State& state) {
         v.push_back(state.range(0));
     }
 }
+BENCHMARK(BM_insert)->DenseRange(0, 10);
 
 static void BM_insert_at_beginning(benchmark::State& state) {
     pc2l::Vector<int> v;
@@ -52,9 +53,7 @@ static void BM_insert_at_beginning(benchmark::State& state) {
         v.insert(0, state.range(0));
     }
 }
-
-BENCHMARK(BM_insert)->DenseRange(0, 10);
-
+BENCHMARK(BM_insert_at_beginning)->Args({0});
 
 int main(int argc, char** argv) {
     auto& pc2l = pc2l::System::get();

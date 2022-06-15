@@ -54,15 +54,12 @@ CacheManager::finalize() {
 }
 
 MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
-    MessagePtr ret = nullptr;
     size_t key = Message::getKey(dsTag, blockTag);
     try {
-        ret = cache.at(key);
+        return cache.at(key);
     } catch (const std::out_of_range& e) {
         return nullptr;
     }
-
-    return ret;
 }
 
 MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
