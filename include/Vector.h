@@ -219,6 +219,10 @@ public:
      * @param value value to be inserted
      */
     void insert(unsigned long long index, T value) {
+        static int TypeSize = 2, BlockShiftBits = 5, IndexMask = 31;
+        const size_t offset   = index << TypeSize;
+        const size_t blockTag = (offset >> BlockShiftBits),
+                inBlockIdx = (offset & IndexMask);
         CacheManager &cm = System::get().cacheManager();
         if (index < size()) {
             // all other values shifted right one index (size incremented here)
@@ -233,7 +237,6 @@ public:
 //                }
             }
         }
-        size_t blockTag = index * sizeof(T) / blockSize;
         MessagePtr msg;
         if (prevBlockTag == blockTag) {
             msg = prevMsg;
@@ -245,8 +248,6 @@ public:
             msg = Message::create(blockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
         }
         char *block = msg->getPayload();
-        // offset into the block array of serializations and insert val
-        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         // std::cout << "@insert: index = " << index << ", blockTag = "
         //         << blockTag << ", inBlockIdx = " << inBlockIdx << std::endl;
         char *serialized = reinterpret_cast<char *>(&value);

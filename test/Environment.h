@@ -11,13 +11,19 @@ class PC2LEnvironment : public ::testing::Environment {
 public:
     int argc;
     char** argv;
+    // define characteristics of the PC2L instance we will use for testing
+    // we use small block sizes here just to test that features are working
+    // correctly. Tests for performance are conducted in the examples and/or
+    // benchmarks directory.
+    const static unsigned int blockSize = sizeof(int) * 8;
+    const static unsigned int blocksInCache = 3;
+    const static unsigned int cacheSize = blocksInCache * blockSize;
+
     ~PC2LEnvironment() override {};
     void SetUp() override {
-        // set block size to 5 integers
         auto& pc2l = pc2l::System::get();
-        pc2l.setBlockSize(sizeof(int) * 5);
-        // set cache size to 3 blocks
-        pc2l.setCacheSize(3*5*sizeof(int));
+        pc2l.setBlockSize(blockSize);
+        pc2l.setCacheSize(cacheSize);
         pc2l.initialize(argc, argv);
         pc2l.start();
         ::testing::TestEventListeners& listeners =

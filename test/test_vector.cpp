@@ -38,6 +38,10 @@
 #include <random>
 #include "Environment.h"
 
+const unsigned int PC2LEnvironment::blockSize;
+const unsigned int PC2LEnvironment::cacheSize;
+const unsigned int PC2LEnvironment::blocksInCache;
+
 
 class VectorTest : public ::testing::Test {
 
@@ -107,16 +111,17 @@ TEST_F(VectorTest, test_iterator) {
 TEST_F(VectorTest, test_lru_caching) {
     auto& pc2l = pc2l::System::get();
     pc2l::Vector<int> intVec;
-    // this produces 20 blocks of integers
-    for (int i = 0; i < 100; i++) {
+    const int listSize = 100;
+    for (int i = 0; i < listSize; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
     }
-    // cache should contain 3 blocks 85-90, 90-95, 95-100
-    ASSERT_EQ(pc2l.cacheManager().managerCache().size(), 3);
-    // cache should now be the last 3 blocks inserted
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 17), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 18), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 19), nullptr);
+    // calculate total blocks after these inserts
+    auto totalBlocks = listSize * sizeof(int) / PC2LEnvironment::blockSize;
+    ASSERT_EQ(pc2l.cacheManager().managerCache().size(), PC2LEnvironment::blocksInCache);
+    // cache should now be the last blocks inserted
+    for (auto i = 0; i < PC2LEnvironment::blocksInCache; i++) {
+        ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, totalBlocks - i - 1), nullptr);
+    }
     // front of cache is the last block, rear of cache is the third-last (LRU)
     // now retrieve another block
     intVec.at(0);
