@@ -48,12 +48,19 @@ size_t Message::getKey(const MessagePtr& msg) noexcept {
     return getKey(msg->dsTag, msg->blockTag);
 }
 
-size_t Message::getKey(size_t dsTag, size_t blockTag) noexcept {
+size_t Message::getKey(unsigned int dsTag, unsigned int blockTag) noexcept {
+    // This method assumes that the dsTag and blockTag are exactly 32-bits
+    // in size to pack them into a 64-bit data type.
+    ASSERT(sizeof(dsTag)    == 4);
+    ASSERT(sizeof(blockTag) == 4);
+    ASSERT(sizeof(size_t)   >= 8);
+    
     size_t key = dsTag;
-    key <<= sizeof(dsTag);
+    key <<= 32;  // Shift left by 32-bits
     key |= blockTag;
     return key;
 }
+
 // Create a message from scratch using dynamic memory
 MessagePtr
 Message::create(const int dataSize, const MsgTag tag,

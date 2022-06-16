@@ -57,10 +57,11 @@ BENCHMARK(BM_insert_at_beginning)->Args({0});
 
 int main(int argc, char** argv) {
     auto& pc2l = pc2l::System::get();
-    // set block size to 5 ints
-    pc2l.setBlockSize(sizeof(int) * 5);
+    // Override the default block size to 8 ints
+    const int BlockSize = sizeof(int) * 8;
+    pc2l.setBlockSize(BlockSize);
     // set cache size to 3 blocks
-    pc2l.setCacheSize(3*5*sizeof(int));
+    pc2l.setCacheSize(3 * BlockSize);
     pc2l.initialize(argc, argv);
     pc2l.start();
 
