@@ -75,22 +75,32 @@ TEST_F(VectorTest, test_insert_int) {
     for (size_t i =  51; i < intVec.size(); i++) {
         ASSERT_EQ(i-2, intVec.at(i));
     }
-
-
-
     // intVec.clear();
 }
 
 TEST_F(VectorTest, test_at) {
     pc2l::Vector<int> intVec;
     for (int i = 0; i < 100; i++) {
-        ASSERT_NO_THROW(intVec.insert(i, i));
+        intVec.insert(i, i);
     }
     // check to see if data is correct (tests deserializtion)
     for (int i = 0; i < 100; i++) {
         ASSERT_EQ(i, intVec.at(i));
     }
+}
 
+// Test the custom iterator for our vector class
+TEST_F(VectorTest, test_iterator) {
+    pc2l::Vector<int> intVec;
+    for (int i = 0; i < 100; i++) {
+        intVec.insert(i, i);
+    }
+    int i = 0;
+    // check to see if data is correct (tests deserializtion)
+    for (auto e : intVec) {
+        ASSERT_EQ(e, i);
+        ++i;
+    }
 }
 
 

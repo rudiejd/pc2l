@@ -66,9 +66,41 @@ BEGIN_NAMESPACE(pc2l);
 template <typename T>
 class Vector {
 public:
-    struct Iterator {
 
+    struct Iterator : public std::iterator<
+                                std::input_iterator_tag,
+                                T,
+                                T,
+                                const T*,
+                                T> {
+        friend class Vector<T>;
+    public:
+        // Return value of data at index i
+        T operator*() const { return vec.at(i); };
+
+        // Maybe implement bounds check here
+        Iterator& operator++() { i++; return *this; }
+        Iterator& operator--() { i--; return *this; }
+
+        bool operator==(const Iterator& rhs) const {
+            return &rhs.vec == &vec && rhs.i == i;
+        }
+        bool operator!=(const Iterator& rhs) const {
+            return !(*this == rhs);
+        }
+
+    private:
+        Iterator(const Vector<T>& vec, const int end = 0) :
+            vec(vec), i(end) {}
+        const Vector<T>& vec;
+        size_t i = 0;
     };
+
+
+    // Iterator methods
+    Vector<T>::Iterator begin() const {return Iterator(*this); }
+    Vector<T>::Iterator end() const {return Iterator(*this, size()); }
+
     /**
      * The default constructor.  Currently, the constructor calls the
      * workhorse
