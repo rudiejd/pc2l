@@ -175,11 +175,27 @@ public:
      * @return The value at \p index
      */
     T at(unsigned long long index) const {
+        static int TypeSize = 2, BlockShiftBits = 5, IndexMask = 31;
         // instead of div, prefer bitwise operations eventually
         // but this will require moving to powers of 2 only
-        const auto ret = std::lldiv(index*sizeof(T), blockSize);
-        const size_t blockTag = ret.quot;
-        unsigned long long inBlockIdx = ret.rem;
+
+        // For now we are hardcoding some of this to just test to see
+        // what is the performance improvement that we may be able to
+        // achieve with bitwise operations.
+        
+        // const auto ret = std::lldiv(index*sizeof(T), blockSize);
+        // const size_t blockTag = ret.quot;
+        // unsigned long long inBlockIdx = ret.rem;
+
+        // @insert: index = 99, blockTag = 12, inBlockIdx = 12
+        // @at: index = 99, blockTag = 49, inBlockIdx = 4
+            
+        const size_t offset   = index << TypeSize;
+        const size_t blockTag = (offset >> BlockShiftBits),
+            inBlockIdx = (offset & IndexMask);
+        // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
+        //           << ", inBlockIdx = " << inBlockIdx << std::endl;
+
         if (blockTag == prevBlockTag) {
             // if the CacheManager's cache contains this block, just get it
             // get array of concatenated T-serializations
@@ -231,6 +247,8 @@ public:
         char *block = msg->getPayload();
         // offset into the block array of serializations and insert val
         unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
+        // std::cout << "@insert: index = " << index << ", blockTag = "
+        //         << blockTag << ", inBlockIdx = " << inBlockIdx << std::endl;
         char *serialized = reinterpret_cast<char *>(&value);
         std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache

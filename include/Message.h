@@ -145,7 +145,7 @@ public:
      *
      * \return The a 64-bit key associated with this message.
      */
-    static size_t getKey(size_t dsTag, size_t blockTag) noexcept;
+    static size_t getKey(unsigned int dsTag, unsigned int blockTag) noexcept;
 
     /**
      * Convenience helper method to get an aggregate key for a given
