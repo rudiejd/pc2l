@@ -307,6 +307,12 @@ public:
         mergesort(0, size() - 1);
     }
 private:
+    /**
+     * Calculate the block tag and position within a block where the item at
+     * position \p index should be stored.
+     * @param index the index for which we perform calculations
+     * @return tuple of (offset, blockTag, inBlockIdx)
+     */
     const static std::tuple<size_t, size_t, size_t> indexCalculation(unsigned long long index) {
         const size_t offset   = index * TypeSize;
         const size_t blockTag = (offset >> BlockShiftBits),
@@ -314,6 +320,7 @@ private:
         return std::tie(offset, blockTag, inBlockIdx);
     }
 
+    // Merges the sorted and unsorted portions of the Vector
     void merge(int low, int mid, int high) {
         auto secondLow = mid + 1;
 
