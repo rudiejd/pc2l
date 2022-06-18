@@ -77,13 +77,13 @@ void CacheWorker::refer(const MessagePtr& msg) {
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
-        if (msg->getPayloadSize() * cache.size() >= cacheSize) {
+        if (msg->getSize() + currentBytes > cacheSize) {
             auto last = lruBlock.back();
             lruBlock.pop_back();
             placeInQ.erase(last);
-            // send evicted block to remote cacheworker
             MessagePtr evicted = cache[last];
-            cache.erase(last);
+            eraseCacheBlock(cache[last]);
+            // send evicted block to remote cacheworker
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
@@ -102,6 +102,9 @@ CacheWorker::storeCacheBlock(const MessagePtr& msg) {
     MessagePtr clone = Message::create(*msg);
     // Refer to our eviction structure
     refer(msg);
+    // Increment current bytes that worker is holding if the block is new
+    if (cache.find(msg->key) == cache.end())
+        currentBytes += clone->getSize();
     // Put a clone of the message in the cache
     cache[clone->key] = clone;
 }
@@ -129,6 +132,8 @@ CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
     const auto entry = cache.find(msg->key);
     // If the entry is found, delete the entry
     if (entry != cache.end()) {
+        // Decrement current bytes that worker is holding
+        currentBytes -= entry->second->getSize();
         cache.erase(entry);
     }
     //     // When control drops here, that means the requested block was

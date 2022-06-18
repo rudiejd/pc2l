@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 }
 TEST_F(VectorTest, test_insert_int) {
     // Test inserting 100 integers
-    pc2l::Vector<int> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
     for (int i = 0; i < 100; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
     }
@@ -83,7 +83,7 @@ TEST_F(VectorTest, test_insert_int) {
 }
 
 TEST_F(VectorTest, test_at) {
-    pc2l::Vector<int> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
     for (int i = 0; i < 100; i++) {
         intVec.insert(i, i);
     }
@@ -95,7 +95,7 @@ TEST_F(VectorTest, test_at) {
 
 // Test the custom iterator for our vector class
 TEST_F(VectorTest, test_iterator) {
-    pc2l::Vector<int> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
     for (int i = 0; i < 100; i++) {
         intVec.insert(i, i);
     }
@@ -107,35 +107,29 @@ TEST_F(VectorTest, test_iterator) {
     }
 }
 
-
 TEST_F(VectorTest, test_lru_caching) {
     auto& pc2l = pc2l::System::get();
-    pc2l::Vector<int> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
     const int listSize = 100;
     for (int i = 0; i < listSize; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
     }
-    // calculate total blocks after these inserts
-    auto totalBlocks = listSize * sizeof(int) / PC2LEnvironment::blockSize;
-    ASSERT_EQ(pc2l.cacheManager().managerCache().size(), PC2LEnvironment::blocksInCache);
-    // cache should now be the last blocks inserted
-    for (auto i = 0; i < PC2LEnvironment::blocksInCache; i++) {
-        ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, totalBlocks - i - 1), nullptr);
-    }
+    // cache should now be the last 3 blocks inserted
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
+
     // front of cache is the last block, rear of cache is the third-last (LRU)
     // now retrieve another block
     intVec.at(0);
-    // cache should be size 3
     ASSERT_EQ(pc2l.cacheManager().managerCache().size(), 3);
-    // the 17th (third to last) block should be removed from cache (contains 85-90)
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 17), nullptr);
-    // the 0-5 block should be in the cache
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
+    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
 }
 
 TEST_F(VectorTest, test_delete) {
     auto& pc2l = pc2l::System::get();
-    pc2l::Vector<int> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
     // this produces 20 blocks of integers
     for (size_t i = 0; i < 100; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
@@ -155,7 +149,7 @@ TEST_F(VectorTest, test_delete) {
 }
 
 TEST_F(VectorTest, test_sort) {
-    pc2l::Vector<int> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
 
     // push 100 random numbers 0 - 99
     for (unsigned int i = 0; i < 100; i++) {

@@ -17,7 +17,7 @@ public:
     // benchmarks directory.
     const static unsigned int blockSize = sizeof(int) * 8;
     const static unsigned int blocksInCache = 3;
-    const static unsigned int cacheSize = blocksInCache * blockSize;
+    const static unsigned int cacheSize = blocksInCache * (sizeof(pc2l::Message) + blockSize);
 
     ~PC2LEnvironment() override {};
     void SetUp() override {

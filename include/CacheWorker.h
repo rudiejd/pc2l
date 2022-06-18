@@ -156,6 +156,11 @@ private:
      * This message is reused to minimize message creation overheads.
      */
     MessagePtr blockNotFoundMsg;
+    /**
+     * The amount of bytes currently stored in the cache manager (incremented each time a message is
+     * added
+     */
+    unsigned int currentBytes = 0;
 };
 
 END_NAMESPACE(pc2l);

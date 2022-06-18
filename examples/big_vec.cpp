@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     // Do some testing here.
     std::cout << "world size " << pc2l.worldSize() << std::endl;
-    pc2l::Vector<char*> v;
+    pc2l::Vector<char*, 1000> v;
     char* data = (char*) "String test";
     for (int i = 0; i < 100; i++) {
         v.insert(i, data);

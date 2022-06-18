@@ -47,6 +47,7 @@
 
 #include <iterator>
 #include <unordered_map>
+#include <cmath>
 #include "Worker.h"
 #include "CacheManager.h"
 #include "System.h"
@@ -63,22 +64,27 @@ BEGIN_NAMESPACE(pc2l);
  * utilizing message passing through MPI. This initial  
  * implementation does not include any caching.
  */
-template <typename T>
+template <typename T, unsigned int UserBlockSize = 4096>
 class Vector {
 public:
-
+    /**
+     * Customer iterator for a PC2L vector. As of right now,
+     * only an input iterator is implemented.
+     * TODO: Random access iterator?
+     */
     struct Iterator : public std::iterator<
                                 std::input_iterator_tag,
                                 T,
                                 T,
                                 const T*,
                                 T> {
-        friend class Vector<T>;
+        // declare friend class so only pc2l::Vector can access Iterator's private constructor
+        friend class Vector<T, UserBlockSize>;
     public:
-        // Return value of data at index i
+        // Dereference: return value of data at index i (call vec.at)
         T operator*() const { return vec.at(i); };
 
-        // Maybe implement bounds check here
+        // Maybe implement bounds check here? Or bounds check in pc2l::Vector
         Iterator& operator++() { i++; return *this; }
         Iterator& operator--() { i--; return *this; }
 
@@ -90,22 +96,22 @@ public:
         }
 
     private:
-        Iterator(const Vector<T>& vec, const int end = 0) :
+        Iterator(const Vector<T, UserBlockSize>& vec, const int end = 0) :
             vec(vec), i(end) {}
-        const Vector<T>& vec;
+        const Vector<T, UserBlockSize>& vec;
         size_t i = 0;
     };
 
 
     // Iterator methods
-    Vector<T>::Iterator begin() const {return Iterator(*this); }
-    Vector<T>::Iterator end() const {return Iterator(*this, size()); }
+    Vector<T, UserBlockSize>::Iterator begin() const {return Iterator(*this); }
+    Vector<T, UserBlockSize>::Iterator end() const {return Iterator(*this, size()); }
 
     /**
-     * The default constructor.  Currently, the constructor calls the
-     * workhorse
+     * The default constructor. Increments system-wide data structure
+     * count
      */
-    Vector() : blockSize(System::get().getBlockSize()), siz(0), dsTag(System::get().dsCount++){ }
+    Vector() : siz(0), dsTag(System::get().dsCount++) { }
 
     /**
      * The destructor.
@@ -115,10 +121,6 @@ public:
     // unique identifier for this data structure
     size_t dsTag;
 
-    // the size (in bytes) of each block in vector. Potentially offer heterogeneous
-    // block sizes on different data structures later, but for now it is uniform
-    unsigned long long blockSize;
-
     // The number of elements currently in the vector
     unsigned long long siz;
 
@@ -127,7 +129,21 @@ public:
 
     // reference to message containing last retrieved block
     mutable MessagePtr prevMsg;
-
+    // calculate log2(n) at compile time
+    static constexpr unsigned int log2(unsigned int n) {
+        return std::log2(n);
+    }
+    // Calculate a^n at compile time
+    static constexpr unsigned int pow(unsigned int a, unsigned int n) {
+        return std::pow(a, n);
+    }
+    // If user provides a block size that isn't a power of 2, round it up to nearest power of 2
+    // the bit shift hack UserBlockSize & (UserBlockSize - 1)  is a fast way to check this (from stanford bitshift hacks)
+    static constexpr unsigned int BlockShiftBits = !(UserBlockSize & (UserBlockSize - 1)) ? log2(UserBlockSize) :
+            log2(UserBlockSize) + 1;
+    static constexpr unsigned int BlockSize = pow(2, BlockShiftBits);
+    static constexpr unsigned int TypeSize = sizeof(T);
+    static constexpr unsigned int IndexMask = BlockSize - 1;
 
     /**
      * Returns size (in values, not blocks) of vector
@@ -175,7 +191,6 @@ public:
      * @return The value at \p index
      */
     T at(unsigned long long index) const {
-        static int TypeSize = 2, BlockShiftBits = 5, IndexMask = 31;
         // instead of div, prefer bitwise operations eventually
         // but this will require moving to powers of 2 only
 
@@ -183,16 +198,13 @@ public:
         // what is the performance improvement that we may be able to
         // achieve with bitwise operations.
         
-        // const auto ret = std::lldiv(index*sizeof(T), blockSize);
+        // const auto ret = std::lldiv(index*sizeof(T), BlockSize);
         // const size_t blockTag = ret.quot;
         // unsigned long long inBlockIdx = ret.rem;
 
         // @insert: index = 99, blockTag = 12, inBlockIdx = 12
         // @at: index = 99, blockTag = 49, inBlockIdx = 4
-            
-        const size_t offset   = index << TypeSize;
-        const size_t blockTag = (offset >> BlockShiftBits),
-            inBlockIdx = (offset & IndexMask);
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
         // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
         //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
@@ -219,10 +231,7 @@ public:
      * @param value value to be inserted
      */
     void insert(unsigned long long index, T value) {
-        static int TypeSize = 2, BlockShiftBits = 5, IndexMask = 31;
-        const size_t offset   = index << TypeSize;
-        const size_t blockTag = (offset >> BlockShiftBits),
-                inBlockIdx = (offset & IndexMask);
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
         CacheManager &cm = System::get().cacheManager();
         if (index < size()) {
             // all other values shifted right one index (size incremented here)
@@ -245,7 +254,7 @@ public:
             msg = cm.getBlockFallbackRemote(dsTag, blockTag);
         } else {
             // if insert at end, make new block+
-            msg = Message::create(blockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
+            msg = Message::create(BlockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
         }
         char *block = msg->getPayload();
         // std::cout << "@insert: index = " << index << ", blockTag = "
@@ -270,15 +279,11 @@ public:
 
     /**
      * Replace value at \p index with \p value
-     * @param index
-     * @param value
+     * @param index index in vector which should be replaced
+     * @param value object to put in the index
      */
     void replace(unsigned long long index, T value) {
-        // instead of div, prefer bitwise operations eventually
-        // but this will require moving to powers of 2 only
-        const auto ret = std::lldiv(index*sizeof(T), blockSize);
-        const size_t blockTag = ret.quot;
-        unsigned long long inBlockIdx = ret.rem;
+        const auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
         MessagePtr msg;
         CacheManager& cm = System::get().cacheManager();
         if (blockTag == prevBlockTag) {
@@ -295,8 +300,6 @@ public:
         cm.storeCacheBlock(msg);
     }
 
-
-
     /**
      * Sort vector in ascending order using mergesort
      */
@@ -304,6 +307,13 @@ public:
         mergesort(0, size() - 1);
     }
 private:
+    const static std::tuple<size_t, size_t, size_t> indexCalculation(unsigned long long index) {
+        const size_t offset   = index * TypeSize;
+        const size_t blockTag = (offset >> BlockShiftBits),
+                inBlockIdx = (offset & IndexMask);
+        return std::tie(offset, blockTag, inBlockIdx);
+    }
+
     void merge(int low, int mid, int high) {
         auto secondLow = mid + 1;
 
