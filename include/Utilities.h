@@ -72,27 +72,56 @@
 #endif
 #endif
 
-/** \def DEBUG(x)
+/** \def PC2L_DEBUG(x)
 
     \brief Define a convenient macro for conditionally compiling
     additional debugging information.
 
-    Define a custom macro DEBUG (note the all caps) macro to be used
+    Define a custom macro PC2L_DEBUG (note the all caps) macro to be used
     to conditionally compile in debugging code to generate detailed
     logs.  This helps to minimize code modification to insert and
     remove debugging messages.
 */
-#ifndef DEBUG
-#ifdef DEBUG_OUTPUT
+#ifndef PC2L_DEBUG
+#ifdef PC2L_DEBUG_MODE
 
-#define DEBUG(x) x
+#define PC2L_DEBUG(x) x
 
-#else // !DEBUG_OUTPUT
+#else // !PC2L_DEBUG_MODE
 
-#define DEBUG(x)
+#define PC2L_DEBUG(x)
 
 #endif
 #endif
+
+/**
+ * Start a timer for debugging purposes. Note that there can only
+ * be one timer going at a time
+ */
+#ifndef PC2L_DEBUG_START_TIMER
+
+#define PC2L_DEBUG_START_TIMER() PC2L_DEBUG(auto start = clock();)
+
+#endif
+
+/**
+ * Stop the debug timer and print the name of what was being timed
+ */
+#ifndef PC2L_DEBUG_STOP_TIMER
+
+#define PC2L_DEBUG_STOP_TIMER(X) PC2L_DEBUG(std::cout << X << " took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;)
+
+#endif
+
+/**
+ * Prints a given string if debug flags are enabled
+ */
+#ifndef PC2L_DEBUG_PRINT
+
+#define PC2L_DEBUG_PRINT(x) PC2L_DEBUG(std::cout << x << std::endl;)
+
+#endif
+
 
 /** \def END_NAMESPACE(pc2l)
 

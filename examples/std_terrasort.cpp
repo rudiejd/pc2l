@@ -3,8 +3,8 @@
 
 //---------------------------------------------------------------------
 //  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
@@ -42,6 +42,53 @@
 #include <vector>
 #include <algorithm>
 #include <ctime>
+
+// Merges the sorted and unsorted portions of the Vector
+void merge(int low, int mid, int high, std::vector<int>& v) {
+    auto secondLow = mid + 1;
+
+    // if merge already sorted
+    if (v[mid] <= v[secondLow]) {
+        return;
+    }
+
+    while (low <= mid && secondLow <= high) {
+        // first element is in right place
+        if (v[low] <= v[secondLow]) {
+            low++;
+        } else {
+            auto val = v[secondLow];
+            auto idx = secondLow;
+
+            // Shift all shit between low and 2nd low right by one
+            while (idx != low) {
+                v[idx] = v[idx -1];
+                idx--;
+            }
+            v[low] = val;
+
+            // update indices
+            low++;
+            mid++;
+            secondLow++;
+        }
+    }
+}
+
+// Iteratively sort subarray `A[low…high]` using a temporary array
+void mergesort(unsigned long long low, unsigned long long high, std::vector<int>& v) {
+    if (low < high) {
+
+        // avoid overflow for large low/high indices
+        auto mid = low + (high - low)  / 2;
+
+        mergesort(low, mid, v);
+        mergesort(mid + 1, high, v);
+
+        merge(low, mid, high, v);
+
+    }
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {

@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     pc2l.start(pc2l.OneWriter_DistributedCache, true);
     std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
     std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
-    pc2l::Vector<int> terraVec;
+    pc2l::Vector<int, 100000> terraVec;
     auto start = clock();
     while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
         // create one terrabyte of pseudo random ints

@@ -178,9 +178,11 @@ public:
      * @param index the index of the value to be erased
      */
     void erase(unsigned long long index) {
+        PC2L_DEBUG_START_TIMER()
         // move all of the blocks to the right of the index left by one
         for (unsigned long long i = index; i < size() - 1; i++) { swap(i, i + 1); }
         siz--;
+        PC2L_DEBUG_STOP_TIMER("erase(" << index << ")")
         //TODO: maybe some check to see if it is successfully deleted?
     }
 
@@ -191,6 +193,7 @@ public:
      * @return The value at \p index
      */
     T at(unsigned long long index) const {
+        PC2L_DEBUG_START_TIMER()
         // instead of div, prefer bitwise operations eventually
         // but this will require moving to powers of 2 only
 
@@ -222,6 +225,7 @@ public:
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
         // offset into this array and extract correct portion
+        PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
         return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
@@ -231,6 +235,7 @@ public:
      * @param value value to be inserted
      */
     void insert(unsigned long long index, T value) {
+        PC2L_DEBUG_START_TIMER()
         auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
         CacheManager &cm = System::get().cacheManager();
         if (index < size()) {
@@ -260,13 +265,14 @@ public:
         // std::cout << "@insert: index = " << index << ", blockTag = "
         //         << blockTag << ", inBlockIdx = " << inBlockIdx << std::endl;
         char *serialized = reinterpret_cast<char *>(&value);
-        std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+        std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
         prevMsg = msg;
         prevBlockTag = blockTag;
         cm.storeCacheBlock(msg);
         // if it's an insert at the end, we haven't yet incremented size. otherwise we have
         if (index == size()) siz++;
+        PC2L_DEBUG_STOP_TIMER("insert(" << index << ", " << value << ")")
     }
 
     /**
@@ -283,6 +289,7 @@ public:
      * @param value object to put in the index
      */
     void replace(unsigned long long index, T value) {
+        PC2L_DEBUG_START_TIMER()
         const auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
         MessagePtr msg;
         CacheManager& cm = System::get().cacheManager();
@@ -294,10 +301,11 @@ public:
         char* block = msg->getPayload();
         // fill the buffer with new datum at correct in-blok offset
         char* serialized = reinterpret_cast<char*>(&value);
-        std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+        std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         prevMsg = msg;
         prevBlockTag = blockTag;
         cm.storeCacheBlock(msg);
+        PC2L_DEBUG_STOP_TIMER("replace(" << index << ", " << value << ")")
     }
 
     /**

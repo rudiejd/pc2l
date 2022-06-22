@@ -98,6 +98,7 @@ void CacheWorker::refer(const MessagePtr& msg) {
 
 void
 CacheWorker::storeCacheBlock(const MessagePtr& msg) {
+    PC2L_DEBUG_START_TIMER()
     // Clone this message for storing into our cache
     MessagePtr clone = Message::create(*msg);
     // Refer to our eviction structure
@@ -107,10 +108,12 @@ CacheWorker::storeCacheBlock(const MessagePtr& msg) {
         currentBytes += clone->getSize();
     // Put a clone of the message in the cache
     cache[clone->key] = clone;
+    PC2L_DEBUG_STOP_TIMER("storeCacheBlock() on node " << MPI_GET_RANK() << " ")
 }
 
 void
 CacheWorker::sendCacheBlock(const MessagePtr& msg) {
+    PC2L_DEBUG_START_TIMER()
     // Get entry for key, if present in the cache
     const auto entry = cache.find(msg->key);
     // If the entry is found, send it back to the requestor
@@ -125,6 +128,7 @@ CacheWorker::sendCacheBlock(const MessagePtr& msg) {
     //     blockNotFoundMsg->blockTag = msg->blockTag;
     //     send(blockNotFoundMsg, msg->srcRank);
     // }
+    PC2L_DEBUG_STOP_TIMER("sendCacheBlock() on node " << MPI_GET_RANK() << " ")
 }
 void
 CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
