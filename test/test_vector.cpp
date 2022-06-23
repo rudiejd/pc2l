@@ -148,7 +148,36 @@ TEST_F(VectorTest, test_delete) {
     }
 }
 
+TEST_F(VectorTest, test_std_find) {
+    auto& pc2l = pc2l::System::get();
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
+    // this produces 20 blocks of integers
+    for (size_t i = 0; i < 100; i++) {
+        ASSERT_NO_THROW(intVec.insert(i, i));
+    }
+    ASSERT_EQ(std::find(intVec.begin(), intVec.end(), 50), 51);
+    ASSERT_EQ(std::find(intVec.begin(), intVec.end(), 0), 0);
+    ASSERT_EQ(std::find(intVec.begin(), intVec.end(), 99), 99);
+}
+
 TEST_F(VectorTest, test_sort) {
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVecSorted;
+
+    // push 100 random numbers 0 - 99
+    for (unsigned int i = 0; i < 100; i++) {
+        intVec.push_back(rand() % 100);
+    }
+
+    std::sort(intVec.begin(), intVec.end());
+
+    // assert sorted order
+    for (unsigned int i = 1; i < 100; i++) {
+        ASSERT_TRUE(intVec.at(i) >= intVec.at(i - 1));
+    }
+}
+
+TEST_F(VectorTest, test_std_sort) {
     pc2l::Vector<int, 8 * sizeof(int)> intVec;
 
     // push 100 random numbers 0 - 99

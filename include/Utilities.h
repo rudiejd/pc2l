@@ -38,6 +38,7 @@
 //---------------------------------------------------------------------
 
 #include <ctime>
+#include <chrono>
 #include <cstring>
 
 /** \file Utilities.h
@@ -100,7 +101,7 @@
  */
 #ifndef PC2L_DEBUG_START_TIMER
 
-#define PC2L_DEBUG_START_TIMER() PC2L_DEBUG(auto start = clock();)
+#define PC2L_DEBUG_START_TIMER() PC2L_DEBUG(auto start = std::chrono::high_resolution_clock::now();)
 
 #endif
 
@@ -109,7 +110,7 @@
  */
 #ifndef PC2L_DEBUG_STOP_TIMER
 
-#define PC2L_DEBUG_STOP_TIMER(X) PC2L_DEBUG(std::cout << X << " took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;)
+#define PC2L_DEBUG_STOP_TIMER(X) PC2L_DEBUG(std::cout << X << " took " << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count() << "ns" << std::endl;)
 
 #endif
 

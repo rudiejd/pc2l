@@ -77,6 +77,17 @@ static void BM_insert_at_beginning(benchmark::State& state) {
 }
 BENCHMARK(BM_insert_at_beginning)->Args({0});
 
+static void BM_find(benchmark::State& state) {
+    pc2l::Vector<int, 8 * sizeof(int)> v;
+    for (int i = 0; i < 100; i++) {
+        v.push_back(i);
+    }
+    while (state.KeepRunning()) {
+        std::find(v.begin(), v.end(), 50);
+    }
+}
+BENCHMARK(BM_find)
+
 int main(int argc, char** argv) {
     auto& pc2l = pc2l::System::get();
     // Override the default block size to 8 ints

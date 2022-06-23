@@ -104,8 +104,9 @@ CacheWorker::storeCacheBlock(const MessagePtr& msg) {
     // Refer to our eviction structure
     refer(msg);
     // Increment current bytes that worker is holding if the block is new
-    if (cache.find(msg->key) == cache.end())
+    if (cache.find(msg->key) == cache.end()) {
         currentBytes += clone->getSize();
+    }
     // Put a clone of the message in the cache
     cache[clone->key] = clone;
     PC2L_DEBUG_STOP_TIMER("storeCacheBlock() on node " << MPI_GET_RANK() << " ")

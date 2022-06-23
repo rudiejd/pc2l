@@ -73,11 +73,11 @@ public:
      * TODO: Random access iterator?
      */
     struct Iterator : public std::iterator<
-                                std::input_iterator_tag,
-                                T,
-                                T,
-                                const T*,
-                                T> {
+                                std::input_iterator_tag, // iterator_category
+                                T,                       // value_type
+                                size_t,                  // difference_type
+                                const T*,                // pointer
+                                T> {                     // reference
         // declare friend class so only pc2l::Vector can access Iterator's private constructor
         friend class Vector<T, UserBlockSize>;
     public:
@@ -88,6 +88,11 @@ public:
         Iterator& operator++() { i++; return *this; }
         Iterator& operator--() { i--; return *this; }
 
+        Iterator& operator-(size_t n) {return Iterator(vec, i - n); }
+        Iterator& operator-(Iterator& rhs) {return Iterator(vec, i - rhs.i); }
+        Iterator& operator+(size_t n) {return Iterator(vec, i + n); }
+        Iterator& operator+(Iterator& rhs) {return Iterator(vec, i + rhs.i); }
+
         bool operator==(const Iterator& rhs) const {
             return &rhs.vec == &vec && rhs.i == i;
         }
@@ -96,7 +101,7 @@ public:
         }
 
     private:
-        Iterator(const Vector<T, UserBlockSize>& vec, const int end = 0) :
+        Iterator(const Vector<T, UserBlockSize>& vec, const size_t end = 0) :
             vec(vec), i(end) {}
         const Vector<T, UserBlockSize>& vec;
         size_t i = 0;

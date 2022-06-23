@@ -16,7 +16,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # if this is a debug build, enable our debug flags
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	add_compile_definitions(PC2L_DEBUG_MODE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPC2L_DEBUG_MODE")
 endif()
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
