@@ -86,7 +86,7 @@ static void BM_find(benchmark::State& state) {
         std::find(v.begin(), v.end(), 50);
     }
 }
-BENCHMARK(BM_find)
+BENCHMARK(BM_find);
 
 int main(int argc, char** argv) {
     auto& pc2l = pc2l::System::get();

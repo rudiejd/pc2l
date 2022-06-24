@@ -88,10 +88,10 @@ public:
         Iterator& operator++() { i++; return *this; }
         Iterator& operator--() { i--; return *this; }
 
-        Iterator& operator-(size_t n) {return Iterator(vec, i - n); }
-        Iterator& operator-(Iterator& rhs) {return Iterator(vec, i - rhs.i); }
-        Iterator& operator+(size_t n) {return Iterator(vec, i + n); }
-        Iterator& operator+(Iterator& rhs) {return Iterator(vec, i + rhs.i); }
+        Iterator operator-(size_t n) {return Iterator(vec, i - n); }
+        Iterator operator-(Iterator& rhs) {return Iterator(vec, i - rhs.i); }
+        Iterator operator+(size_t n) {return Iterator(vec, i + n); }
+        Iterator operator+(Iterator& rhs) {return Iterator(vec, i + rhs.i); }
 
         bool operator==(const Iterator& rhs) const {
             return &rhs.vec == &vec && rhs.i == i;
