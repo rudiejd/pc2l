@@ -245,10 +245,6 @@ public:
         // if the CacheManager's cache contains this block, just get it
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
-        // Sequential prefetching
-        if (inBlockIdx + PrefetchCount == BlockElementCount) {
-            cm.getRemoteBlockNonblocking(dsTag, blockTag + 1);
-        }
         PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
         return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
