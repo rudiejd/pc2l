@@ -86,8 +86,19 @@ MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
     return ret;
 }
 
+MessagePtr CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {
+    const unsigned long long worldSize = System::get().worldSize();
+    const int storedRank = (blockTag % (worldSize - 1)) + 1;
+    MessagePtr ret = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
+    send(ret, storedRank);
+    // do a non-blocking receive call
+    ret = recv(storedRank, false);
+    // then put the object at retrieved index into cache
+    storeCacheBlock(ret);
+}
 
-void CacheManager::run() {
+
+    void CacheManager::run() {
         // bgWorker = std::thread(CacheManager::runBackgroundWorker);
 }
 

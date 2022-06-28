@@ -64,7 +64,7 @@ BEGIN_NAMESPACE(pc2l);
  * utilizing message passing through MPI. This initial  
  * implementation does not include any caching.
  */
-template <typename T, unsigned int UserBlockSize = 4096>
+template <typename T, unsigned int UserBlockSize = 4096, unsigned int PrefetchCount = 5>
 class Vector {
 public:
     /**
@@ -109,8 +109,8 @@ public:
 
 
     // Iterator methods
-    Vector<T, UserBlockSize>::Iterator begin() const {return Iterator(*this); }
-    Vector<T, UserBlockSize>::Iterator end() const {return Iterator(*this, size()); }
+    Vector<T, UserBlockSize, PrefetchCount>::Iterator begin() const {return Iterator(*this); }
+    Vector<T, UserBlockSize, PrefetchCount>::Iterator end() const {return Iterator(*this, size()); }
 
     /**
      * The default constructor. Increments system-wide data structure
@@ -149,6 +149,21 @@ public:
     static constexpr unsigned int BlockSize = pow(2, BlockShiftBits);
     static constexpr unsigned int TypeSize = sizeof(T);
     static constexpr unsigned int IndexMask = BlockSize - 1;
+    // Count the number of elements of type T in a single block for prefetching purposes
+    static constexpr unsigned int BlockElementCount = BlockSize / TypeSize;
+    /**
+     * Prefetch the next block if necessary. Will eventually be a bunch of
+     * ifdefs depending on some prefetching strategy specified as a template
+     * argument
+     */
+    void prefetch(size_t inBlockIdx, size_t blockTag) {
+        if (BlockSize - inBlockIdx + 1 >= PrefetchCount) {
+            auto& pc2l = pc2l::System::get();
+            pc2l.cacheManager().getBlockFallbackRemote(dsTag, blockTag + 1);
+
+        }
+
+    }
 
     /**
      * Returns size (in values, not blocks) of vector
@@ -216,6 +231,7 @@ public:
         // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
         //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
+        prefetch(inBlockIdx, blockTag);
         if (blockTag == prevBlockTag) {
             // if the CacheManager's cache contains this block, just get it
             // get array of concatenated T-serializations
@@ -229,7 +245,10 @@ public:
         // if the CacheManager's cache contains this block, just get it
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
-        // offset into this array and extract correct portion
+        // Sequential prefetching
+        if (inBlockIdx + PrefetchCount == BlockElementCount) {
+            cm.getRemoteBlockNonblocking(dsTag, blockTag + 1);
+        }
         PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
         return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
@@ -296,6 +315,7 @@ public:
     void replace(unsigned long long index, T value) {
         PC2L_DEBUG_START_TIMER()
         const auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        prefetch(inBlockIdx, blockTag);
         MessagePtr msg;
         CacheManager& cm = System::get().cacheManager();
         if (blockTag == prevBlockTag) {
