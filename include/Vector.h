@@ -58,13 +58,18 @@
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 
+enum PrefetchStrategy {
+    FORWARD_SEQUENTIAL = 0,
+    BACKWARD_SEQUENTIAL,
+
+};
 
 /**
  * A distributed vector that runs across multiple machines
  * utilizing message passing through MPI. This initial  
  * implementation does not include any caching.
  */
-template <typename T, unsigned int UserBlockSize = 4096, unsigned int PrefetchCount = 5>
+template <typename T, unsigned int UserBlockSize = 4096, unsigned int PrefetchCount = 5, PrefetchStrategy PFStrategy = FORWARD_SEQUENTIAL>
 class Vector {
 public:
     /**
@@ -109,8 +114,8 @@ public:
 
 
     // Iterator methods
-    Vector<T, UserBlockSize, PrefetchCount>::Iterator begin() const {return Iterator(*this); }
-    Vector<T, UserBlockSize, PrefetchCount>::Iterator end() const {return Iterator(*this, size()); }
+    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator begin() const {return Iterator(*this); }
+    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator end() const {return Iterator(*this, size()); }
 
     /**
      * The default constructor. Increments system-wide data structure
@@ -156,11 +161,15 @@ public:
      * ifdefs depending on some prefetching strategy specified as a template
      * argument
      */
-    void prefetch(size_t inBlockIdx, size_t blockTag) {
-        if (BlockSize - inBlockIdx + 1 >= PrefetchCount) {
-            auto& pc2l = pc2l::System::get();
-            pc2l.cacheManager().getBlockFallbackRemote(dsTag, blockTag + 1);
+    void prefetch(size_t inBlockIdx, size_t blockTag) const {
+        if constexpr(PFStrategy == PrefetchStrategy::FORWARD_SEQUENTIAL) {
+            if (BlockSize - inBlockIdx + 1 >= PrefetchCount && (siz / BlockSize) > blockTag + 1) {
+                auto& pc2l = pc2l::System::get();
+                pc2l.cacheManager().getBlockFallbackRemote(dsTag, blockTag + 1);
 
+            }
+        } else if constexpr(PFStrategy == PrefetchStrategy::BACKWARD_SEQUENTIAL) {
+            
         }
 
     }

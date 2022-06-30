@@ -95,6 +95,7 @@ MessagePtr CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag
     ret = recv(storedRank, false);
     // then put the object at retrieved index into cache
     storeCacheBlock(ret);
+    return ret;
 }
 
 

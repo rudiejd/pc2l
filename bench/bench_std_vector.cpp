@@ -54,6 +54,17 @@ static void BM_insert_at_beginning(benchmark::State& state) {
 
 BENCHMARK(BM_insert_at_beginning)->DenseRange(0, 10);
 
+static void BM_find_middle(benchmark::State& state) {
+    std::vector<int> v;
+    for (int i = 0; i < 100; i++) {
+        v.push_back(i);
+    }
+    while (state.KeepRunning()) {
+        std::find(v.begin(), v.end(), 50);
+    }
+}
+BENCHMARK(BM_find_middle);
+
 int main(int argc, char** argv) {
     benchmark::Initialize(&argc, argv);
     benchmark::RunSpecifiedBenchmarks();

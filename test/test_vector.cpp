@@ -155,7 +155,7 @@ TEST_F(VectorTest, test_std_find) {
     for (size_t i = 0; i < 100; i++) {
         ASSERT_NO_THROW(intVec.insert(i, i));
     }
-    ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 50), 51);
+    ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 50), 50);
     ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 0), 0);
     ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 99), 99);
 }
