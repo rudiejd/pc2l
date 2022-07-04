@@ -45,6 +45,7 @@
  */
 
 #include <vector>
+#include <variant>
 #include "Message.h"
 
 // namespace pc2l {
@@ -132,7 +133,7 @@ public:
      *
      * \return The message received, if any.
      */
-    MessagePtr recv(const int srcRank = MPI_ANY_SOURCE,
+    std::variant<MPI_Request, MessagePtr> recv(const int srcRank = MPI_ANY_SOURCE,
                     const bool blocking = true,
                     const int tag = MPI_ANY_TAG);
     

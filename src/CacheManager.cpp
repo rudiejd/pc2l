@@ -54,6 +54,15 @@ CacheManager::finalize() {
 }
 
 MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
+    // see if this is something we've prefetched. if so, just wait on the request
+    if (prefetchMsg != nullptr &&
+        dsTag == prefetchMsg->dsTag && blockTag == prefetchMsg->dsTag) {
+        MPI_Status status;
+        // wait for nonblocking receive
+        MPI_Wait(&prefetchReq, &status);
+        // MPI_Wait has completed, so now our nonblocking receive should succeed
+        return std::get<MessagePtr>(recv(MPI::ANY_SOURCE, false));
+    }
     size_t key = Message::getKey(dsTag, blockTag);
     try {
         return cache.at(key);
@@ -63,11 +72,8 @@ MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
 }
 
 MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
-    MessagePtr ret = nullptr;
-    size_t key = Message::getKey(dsTag, blockTag);
-    try {
-        ret = cache.at(key);
-    } catch (const std::out_of_range& e) {
+    MessagePtr ret = getBlock(dsTag, blockTag);
+    if (ret == nullptr) {
         // otherwise, we have to get it from a remote cacheworker
         // if we're in profiling mode, note this
         if (System::get().profile) {
@@ -77,25 +83,31 @@ MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
         const int storedRank = (blockTag % (worldSize - 1)) + 1;
         ret = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
         send(ret, storedRank);
-        ret = recv(storedRank);
+        ret = std::get<MessagePtr>(recv(storedRank));
         // then put the object at retrieved index into cache
         storeCacheBlock(ret);
     }
-    refer(cache[key]);
+    refer(cache[ret->key]);
 
     return ret;
 }
 
-MessagePtr CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {
+void CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {
     const unsigned long long worldSize = System::get().worldSize();
     const int storedRank = (blockTag % (worldSize - 1)) + 1;
-    MessagePtr ret = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
-    send(ret, storedRank);
+    MessagePtr reqMsg = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
+    send(reqMsg, storedRank);
     // do a non-blocking receive call
-    ret = recv(storedRank, false);
-    // then put the object at retrieved index into cache
-    storeCacheBlock(ret);
-    return ret;
+    std::variant<MPI_Request, MessagePtr> var(recv(storedRank, false));
+    try {
+        // if it returns right away, store the message
+        MessagePtr ret = std::get<MessagePtr>(var);
+        storeCacheBlock(ret);
+    } catch (const std::bad_variant_access& ex) {
+        // otherwise store an MPI_Request that we can wait on
+        prefetchMsg = reqMsg;
+        prefetchReq = std::get<MPI_Request>(var);
+    }
 }
 
 

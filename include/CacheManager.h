@@ -109,9 +109,9 @@ public:
      *  Retrieve a block from a remote CacheWorker in a non-blocking fashion
      * \param[in] dsTag the data structure tag associated with this block
      * \param[in] blockTag the block tag associated with this block
-     * @return message containing the block
+     *
      */
-    MessagePtr getRemoteBlockNonblocking(size_t dsTag, size_t blockTag);
+    void getRemoteBlockNonblocking(size_t dsTag, size_t blockTag);
 
     /**
      * Gives a reference to the manager's cache for use in insertion
@@ -121,6 +121,10 @@ public:
     DataCache& managerCache() {
         return cache;
     }
+
+private:
+    MPI_Request prefetchReq;
+    MessagePtr prefetchMsg;
 };
 
 

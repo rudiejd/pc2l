@@ -55,7 +55,7 @@ Worker::send(MessagePtr msgPtr, const int destRank) {
 }
 
 // Recieve a message using our recv buffer
-MessagePtr
+std::variant<MPI_Request, MessagePtr>
 Worker::recv(const int srcRank, const bool blocking,
              const int tag) {
     // First poll and find out the size of the message to read
@@ -63,7 +63,7 @@ Worker::recv(const int srcRank, const bool blocking,
     try {
         if (!blocking && !MPI_IPROBE(srcRank, tag, status)) {
             // No pending message.
-            return MessagePtr(nullptr);
+            return std::variant<MPI_Request, MessagePtr>(MessagePtr(nullptr));
         } else if (blocking) {
             // Wait until we get a valid message to read.
             MPI_PROBE(srcRank, tag, status);
@@ -86,7 +86,7 @@ Worker::recv(const int srcRank, const bool blocking,
     }
 
     // Return our buffer as if it is a message
-    return Message::create(recvBuf.data());
+    return std::variant<MPI_Request, MessagePtr>(Message::create(recvBuf.data()));
 }
 
 void
