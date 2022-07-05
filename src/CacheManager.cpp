@@ -57,11 +57,8 @@ MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
     // see if this is something we've prefetched. if so, just wait on the request
     if (prefetchMsg != nullptr &&
         dsTag == prefetchMsg->dsTag && blockTag == prefetchMsg->dsTag) {
-        MPI_Status status;
-        // wait for nonblocking receive
-        MPI_Wait(&prefetchReq, &status);
-        // MPI_Wait has completed, so now our nonblocking receive should succeed
-        return std::get<MessagePtr>(recv(MPI::ANY_SOURCE, false));
+        // ask worker to wait on the result then return it
+        return wait(prefetchReq);
     }
     size_t key = Message::getKey(dsTag, blockTag);
     try {
@@ -83,7 +80,7 @@ MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
         const int storedRank = (blockTag % (worldSize - 1)) + 1;
         ret = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
         send(ret, storedRank);
-        ret = std::get<MessagePtr>(recv(storedRank));
+        ret = recv(storedRank);
         // then put the object at retrieved index into cache
         storeCacheBlock(ret);
     }
@@ -97,17 +94,8 @@ void CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {
     const int storedRank = (blockTag % (worldSize - 1)) + 1;
     MessagePtr reqMsg = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
     send(reqMsg, storedRank);
-    // do a non-blocking receive call
-    std::variant<MPI_Request, MessagePtr> var(recv(storedRank, false));
-    try {
-        // if it returns right away, store the message
-        MessagePtr ret = std::get<MessagePtr>(var);
-        storeCacheBlock(ret);
-    } catch (const std::bad_variant_access& ex) {
-        // otherwise store an MPI_Request that we can wait on
-        prefetchMsg = reqMsg;
-        prefetchReq = std::get<MPI_Request>(var);
-    }
+    // do a non-blocking receive call and store the request as a member
+    prefetchReq = startReceiveNonblocking(storedRank);
 }
 
 

@@ -115,6 +115,13 @@ public:
     void send(MessagePtr msgPtr, const int destRank = 0);
 
     /**
+     * Waits on a request to come back then returns pointer to data with result
+     * @param req MPI_Request to wait on
+     * @return resulting message
+     */
+    MessagePtr wait(MPI_Request req);
+
+    /**
      * Helper method to receive a message (binary blob), optionaly
      * from a given source-rank.
      *
@@ -122,21 +129,35 @@ public:
      * received.  If this parameter is \c MPI_ANY_SOURCE, then the
      * first revived message is typically returned.
      *
-     * \param[in] blocking If this flag is true then this method will
-     * block and wait until a message is received.  If this flag is
-     * false, and if a message is not available then this method
-     * returns an invalid message.
-     *
      * \param[in] tag Only read a message with a specific tag.  If
      * this tag is \c MPI_ANY_TAG then messages are read ignoring the
      * their tag values.
      *
      * \return The message received, if any.
      */
-    std::variant<MPI_Request, MessagePtr> recv(const int srcRank = MPI_ANY_SOURCE,
-                    const bool blocking = true,
-                    const int tag = MPI_ANY_TAG);
-    
+    MessagePtr recv(const int srcRank = MPI_ANY_SOURCE, const int tag = MPI_ANY_TAG);
+
+
+    /**
+     * Helper method to receive a message (binary blob),
+     * from a given source-rank in a non blocking fashion
+     * This initiates the non-blocking receive. The wait
+     * method ensures that it has concluded, and it must
+     * be passed the MPI_Request from this method
+     *
+     * \param[in] srcRank The rank from where a message must be
+     * received.  If this parameter is \c MPI_ANY_SOURCE, then the
+     * first revived message is typically returned.
+     *
+     * \param[in] tag Only read a message with a specific tag.  If
+     * this tag is \c MPI_ANY_TAG then messages are read ignoring the
+     * their tag values.
+     *
+     * \return Request resulting from recv
+     */
+    MPI_Request startReceiveNonblocking(const int srcRank = MPI_ANY_SOURCE,
+                                               const int tag = MPI_ANY_TAG);
+
 protected:
     /**
      * The default constructor is made protected to ensure that this

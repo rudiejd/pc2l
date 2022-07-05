@@ -53,7 +53,7 @@ CacheWorker::CacheWorker() {
 void
 CacheWorker::run() {
     // Keep processing messages until we get a message with finish tag.
-    for (MessagePtr msg = std::get<MessagePtr>(recv()); msg->tag != Message::FINISH; msg = std::get<MessagePtr>(recv())) {
+    for (MessagePtr msg = recv(); msg->tag != Message::FINISH; msg = recv()) {
         switch (msg->tag) {
         case Message::STORE_BLOCK:
             storeCacheBlock(msg);
