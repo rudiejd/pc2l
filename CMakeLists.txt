@@ -14,11 +14,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-# if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-# include_directories("/opt/Homebrew/include")
-# link_libraries("/opt/Homebrew/lib")
-# endif()
-
 # Options
 option(pc2l_BUILD_EXAMPLES "Build examples in the examples/ folder" OFF)
 
