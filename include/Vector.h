@@ -54,12 +54,12 @@
 #include "MPIHelper.h"
 #include "Message.h"
 
-
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 
 enum PrefetchStrategy {
-    FORWARD_SEQUENTIAL = 0,
+    NONE = 0,
+    FORWARD_SEQUENTIAL,
     BACKWARD_SEQUENTIAL,
 
 };
@@ -69,53 +69,65 @@ enum PrefetchStrategy {
  * utilizing message passing through MPI. This initial  
  * implementation does not include any caching.
  */
-template <typename T, unsigned int UserBlockSize = 4096, unsigned int PrefetchCount = 5, PrefetchStrategy PFStrategy = FORWARD_SEQUENTIAL>
+template <typename T, unsigned int UserBlockSize = 4096, unsigned int PrefetchCount = 5, PrefetchStrategy PFStrategy = NONE>
 class Vector {
 public:
     /**
      * Customer iterator for a PC2L vector. As of right now,
      * only an input iterator is implemented.
-     * TODO: Random access iterator?
+     * TODO: need a custom reference to replace reference
      */
-    struct Iterator : public std::iterator<
-                                std::input_iterator_tag, // iterator_category
-                                T,                       // value_type
-                                size_t,                  // difference_type
-                                const T*,                // pointer
-                                T> {                     // reference
-        // declare friend class so only pc2l::Vector can access Iterator's private constructor
-        friend class Vector<T, UserBlockSize>;
+    class Iterator {
     public:
-        // Dereference: return value of data at index i (call vec.at)
-        T operator*() const { return vec.at(i); };
+         using iterator_category = std::random_access_iterator_tag;
+         using value_type = T;
+         using difference_type = size_t;
+         // remove pointer type?
+         using pointer = T&;
+         using reference = T&;
+         // declare friend class so only pc2l::Vector can access Iterator's private constructor
+         friend class Vector<T, UserBlockSize>;
 
         // Maybe implement bounds check here? Or bounds check in pc2l::Vector
-        Iterator& operator++() { i++; return *this; }
-        Iterator& operator--() { i--; return *this; }
+        inline Iterator& operator++() { i++; return *this; }
+        inline Iterator& operator--() { i--; return *this; }
+        inline Iterator& operator=(const Iterator& rhs) {i = rhs.i; return * this; }
+        inline Iterator& operator+=(const difference_type& rhs) {i += rhs; return *this; }
+        inline Iterator& operator+=(const Iterator& rhs) {i += rhs.i; return *this; }
+        inline Iterator& operator-=(const difference_type& rhs) {i -= rhs; return *this; }
+        inline Iterator& operator-=(const Iterator& rhs) {i -= rhs.i; return *this; }
 
-        Iterator operator-(size_t n) {return Iterator(vec, i - n); }
-        Iterator operator-(Iterator& rhs) {return Iterator(vec, i - rhs.i); }
-        Iterator operator+(size_t n) {return Iterator(vec, i + n); }
-        Iterator operator+(Iterator& rhs) {return Iterator(vec, i + rhs.i); }
 
-        bool operator==(const Iterator& rhs) const {
-            return &rhs.vec == &vec && rhs.i == i;
-        }
-        bool operator!=(const Iterator& rhs) const {
-            return !(*this == rhs);
-        }
+        pointer operator->() const { return vec.ptr(i); }
+        // TODO: Redefine reference type with custom reference
+        reference operator[](const difference_type& rhs) const { return vec[rhs]; }
+        reference operator*() const { return vec[i]; };
+
+
+        value_type operator-(const Iterator& rhs) { return i - rhs.i; }
+        Iterator operator+(const difference_type& rhs) const { return Iterator(vec, i + rhs); }
+        Iterator operator-(const difference_type& rhs) const { return Iterator(vec, i - rhs); }
+        friend Iterator operator+(const difference_type& lhs, const Iterator& rhs) { return Iterator(lhs + rhs.i); }
+        friend Iterator operator-(const difference_type& lhs, const Iterator& rhs) { return Iterator(lhs - rhs.i); }
+
+        bool operator==(const Iterator& rhs) const { return &rhs.vec == &vec && rhs.i == i; }
+        bool operator!=(const Iterator& rhs) const { return !(*this == rhs); }
+        bool operator<(const Iterator& rhs) const { return i < rhs.i; }
+        bool operator>(const Iterator& rhs) const { return i > rhs.i; }
+        bool operator<=(const Iterator& rhs) const { return i >= rhs.i; }
+        bool operator>=(const Iterator& rhs) const { return i >= rhs.i; }
 
     private:
-        Iterator(const Vector<T, UserBlockSize>& vec, const size_t end = 0) :
+        Iterator(Vector<T, UserBlockSize>& vec, const size_t end = 0) :
             vec(vec), i(end) {}
-        const Vector<T, UserBlockSize>& vec;
+        Vector<T, UserBlockSize>& vec;
         size_t i = 0;
     };
 
 
     // Iterator methods
-    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator begin() const {return Iterator(*this); }
-    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator end() const {return Iterator(*this, size()); }
+    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator begin() { return Iterator(*this); }
+    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator end() { return Iterator(*this, size()); }
 
     /**
      * The default constructor. Increments system-wide data structure
@@ -180,6 +192,28 @@ public:
      */
     unsigned long long size() const {
         return siz;
+    }
+
+    T& operator[](size_t index){
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
+        //           << ", inBlockIdx = " << inBlockIdx << std::endl;
+
+        prefetch(inBlockIdx, blockTag);
+        if (blockTag == prevBlockTag) {
+            // if the CacheManager's cache contains this block, just get it
+            // get array of concatenated T-serializations
+            char* payload = prevMsg->getPayload();
+            return *reinterpret_cast<T*>(payload + inBlockIdx);
+        }
+        CacheManager& cm  = System::get().cacheManager();
+        MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        prevBlockTag = blockTag;
+        prevMsg = msg;
+        // if the CacheManager's cache contains this block, just get it
+        // get array of concatenated T-serializations
+        char* payload = msg->getPayload();
+        return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
     /**
@@ -256,6 +290,43 @@ public:
         char* payload = msg->getPayload();
         PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
         return *reinterpret_cast<T*>(payload + inBlockIdx);
+    }
+
+    T* ptr(unsigned long long index) {
+        PC2L_DEBUG_START_TIMER()
+        // instead of div, prefer bitwise operations eventually
+        // but this will require moving to powers of 2 only
+
+        // For now we are hardcoding some of this to just test to see
+        // what is the performance improvement that we may be able to
+        // achieve with bitwise operations.
+
+        // const auto ret = std::lldiv(index*sizeof(T), BlockSize);
+        // const size_t blockTag = ret.quot;
+        // unsigned long long inBlockIdx = ret.rem;
+
+        // @insert: index = 99, blockTag = 12, inBlockIdx = 12
+        // @at: index = 99, blockTag = 49, inBlockIdx = 4
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
+        //           << ", inBlockIdx = " << inBlockIdx << std::endl;
+
+        prefetch(inBlockIdx, blockTag);
+        if (blockTag == prevBlockTag) {
+            // if the CacheManager's cache contains this block, just get it
+            // get array of concatenated T-serializations
+            char* payload = prevMsg->getPayload();
+            return *reinterpret_cast<T*>(payload + inBlockIdx);
+        }
+        CacheManager& cm  = System::get().cacheManager();
+        MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        prevBlockTag = blockTag;
+        prevMsg = msg;
+        // if the CacheManager's cache contains this block, just get it
+        // get array of concatenated T-serializations
+        char* payload = msg->getPayload();
+        PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
+        return reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
     /**

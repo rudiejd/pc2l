@@ -93,6 +93,16 @@ TEST_F(VectorTest, test_at) {
     }
 }
 
+TEST_F(VectorTest, test_operatorbrack) {
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
+    for (int i = 0; i < 100; i++) {
+        intVec.push_back(i);
+    }
+    for (int i = 0; i < 100; i++) {
+        ASSERT_TRUE(intVec[static_cast<size_t>(i)] == i);
+    }
+}
+
 // Test the custom iterator for our vector class
 TEST_F(VectorTest, test_iterator) {
     pc2l::Vector<int, 8 * sizeof(int)> intVec;
@@ -160,22 +170,23 @@ TEST_F(VectorTest, test_std_find) {
     ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 99), 99);
 }
 
-//TEST_F(VectorTest, test_sort) {
-//    pc2l::Vector<int, 8 * sizeof(int)> intVec;
-//    pc2l::Vector<int, 8 * sizeof(int)> intVecSorted;
-//
-//    // push 100 random numbers 0 - 99
-//    for (unsigned int i = 0; i < 100; i++) {
-//        intVec.push_back(rand() % 100);
-//    }
-//
-//    std::sort(intVec.begin(), intVec.end());
-//
-//    // assert sorted order
-//    for (unsigned int i = 1; i < 100; i++) {
-//        ASSERT_TRUE(intVec.at(i) >= intVec.at(i - 1));
-//    }
-//}
+TEST_F(VectorTest, test_std_sort) {
+    pc2l::Vector<int, 8 * sizeof(int)> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVecSorted;
+
+    // push 100 random numbers 0 - 99
+    for (unsigned int i = 0; i < 100; i++) {
+        intVec.push_back(rand() % 100);
+    }
+
+    std::sort(intVec.begin(), intVec.end());
+
+    // assert sorted order
+    for (unsigned int i = 1; i < 100; i++) {
+        std::cout << "the sorted value at " << i << " is " << intVec[i] << std::endl;
+        ASSERT_TRUE(intVec.at(i) >= intVec.at(i - 1));
+    }
+}
 
 TEST_F(VectorTest, test_sort) {
     pc2l::Vector<int, 8 * sizeof(int)> intVec;

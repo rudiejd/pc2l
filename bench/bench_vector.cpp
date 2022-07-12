@@ -20,18 +20,21 @@ static void BM_at(benchmark::State& state) {
         v.at(state.range(0));
     }
 }
+BENCHMARK(BM_at)->DenseRange(0, 100);
 
-BENCHMARK(BM_at)
-        ->Args({99})
-        ->Args({98})
-        ->Args({97})
-        ->Args({96})
-        ->Args({95})
-        ->Args({94})
-        ->Args({93})
-        ->Args({92})
-        ->Args({91})
-        ->Args({90});
+static void BM_at_prefetch(benchmark::State& state) {
+    pc2l::Vector<int, 8 * sizeof(int), 5, pc2l::FORWARD_SEQUENTIAL> v;
+    for (int i = 0; i < 100; i++) {
+        v.insert(i, i);
+    }
+    // so now the last 3 blocks will be in cache (default LRU strategy)
+    // this is [94-99], [89-93], [84-88]
+    // part that is timed is in this loop
+    while (state.KeepRunning()) {
+        v.at(state.range(0));
+    }
+}
+BENCHMARK(BM_at_prefetch)->DenseRange(0, 100);
 
 static void BM_insert(benchmark::State& state) {
     pc2l::Vector<int, 8 * sizeof(int)> v;

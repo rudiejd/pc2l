@@ -86,7 +86,7 @@ MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
     }
     refer(cache[ret->key]);
 
-    return ret;
+    return cache[ret->key];
 }
 
 void CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {
