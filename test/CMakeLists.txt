@@ -17,3 +17,4 @@ function(add_mpi_test name no_mpi_proc)
 endfunction(add_mpi_test)
 
 add_mpi_test(vector 2)
+add_mpi_test(map 2)

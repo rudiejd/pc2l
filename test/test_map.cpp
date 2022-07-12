@@ -52,19 +52,21 @@ int main(int argc, char *argv[]) {
     return RUN_ALL_TESTS();
 }
 TEST_F(UnorderedMapTest, test_insert) {
-    pc2l::UnorderedMap<char*, int> map;
-    ASSERT_NO_THROW(map.insert("apple", 1));
-    ASSERT_NO_THROW(map.insert("banana", 2));
-    ASSERT_NO_THROW(map.insert("carrot", 3));
+    pc2l::Map<const char*, int> map;
+    ASSERT_NO_THROW(map["apple"] = 1);
+    ASSERT_NO_THROW(map["banana"] = 2);
+    ASSERT_NO_THROW(map["carrot"] = 3);
 }
 
 TEST_F(UnorderedMapTest, test_at) {
-    pc2l::UnorderedMap<const char*, int> map;
+    pc2l::Map<const char*, int> map;
     for (int i = 0; i < 100; i++) {
-        map.insert(static_cast<char>('0' + i) + "i", i);
+        std::string s("a" + std::to_string(i));
+        map[s.c_str()] = i;
     }
     // check to see if data is correct (tests deserializtion)
     for (int i = 0; i < 100; i++) {
-        ASSERT_EQ(i, map.at(static_cast<char>('0' + i) + "i"));
+        std::string s("a" + std::to_string(i));
+        ASSERT_EQ(map[s.c_str()], i);
     }
 }

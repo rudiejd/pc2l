@@ -3,8 +3,8 @@
 
 //---------------------------------------------------------------------
 //  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
@@ -59,56 +59,63 @@ BEGIN_NAMESPACE(pc2l);
 
 /**
  * A distributed vector that runs across multiple machines
- * utilizing message passing through MPI. This initial  
+ * utilizing message passing through MPI. This initial
  * implementation does not include any caching.
  */
  // T is key type, U is value type
-template <typename T, typename U>
-class UnorderedMap {
+ // associative map
+template <typename KeyType, typename ValueType>
+class Map {
 public:
+
+
+    struct MapPair {
+        KeyType key;
+        ValueType value;
+        MapPair(const KeyType& key, const ValueType& value) : key(key), value(value) {}
+    };
+
+     typedef typename pc2l::Vector<MapPair>::Iterator iterator;
     // underlying vector representation of the hashmap
-    Vector<U> vec;
+    Vector<MapPair> vec;
 
-
-    // hash function for this map
-    std::hash<T> mapHash;
     /**
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
      */
-    UnorderedMap() {
-        dsTag = System::get().dsCount++;
+    Map() {
     }
 
     /**
      * The destructor.
      */
-    virtual ~UnorderedMap() {}
+    virtual ~Map() {}
 
-    int dsTag;
+    iterator insert(KeyType key, ValueType value) {
+        iterator i(std::lower_bound(vec.begin(), vec.end(), key, [](const MapPair& lhs, const KeyType& rhs) {
+            return lhs.key < rhs;
+        }));
 
-    void insert(T key, U value) {
-        // obtain world size and compute destination rank
-        const int worldSize = System::get().worldSize();
-        unsigned int index = mapHash(key) % index;
-        // linear probing: if the slot is full, go to the next slot. If that's full, go to next
-        // etc. New probe method must be implemented to prevent sending whole object to check
-        // whether a cache block is full
-        CacheManager& cm = System::get().cacheManager();
-        bool full = true;
-        while (full) {
-            MessagePtr probePtr = Message::create(1, Message::PROBE_BLOCK, index, vec.dsTag, index);
-            cm.send(probePtr, destRank);
-            MessagePtr probeRes = cm.recv();
-            full = reinterpret_cast<bool*>(probeRes->getPayload());
-            if (full) index++;
+        if (i == vec.end() || std::less<KeyType>{}(key, (*i).key)) {
+            i = vec.insert(i, MapPair(key, value));
         }
-        vec.insert(index, value);
+        return i;
     }
 
-    U at(T key) {
+    iterator find(const KeyType& k)
+    {
+        iterator i(std::lower_bound(vec.begin(), vec.end(), k, [](const MapPair& lhs, const KeyType& rhs)-> bool {
+            return lhs.key < rhs;
+        }));
+        if (i != vec.end() && std::less<KeyType>{}(k, (*i).key)) {
+            i = vec.end();
+        }
+        return i;
+    }
 
-    };
+    ValueType& operator[](const KeyType& key) {
+        return (*find(key)).value;
+    }
 };
 
 END_NAMESPACE(pc2l);

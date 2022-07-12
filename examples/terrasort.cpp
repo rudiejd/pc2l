@@ -41,7 +41,7 @@
 #include <pc2l.h>
 #include <climits>
 #include <ctime>
-
+#include <algorithm>
 int main(int argc, char *argv[]) {
     if (argc != 4) {
         std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     if (pc2l::MPI_GET_RANK() == 0) {
         std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
         auto sortStart = clock();
-        terraVec.sort();
+        std::sort(terraVec.begin(), terraVec.end());
         std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
     }
 

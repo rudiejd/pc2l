@@ -107,8 +107,8 @@ public:
         value_type operator-(const Iterator& rhs) { return i - rhs.i; }
         Iterator operator+(const difference_type& rhs) const { return Iterator(vec, i + rhs); }
         Iterator operator-(const difference_type& rhs) const { return Iterator(vec, i - rhs); }
-        friend Iterator operator+(const difference_type& lhs, const Iterator& rhs) { return Iterator(lhs + rhs.i); }
-        friend Iterator operator-(const difference_type& lhs, const Iterator& rhs) { return Iterator(lhs - rhs.i); }
+        friend Iterator operator+(const difference_type& lhs, const Iterator& rhs) { return Iterator(rhs.vec, lhs + rhs.i); }
+        friend Iterator operator-(const difference_type& lhs, const Iterator& rhs) { return Iterator(rhs.vec, lhs - rhs.i); }
 
         bool operator==(const Iterator& rhs) const { return &rhs.vec == &vec && rhs.i == i; }
         bool operator!=(const Iterator& rhs) const { return !(*this == rhs); }
@@ -373,6 +373,11 @@ public:
         // if it's an insert at the end, we haven't yet incremented size. otherwise we have
         if (index == size()) siz++;
         PC2L_DEBUG_STOP_TIMER("insert(" << index << ", " << value << ")")
+    }
+
+    Iterator insert(Iterator index, T value) {
+        insert(index.i, value);
+        return Iterator(*this, index.i);
     }
 
     /**
