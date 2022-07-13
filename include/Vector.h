@@ -104,7 +104,7 @@ public:
         reference operator*() const { return vec[i]; };
 
 
-        value_type operator-(const Iterator& rhs) { return i - rhs.i; }
+        difference_type operator-(const Iterator& rhs) { return i - rhs.i; }
         Iterator operator+(const difference_type& rhs) const { return Iterator(vec, i + rhs); }
         Iterator operator-(const difference_type& rhs) const { return Iterator(vec, i - rhs); }
         friend Iterator operator+(const difference_type& lhs, const Iterator& rhs) { return Iterator(rhs.vec, lhs + rhs.i); }

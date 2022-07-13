@@ -46,6 +46,7 @@
  */
 
 #include <unordered_map>
+#include <algorithm>
 #include "Worker.h"
 #include "CacheManager.h"
 #include "System.h"
@@ -114,8 +115,7 @@ public:
     }
 
     ValueType& operator[](const KeyType& key) {
-        return (*find(key)).value;
-    }
+        return ;    }
 };
 
 END_NAMESPACE(pc2l);
