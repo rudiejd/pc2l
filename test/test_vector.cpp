@@ -38,10 +38,6 @@
 #include <random>
 #include "Environment.h"
 
-const unsigned int PC2LEnvironment::blockSize;
-const unsigned int PC2LEnvironment::cacheSize;
-const unsigned int PC2LEnvironment::blocksInCache;
-
 
 class VectorTest : public ::testing::Test {
 
@@ -49,6 +45,8 @@ class VectorTest : public ::testing::Test {
 
 int main(int argc, char *argv[]) {
     ::testing::InitGoogleTest(&argc, argv);
+    auto& pc2l = pc2l::System::get();
+    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
     auto env = new PC2LEnvironment();
     env->argc = argc;
     env->argv = argv;
@@ -101,6 +99,9 @@ TEST_F(VectorTest, test_operatorbrack) {
     for (int i = 0; i < 100; i++) {
         ASSERT_TRUE(intVec[static_cast<size_t>(i)] == i);
     }
+    pc2l::Vector<char*, 8 * sizeof(char)> strVec;
+    strVec.push_back("hi");
+    strVec[0] = "hello"
 }
 
 // Test the custom iterator for our vector class

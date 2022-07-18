@@ -47,6 +47,7 @@
 
 #include <unordered_map>
 #include <algorithm>
+#include <iostream>
 #include "Worker.h"
 #include "CacheManager.h"
 #include "System.h"
@@ -74,6 +75,13 @@ public:
         KeyType key;
         ValueType value;
         MapPair(const KeyType& key, const ValueType& value) : key(key), value(value) {}
+        friend std::ostream& operator<<(std::ostream& output, const MapPair& mp) {
+            output << mp.key << ": " << mp.value;
+            return output;
+        }
+        virtual ValueType& val() {
+            return value;
+        }
     };
 
      typedef typename pc2l::Vector<MapPair>::Iterator iterator;
@@ -115,7 +123,13 @@ public:
     }
 
     ValueType& operator[](const KeyType& key) {
-        return ;    }
+        auto it = find(key);
+        ValueType val{};
+        if (it == vec.end()) {
+            it = insert(key, val);
+        }
+        return it->val();
+    }
 };
 
 END_NAMESPACE(pc2l);

@@ -16,14 +16,13 @@ public:
     // correctly. Tests for performance are conducted in the examples and/or
     // benchmarks directory.
     const static unsigned int blockSize = sizeof(int) * 8;
-    const static unsigned int blocksInCache = 3;
-    const static unsigned int cacheSize = blocksInCache * (sizeof(pc2l::Message) + blockSize);
+//    const static unsigned int cacheSize = 3 * (sizeof(pc2l::Message) + blockSize);
 
     ~PC2LEnvironment() override {};
     void SetUp() override {
         auto& pc2l = pc2l::System::get();
         pc2l.setBlockSize(blockSize);
-        pc2l.setCacheSize(cacheSize);
+//        pc2l.setCacheSize(cacheSize);
         pc2l.initialize(argc, argv);
         pc2l.start();
         ::testing::TestEventListeners& listeners =

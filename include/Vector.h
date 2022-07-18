@@ -83,7 +83,7 @@ public:
          using value_type = T;
          using difference_type = size_t;
          // remove pointer type?
-         using pointer = T&;
+         using pointer = T*;
          using reference = T&;
          // declare friend class so only pc2l::Vector can access Iterator's private constructor
          friend class Vector<T, UserBlockSize>;
@@ -116,6 +116,8 @@ public:
         bool operator>(const Iterator& rhs) const { return i > rhs.i; }
         bool operator<=(const Iterator& rhs) const { return i >= rhs.i; }
         bool operator>=(const Iterator& rhs) const { return i >= rhs.i; }
+
+        Iterator(const Iterator& other) : vec(other.vec), i(other.i) {}
 
     private:
         Iterator(Vector<T, UserBlockSize>& vec, const size_t end = 0) :
@@ -316,7 +318,7 @@ public:
             // if the CacheManager's cache contains this block, just get it
             // get array of concatenated T-serializations
             char* payload = prevMsg->getPayload();
-            return *reinterpret_cast<T*>(payload + inBlockIdx);
+            return reinterpret_cast<T*>(payload + inBlockIdx);
         }
         CacheManager& cm  = System::get().cacheManager();
         MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
@@ -375,7 +377,7 @@ public:
         PC2L_DEBUG_STOP_TIMER("insert(" << index << ", " << value << ")")
     }
 
-    Iterator insert(Iterator index, T value) {
+    Iterator insert(const Iterator& index, T value) {
         insert(index.i, value);
         return Iterator(*this, index.i);
     }
@@ -384,8 +386,8 @@ public:
      * Alias for inserting at "back" (largest index) of vector
      * @param value value to be inserted
      */
-    void push_back(T value) {
-       insert(size(), value);
+    Iterator push_back(T value) {
+       return insert(Iterator(*this, size()), value);
     }
 
     /**
