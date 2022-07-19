@@ -76,8 +76,7 @@ public:
         ValueType value;
         MapPair(const KeyType& key, const ValueType& value) : key(key), value(value) {}
         friend std::ostream& operator<<(std::ostream& output, const MapPair& mp) {
-            output << mp.key << ": " << mp.value;
-            return output;
+            return output << mp.key << ": " << mp.value;
         }
         virtual ValueType& val() {
             return value;
@@ -124,11 +123,11 @@ public:
 
     ValueType& operator[](const KeyType& key) {
         auto it = find(key);
-        ValueType val{};
         if (it == vec.end()) {
+            ValueType val{1};
             it = insert(key, val);
         }
-        return it->val();
+        return (*it).val();
     }
 };
 

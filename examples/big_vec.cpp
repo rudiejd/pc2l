@@ -47,13 +47,13 @@ int main(int argc, char *argv[]) {
 
     // Do some testing here.
     std::cout << "world size " << pc2l.worldSize() << std::endl;
-    pc2l::Vector<char*, 1000> v;
-    char* data = (char*) "String test";
+    pc2l::Vector<std::array<char, 10>, 1000> v;
+    std::array<char, 10> data = {{'t', 'e', 's', 't'}};
     for (int i = 0; i < 100; i++) {
-        v.insert(i, data);
+        v.push_back(data);
     }
     for (int i = 0; i < 100; i++) {
-        std::cout << "at " << i << " " << v.at(i) << std::endl;
+        std::cout << "at " << i << " " << v[0][0] << v[0][1] << v[0][2] << v[0][3] << std::endl;
     }
 
     // delete even indices
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     std::cout << "first ten removed" << std::endl;
 
     for (int i = 0; i < v.size(); i++) {
-        std::cout << "at " << i << " " << v.at(i) << std::endl;
+        std::cout << "at " << i << " " << v[0][0] << v[0][1] << v[0][2] << v[0][3] << std::endl;
     }
 
     // Wind-up

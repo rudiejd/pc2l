@@ -91,6 +91,15 @@ TEST_F(VectorTest, test_at) {
     }
 }
 
+struct Demo {
+    int a = 0;
+    int b = 1;
+    friend std::ostream& operator<<(std::ostream& os, const Demo& d) {
+        os << d.a << " " << d.b;
+        return os;
+    }
+};
+
 TEST_F(VectorTest, test_operatorbrack) {
     pc2l::Vector<int, 8 * sizeof(int)> intVec;
     for (int i = 0; i < 100; i++) {
@@ -99,9 +108,31 @@ TEST_F(VectorTest, test_operatorbrack) {
     for (int i = 0; i < 100; i++) {
         ASSERT_TRUE(intVec[static_cast<size_t>(i)] == i);
     }
-    pc2l::Vector<char*, 8 * sizeof(char)> strVec;
-    strVec.push_back("hi");
-    strVec[0] = "hello"
+    /**
+     * recall that this library is POD, so we cannot use std::string
+     * additionally, pointers to characters will not move since
+     * just the pointer address will be copied and we cannot know total string
+     * size even if we wanted to copy the values at the address.
+     * therefore we use std::array<char, N> as a string
+     */
+    pc2l::Vector<std::array<char, 10>, 8 * sizeof(char)*10> strVec;
+    std::array<char, 10> hiArr = {{'h', 'i', '\0'}};
+    strVec.push_back(hiArr);
+    std::array<char, 10> byeArr = {{'b', 'y', 'e', '\0'}};
+    strVec.push_back(byeArr);
+    ASSERT_EQ(strVec[0], hiArr);
+    ASSERT_EQ(strVec[1], byeArr);
+    std::array<char, 10> helloArr = {{'h', 'e', 'l', 'l', 'o', '\0'}};
+    strVec[0] = helloArr;
+    ASSERT_EQ(strVec[0], helloArr);
+    strVec[1][0] = 'a';
+    std::array<char, 10> ayeArr = {{'a', 'y', 'e', '\0'}};
+    ASSERT_EQ(strVec[1], ayeArr);
+    Demo d;
+    pc2l::Vector<Demo, 8 * sizeof(int)> demoVec;
+    demoVec.push_back(d);
+    demoVec[0].a = 1;
+    ASSERT_EQ(demoVec[0].a, 1);
 }
 
 // Test the custom iterator for our vector class

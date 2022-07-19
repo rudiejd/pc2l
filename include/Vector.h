@@ -118,12 +118,11 @@ public:
         bool operator>=(const Iterator& rhs) const { return i >= rhs.i; }
 
         Iterator(const Iterator& other) : vec(other.vec), i(other.i) {}
-
+        size_t i = 0;
     private:
         Iterator(Vector<T, UserBlockSize>& vec, const size_t end = 0) :
             vec(vec), i(end) {}
         Vector<T, UserBlockSize>& vec;
-        size_t i = 0;
     };
 
 

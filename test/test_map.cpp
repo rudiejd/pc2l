@@ -61,14 +61,14 @@ TEST_F(UnorderedMapTest, test_insert) {
 }
 
 TEST_F(UnorderedMapTest, test_at) {
-    pc2l::Map<const char*, int> map;
+    pc2l::Map<std::string, int> map;
     for (int i = 0; i < 100; i++) {
         std::string s("a" + std::to_string(i));
-        map[s.c_str()] = i;
+        map[s] = i;
     }
     // check to see if data is correct (tests deserializtion)
     for (int i = 0; i < 100; i++) {
         std::string s("a" + std::to_string(i));
-        ASSERT_EQ(map[s.c_str()], i);
+        ASSERT_EQ(map[s], i);
     }
 }
