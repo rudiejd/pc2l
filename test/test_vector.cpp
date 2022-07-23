@@ -91,15 +91,6 @@ TEST_F(VectorTest, test_at) {
     }
 }
 
-struct Demo {
-    int a = 0;
-    int b = 1;
-    friend std::ostream& operator<<(std::ostream& os, const Demo& d) {
-        os << d.a << " " << d.b;
-        return os;
-    }
-};
-
 TEST_F(VectorTest, test_operatorbrack) {
     pc2l::Vector<int, 8 * sizeof(int)> intVec;
     for (int i = 0; i < 100; i++) {
@@ -128,11 +119,6 @@ TEST_F(VectorTest, test_operatorbrack) {
     strVec[1][0] = 'a';
     std::array<char, 10> ayeArr = {{'a', 'y', 'e', '\0'}};
     ASSERT_EQ(strVec[1], ayeArr);
-    Demo d;
-    pc2l::Vector<Demo, 8 * sizeof(int)> demoVec;
-    demoVec.push_back(d);
-    demoVec[0].a = 1;
-    ASSERT_EQ(demoVec[0].a, 1);
 }
 
 // Test the custom iterator for our vector class

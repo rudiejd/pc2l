@@ -40,6 +40,7 @@
 #include <ctime>
 #include <chrono>
 #include <cstring>
+#include <array>
 
 /** \file Utilities.h
  *
@@ -47,6 +48,18 @@
  *  operations of PC2L at compile-time.
  */
 
+
+// for debugging purposes we need some way to print std arrays
+// just print every element
+namespace std {
+    template<typename T, size_t N>
+    std::ostream& operator<< (std::ostream& os, std::array<T, N>& arr) {
+        for (auto i = 0; i < arr.size() - 1; i++) {
+            os << arr[i] << " ";
+        }
+        return os << arr[arr.size() - 1];
+    }
+}
 /** \def ASSERT(x)
 
     \brief Define a convenient macro for using c asserts.
@@ -249,3 +262,4 @@ char* getSystemTime(char *buffer, const time_t *codedTime = NULL);
 #define UNUSED_PARAM(x) (void) x
 
 #endif
+
