@@ -65,7 +65,7 @@ BEGIN_NAMESPACE(pc2l);
  * utilizing message passing through MPI. This initial
  * implementation does not include any caching.
  */
- // T is key type, U is value type
+ // T is first type, U is second type
  // associative map
 template <typename KeyType, typename ValueType>
 class Map {
@@ -73,14 +73,14 @@ public:
 
 
     struct MapPair {
-        KeyType key;
-        ValueType value;
-        MapPair(const KeyType& key, const ValueType& value) : key(key), value(value) {}
+        KeyType first;
+        ValueType second;
+        MapPair(const KeyType& key, const ValueType& value) : first(key), second(value) {}
         friend std::ostream& operator<<(std::ostream& output, const MapPair& mp) {
-            return output << mp.key << ": " << mp.value;
+            return output << mp.first << ": " << mp.second;
         }
         virtual ValueType& val() {
-            return value;
+            return second;
         }
     };
 
@@ -100,12 +100,20 @@ public:
      */
     virtual ~Map() {}
 
+    iterator begin() {
+        return vec.begin();
+    }
+
+    iterator end() {
+        return vec.end();
+    }
+
     iterator insert(KeyType key, ValueType value) {
         iterator i(std::lower_bound(vec.begin(), vec.end(), key, [](const MapPair& lhs, const KeyType& rhs) {
-            return lhs.key < rhs;
+            return lhs.first < rhs;
         }));
 
-        if (i == vec.end() || std::less<KeyType>{}(key, (*i).key)) {
+        if (i == vec.end() || std::less<KeyType>{}(key, (*i).first)) {
             i = vec.insert(i, MapPair(key, value));
         }
         return i;
@@ -114,9 +122,9 @@ public:
     iterator find(const KeyType& k)
     {
         iterator i(std::lower_bound(vec.begin(), vec.end(), k, [](const MapPair& lhs, const KeyType& rhs)-> bool {
-            return lhs.key < rhs;
+            return lhs.first < rhs;
         }));
-        if (i != vec.end() && std::less<KeyType>{}(k, (*i).key)) {
+        if (i != vec.end() && std::less<KeyType>{}(k, (*i).first)) {
             i = vec.end();
         }
         return i;
@@ -129,6 +137,10 @@ public:
             it = insert(key, val);
         }
         return (*it).val();
+    }
+
+    MapPair make_map_pair (KeyType key, ValueType val) {
+        return MapPair(key, val);
     }
 };
 

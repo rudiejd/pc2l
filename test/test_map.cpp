@@ -76,3 +76,26 @@ TEST_F(UnorderedMapTest, test_at) {
     map[carrotArr] = 3;
     ASSERT_EQ(map[carrotArr], 3);
 }
+
+TEST_F(UnorderedMapTest, test_swap) {
+    pc2l::Map<std::array<char, 10>, int> map;
+    std::array<char, 10> appleArr = {'a', 'p', 'p', 'l', 'e'};
+    map[appleArr] = 1;
+    std::array<char, 10> bananaArr = {'b', 'a', 'n', 'a', 'n', 'a'};
+    map[bananaArr] = 2;
+    std::swap(map[appleArr], map[bananaArr]);
+    ASSERT_EQ(map[appleArr], 2);
+    ASSERT_EQ(map[bananaArr], 1);
+}
+
+TEST_F(UnorderedMapTest, test_transform) {
+    pc2l::Map<std::array<char, 10>, int> map;
+    std::array<char, 10> appleArr = {'a', 'p', 'p', 'l', 'e'};
+    map[appleArr] = 1;
+    std::array<char, 10> bananaArr = {'b', 'a', 'n', 'a', 'n', 'a'};
+    map[bananaArr] = 2;
+    std::transform(map.begin(), map.end(), map.begin(), [&](auto e){ return map.make_map_pair(e.first, e.second * 2); });
+    ASSERT_EQ(map[appleArr], 2);
+    ASSERT_EQ(map[bananaArr], 4);
+
+}
