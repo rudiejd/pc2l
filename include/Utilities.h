@@ -53,11 +53,11 @@
 // just print every element
 namespace std {
     template<typename T, size_t N>
-    std::ostream& operator<< (std::ostream& os, std::array<T, N>& arr) {
+    std::ostream& operator<< (std::ostream& os, const std::array<T, N>& arr) {
         for (auto i = 0; i < arr.size() - 1; i++) {
-            os << arr[i] << " ";
+            os << arr.at(i) << " ";
         }
-        return os << arr[arr.size() - 1];
+        return os << arr.at(arr.size() - 1);
     }
 }
 /** \def ASSERT(x)

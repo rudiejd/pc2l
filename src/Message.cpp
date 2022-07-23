@@ -72,6 +72,8 @@ Message::create(const int dataSize, const MsgTag tag,
     Message *msg = new(rawBuf) Message(tag, srcRank,
                                        dataSize + sizeof(Message), true,
                                        rawBuf   + sizeof(Message));
+    msg->dsTag = dsTag;
+    msg->blockTag = blockTag;
     msg->key = getKey(dsTag, blockTag);
     // Return the newly created object
     return MessagePtr(msg, MessageDeleter());

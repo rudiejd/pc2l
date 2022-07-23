@@ -53,22 +53,26 @@ int main(int argc, char *argv[]) {
     ::testing::AddGlobalTestEnvironment(env);
     return RUN_ALL_TESTS();
 }
+
 TEST_F(UnorderedMapTest, test_insert) {
-    pc2l::Map<const char*, int> map;
-    ASSERT_NO_THROW(map["apple"] = 1);
-    ASSERT_NO_THROW(map["banana"] = 2);
-    ASSERT_NO_THROW(map["carrot"] = 3);
+    pc2l::Map<std::array<char, 10>, int> map;
+    std::array<char, 10> appleArr = {'a', 'p', 'p', 'l', 'e'};
+    ASSERT_NO_THROW(map[appleArr] = 1);
+    std::array<char, 10> bananaArr = {'b', 'a', 'n', 'a', 'n', 'a'};
+    ASSERT_NO_THROW(map[bananaArr] = 2);
+    std::array<char, 10> carrotArr = {'c', 'a', 'r', 'r', 'o', 't'};
+    ASSERT_NO_THROW(map[carrotArr] = 3);
 }
 
 TEST_F(UnorderedMapTest, test_at) {
-    pc2l::Map<std::string, int> map;
-    for (int i = 0; i < 100; i++) {
-        std::string s("a" + std::to_string(i));
-        map[s] = i;
-    }
-    // check to see if data is correct (tests deserializtion)
-    for (int i = 0; i < 100; i++) {
-        std::string s("a" + std::to_string(i));
-        ASSERT_EQ(map[s], i);
-    }
+    pc2l::Map<std::array<char, 10>, int> map;
+    std::array<char, 10> appleArr = {'a', 'p', 'p', 'l', 'e'};
+    map[appleArr] = 1;
+    ASSERT_EQ(map[appleArr], 1);
+    std::array<char, 10> bananaArr = {'b', 'a', 'n', 'a', 'n', 'a'};
+    map[bananaArr] = 2;
+    ASSERT_EQ(map[bananaArr], 2);
+    std::array<char, 10> carrotArr = {'c', 'a', 'r', 'r', 'o', 't'};
+    map[carrotArr] = 3;
+    ASSERT_EQ(map[carrotArr], 3);
 }
