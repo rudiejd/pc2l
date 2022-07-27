@@ -31,12 +31,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 ## Internally provided libraries
 find_package(Threads REQUIRED)
 
-# Check and see if MPI is available
-find_package(MPI)
-
-
-## Configure header files to reflect the libarary availabilities
-configure_file("${pc2l_SOURCE_DIR}/include/MPIHelper.h.in" "${pc2l_SOURCE_DIR}/include/MPIHelper.h")
+# We need MPI for this project to work
+find_package(MPI REQUIRED)
 
 ## Externally provided libraries
 include(FetchContent)
