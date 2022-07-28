@@ -53,6 +53,14 @@ int main(int argc, char *argv[]) {
     ::testing::AddGlobalTestEnvironment(env);
     return RUN_ALL_TESTS();
 }
+
+pc2l::Vector<int, 8*sizeof(int)> createRangeIntVec(int size) {
+    pc2l::Vector<int, 8*sizeof(int)> ret;
+    for (int i = 0; i < size; i++) {
+        ret.push_back(i);
+    }
+    return ret;
+}
 TEST_F(VectorTest, test_insert_int) {
     // Test inserting 100 integers
     pc2l::Vector<int, 8 * sizeof(int)> intVec;
@@ -81,10 +89,7 @@ TEST_F(VectorTest, test_insert_int) {
 }
 
 TEST_F(VectorTest, test_at) {
-    pc2l::Vector<int, 8 * sizeof(int)> intVec;
-    for (int i = 0; i < 100; i++) {
-        intVec.insert(i, i);
-    }
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
     // check to see if data is correct (tests deserializtion)
     for (int i = 0; i < 100; i++) {
         ASSERT_EQ(i, intVec.at(i));
@@ -92,10 +97,7 @@ TEST_F(VectorTest, test_at) {
 }
 
 TEST_F(VectorTest, test_operatorbrack) {
-    pc2l::Vector<int, 8 * sizeof(int)> intVec;
-    for (int i = 0; i < 100; i++) {
-        intVec.push_back(i);
-    }
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
     for (int i = 0; i < 100; i++) {
         ASSERT_TRUE(intVec[static_cast<size_t>(i)] == i);
     }
@@ -123,12 +125,9 @@ TEST_F(VectorTest, test_operatorbrack) {
 
 // Test the custom iterator for our vector class
 TEST_F(VectorTest, test_iterator) {
-    pc2l::Vector<int, 8 * sizeof(int)> intVec;
-    for (int i = 0; i < 100; i++) {
-        intVec.insert(i, i);
-    }
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
     int i = 0;
-    // check to see if data is correct (tests deserializtion)
+    // foreach over range of the vec implcity calls pc2l::Vector::Iterator
     for (auto e : intVec) {
         ASSERT_EQ(e, i);
         ++i;
@@ -137,11 +136,8 @@ TEST_F(VectorTest, test_iterator) {
 
 TEST_F(VectorTest, test_lru_caching) {
     auto& pc2l = pc2l::System::get();
-    pc2l::Vector<int, 8 * sizeof(int)> intVec;
     const int listSize = 100;
-    for (int i = 0; i < listSize; i++) {
-        ASSERT_NO_THROW(intVec.insert(i, i));
-    }
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
     // cache should now be the last 3 blocks inserted
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
@@ -157,11 +153,8 @@ TEST_F(VectorTest, test_lru_caching) {
 
 TEST_F(VectorTest, test_delete) {
     auto& pc2l = pc2l::System::get();
-    pc2l::Vector<int, 8 * sizeof(int)> intVec;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
     // this produces 20 blocks of integers
-    for (size_t i = 0; i < 100; i++) {
-        ASSERT_NO_THROW(intVec.insert(i, i));
-    }
     // delete at index 42
     ASSERT_NO_THROW(intVec.erase(42));
     // size should be 99
@@ -178,11 +171,7 @@ TEST_F(VectorTest, test_delete) {
 
 TEST_F(VectorTest, test_std_find) {
     auto& pc2l = pc2l::System::get();
-    pc2l::Vector<int, 8 * sizeof(int)> intVec;
-    // this produces 20 blocks of integers
-    for (size_t i = 0; i < 100; i++) {
-        ASSERT_NO_THROW(intVec.insert(i, i));
-    }
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
     ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 50), 50);
     ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 0), 0);
     ASSERT_EQ(*std::find(intVec.begin(), intVec.end(), 99), 99);
@@ -222,9 +211,32 @@ TEST_F(VectorTest, test_sort) {
     }
 }
 
-/*TEST_F(VectorTest, test_caching) {
-    // Test caching on the vector
-    for (int i = 0; i < 100; i++) {
-        ASSERT_NO_THROW(intVec.insert(i, i));
+TEST_F(VectorTest, test_transform) {
+    pc2l::Vector<double, 8 * sizeof(double)> dubVec;
+    for (auto i = 0; i < dubVec.size(); i++) {
+        dubVec[i] = 1.0;
     }
-}*/
+    std::transform(dubVec.begin(), dubVec.end(), dubVec.begin(), [](double d){ return 2.5 * d; });
+    for (auto i = 0; i < dubVec.size(); i++) {
+        ASSERT_EQ(dubVec[i], 2.5);
+    }
+}
+
+TEST_F(VectorTest, test_minmax) {
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
+    auto maxInt = std::max_element(intVec.begin(), intVec.end());
+    ASSERT_EQ(*maxInt, 99);
+    auto minInt = std::min_element(intVec.begin(), intVec.end());
+    ASSERT_EQ(*minInt, 0);
+}
+
+TEST_F(VectorTest, test_reverse) {
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
+    std::reverse(intVec.begin(), intVec.end());
+    for (int i = 0; i < intVec.size(); i++) {
+        std::cout << "at " << i << " value " << intVec[i];
+        ASSERT_EQ(99-i, intVec[i]);
+    }
+}
+
+

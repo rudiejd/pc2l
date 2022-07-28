@@ -46,6 +46,7 @@
  */
 
 #include <memory>
+#include <list>
 #include "Utilities.h"
 #include "MPIHelper.h"
 
@@ -346,6 +347,12 @@ public:
      * </ul>
      */
     bool ownBuf = true;
+
+    /**
+     * Set to the the object's place in queue on its current node.
+     * If not yet in the queue, set to 0
+     */
+     size_t placeInQueue = 0;
 
 protected:
     /**

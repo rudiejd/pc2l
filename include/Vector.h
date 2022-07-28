@@ -85,7 +85,10 @@ public:
          // remove pointer type?
          using pointer = T*;
          using reference = T&;
-         // declare friend class so only pc2l::Vector can access Iterator's private constructor
+
+        Iterator();
+
+// declare friend class so only pc2l::Vector can access Iterator's private constructor
          friend class Vector<T, UserBlockSize>;
 
         // Maybe implement bounds check here? Or bounds check in pc2l::Vector
@@ -136,6 +139,11 @@ public:
      */
     Vector() : siz(0), dsTag(System::get().dsCount++) { }
 
+    Vector(unsigned long long fillCount) : siz(0), dsTag(System::get().dsCount++) {
+        for (auto i = 0; i < fillCount; i++) {
+            insert(0, T{});
+        }
+    }
     /**
      * The destructor.
      */
@@ -353,7 +361,7 @@ public:
             }
         }
         MessagePtr msg;
-        if (prevBlockTag == blockTag) {
+        if (prevBlockTag == blockTag && size() > 0) {
             msg = prevMsg;
         } else if (index < size()) {
             // fetch from cache manager or remote CW

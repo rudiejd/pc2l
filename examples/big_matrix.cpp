@@ -43,9 +43,11 @@
 
 int main(int argc, char *argv[]) {
     auto& pc2l = pc2l::System::get();
+    unsigned long long size = strtoull(argv[1], NULL, 0);
     pc2l.initialize(argc, argv);
+    // 50 block cache
+    pc2l.setCacheSize(50 * 100 * sizeof(double));
     pc2l.start();
-    unsigned int size = atoi(argv[1]);
     Matrix m1(size, size, 1);
     Matrix m2(size, size, 1);
     Matrix res = m1.dot(m2);

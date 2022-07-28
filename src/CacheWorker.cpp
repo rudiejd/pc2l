@@ -71,7 +71,7 @@ CacheWorker::run() {
     }
 }
 
-void CacheWorker::refer(const MessagePtr& msg) {
+void CacheWorker::refer(MessagePtr& msg) {
     // for now, only do eviction stuff on MANAGER
     if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
@@ -80,29 +80,31 @@ void CacheWorker::refer(const MessagePtr& msg) {
         if (msg->getSize() + currentBytes > cacheSize) {
             auto last = lruBlock.back();
             lruBlock.pop_back();
-            placeInQ.erase(last);
+//          placeInQ.erase(last);
+
             MessagePtr evicted = cache[last];
             eraseCacheBlock(cache[last]);
             // send evicted block to remote cacheworker
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
-    }else {
-        // If the block is present in the cache, we need to update its place in the queue
-        lruBlock.erase(placeInQ[key]);
+    } else {
+        // If the block is present in the cache, we need to update its place in the queue if it's not
+        lruBlock.erase(std::next(lruBlock.begin(), msg->placeInQueue));
     }
-    // Update the reference in the order queue
+    // Update place in queue if necessary
     lruBlock.push_front(key);
-    placeInQ[key] = lruBlock.begin();
+    msg->placeInQueue = 0;
+//    placeInQ[key] = lruBlock.begin();
 }
 
 void
-CacheWorker::storeCacheBlock(const MessagePtr& msg) {
+CacheWorker::storeCacheBlock(MessagePtr& msg) {
     PC2L_DEBUG_START_TIMER()
     // Clone this message for storing into our cache
     MessagePtr clone = Message::create(*msg);
     // Refer to our eviction structure
-    refer(msg);
+    refer(clone);
     // Increment current bytes that worker is holding if the block is new
     if (cache.find(msg->key) == cache.end()) {
         currentBytes += clone->getSize();

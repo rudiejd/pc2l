@@ -36,38 +36,36 @@
 // --------------------------------------------------------------------
 // Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
-
 #include <iostream>
+#include <algorithm>
+#include <numeric>
 #include <pc2l.h>
+using ull = unsigned long long;
 
 int main(int argc, char *argv[]) {
+    // Boilerplate code to get MPI up and running
     auto& pc2l = pc2l::System::get();
     pc2l.initialize(argc, argv);
     pc2l.start();
+    ull num = strtoull(argv[1], NULL, 0);
 
-    // Do some testing here.
-    std::cout << "world size " << pc2l.worldSize() << std::endl;
-    pc2l::Vector<std::array<char, 10>, 1000> v;
-    std::array<char, 10> data = {{'t', 'e', 's', 't'}};
-    for (int i = 0; i < 100; i++) {
-        v.push_back(data);
-    }
-    for (int i = 0; i < 100; i++) {
-        std::cout << "at " << i << " " << v[0][0] << v[0][1] << v[0][2] << v[0][3] << std::endl;
-    }
+    // initialize a vector of type unsigned long long filled with the number specified by 2nd command line argument
+    pc2l::Vector<ull> vec(num);
 
-    // delete even indices
-    for (int i = 0; i < 10; i++) {
-        v.erase(0);
-    }
+    // fill vector with values from 1 to n
+    std::iota(vec.begin(), vec.end(), 1);
 
-    std::cout << "first ten removed" << std::endl;
+    // every number that does not have a 3 or 5 as a factor is set to 0
+    std::replace_if(vec.begin(), vec.end(), [](auto i) {
+        return !((i % 3) || (i % 5));
+    }, 0);
 
-    for (int i = 0; i < v.size(); i++) {
-        std::cout << "at " << i << " " << v[0][0] << v[0][1] << v[0][2] << v[0][3] << std::endl;
-    }
+    // sum all elements in the vector
+    auto total = std::accumulate(vec.begin(), vec.end(), 0ULL);
 
-    // Wind-up
+    std::cout << "The total is " << total << std::endl;
+
+    // Boilerplate to shut down MPI (could be included in other file
     pc2l.stop();
     pc2l.finalize();
 }
