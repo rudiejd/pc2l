@@ -15,6 +15,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
 
+# Options
+option(pc2l_BUILD_EXAMPLES "Build examples in the examples/ folder" OFF)
+
+# if this is a debug build, enable our debug flags
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPC2L_DEBUG_MODE")
+endif()
+
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
@@ -23,6 +31,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 ## Internally provided libraries
 find_package(Threads REQUIRED)
+
+# We need MPI for this project to work
+find_package(MPI REQUIRED)
 
 ## Externally provided libraries
 include(FetchContent)
@@ -41,6 +52,11 @@ FetchContent_MakeAvailable(
 
 ## Add all child directories
 add_subdirectory(src)
+
+# Only build examples when explicitly requested
+if (pc2l_BUILD_EXAMPLES)
 add_subdirectory(examples)
+endif()
+
 add_subdirectory(test)
 add_subdirectory(bench)
