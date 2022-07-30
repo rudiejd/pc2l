@@ -113,7 +113,7 @@ public:
      * \param[in] msg The message that contains a block of cache data
      * to be stored.
      */
-    void storeCacheBlock(MessagePtr& msg);
+    void storeCacheBlock(const MessagePtr& msg);
 
     /**
      * Method that computes hash and erases a block of cache data from
@@ -136,7 +136,7 @@ public:
      * Refer the key for a block to our eviction scheme
      * @param key the key to place into eviction scheme
      */
-     void refer(MessagePtr& msg);
+     void refer(const MessagePtr& msg);
 protected:
     /**
      * The in-memory data cache managed by this worker process.
@@ -147,7 +147,7 @@ protected:
     std::list<size_t> lruBlock;
 
     // Stores a key and a reference to that key's place in the LRU/MRU/etc queue
-//    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
+    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
 private:
     /**
      * This is a convenience message that is created in the

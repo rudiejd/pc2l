@@ -190,7 +190,6 @@ TEST_F(VectorTest, test_std_sort) {
 
     // assert sorted order
     for (unsigned int i = 1; i < 100; i++) {
-        std::cout << "the sorted value at " << i << " is " << intVec[i] << std::endl;
         ASSERT_TRUE(intVec.at(i) >= intVec.at(i - 1));
     }
 }
@@ -234,7 +233,6 @@ TEST_F(VectorTest, test_reverse) {
     pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(100);
     std::reverse(intVec.begin(), intVec.end());
     for (int i = 0; i < intVec.size(); i++) {
-        std::cout << "at " << i << " value " << intVec[i];
         ASSERT_EQ(99-i, intVec[i]);
     }
 }
