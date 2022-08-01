@@ -59,7 +59,8 @@ BEGIN_NAMESPACE(pc2l);
  * for maintaining a local cache and updating caches on distributed
  * worker processes.
  */
-class CacheManager : public CacheWorker {
+template<EvictionStrategy Strategy = LeastRecentlyUsed>
+class CacheManager: public CacheWorker<Strategy> {
 public:
     /**
      * The default constructor.  Currently, the constructor does not

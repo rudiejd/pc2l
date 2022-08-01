@@ -42,9 +42,18 @@
 
 int main(int argc, char* argv[]) {
     unsigned int size = atoi(argv[1]);
+    auto start = clock();
+
     STDMatrix m1(size, size, 1);
     STDMatrix m2(size, size, 1);
-    std::cout << m1 * m2 << std::endl;
+
+    std::cout << "setup took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
+
+    start = clock();
+
+    auto res = m1.dot(m2);
+
+    std::cout << "dot took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
 }
 
 #endif

@@ -42,6 +42,7 @@
 #include "Matrix.h"
 
 int main(int argc, char *argv[]) {
+    auto start = clock();
     auto& pc2l = pc2l::System::get();
     unsigned long long size = strtoull(argv[1], NULL, 0);
     pc2l.initialize(argc, argv);
@@ -50,9 +51,13 @@ int main(int argc, char *argv[]) {
     pc2l.start();
     Matrix m1(size, size, 1);
     Matrix m2(size, size, 1);
+    std::cout << "setup took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
+
+    start = clock();
+
     Matrix res = m1.dot(m2);
-    if (pc2l::MPI_GET_RANK() == 0)
-        std::cout << res << std::endl;
+
+    std::cout << "dot took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
 
     // Wind-up
     pc2l.stop();
