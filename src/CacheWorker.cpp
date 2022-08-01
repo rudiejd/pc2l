@@ -42,7 +42,90 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+    CacheWorker::CacheWorker() {
+        // Do not perform MPI-related operation in the constructor.
+        // Instead do them in the initialize method.
+        cacheSize = System::get().cacheManager().cacheSize;
+        blockNotFoundMsg = Message::create(0, Message::BLOCK_NOT_FOUND);
+    }
 
+    void CacheWorker::run() {
+    // Keep processing messages until we get a message with finish tag.
+        for (MessagePtr msg = recv(); msg->tag != Message::FINISH; msg = recv()) {
+            switch (msg->tag) {
+            case Message::STORE_BLOCK:
+            storeCacheBlock(msg);
+            break;
+            case Message::GET_BLOCK:
+            sendCacheBlock(msg);
+            break;
+            case Message::ERASE_BLOCK:
+            eraseCacheBlock(msg);
+            break;
+            default:
+            throw PC2L_EXP("Received unhandled message. Tag=%d",
+                           "Need to implement?", msg->tag);
+            }
+        }
+    }
+
+    void CacheWorker::storeCacheBlock(const MessagePtr& msgIn) {
+        PC2L_DEBUG_START_TIMER()
+        MessagePtr msg = msgIn;
+        // Clone this message for storing into our cache if it resides in a temporary buffer
+        if (!msg->ownBuf) {
+                msg = Message::create(*msg);
+        }
+        // Refer to our eviction structure
+        refer(msg);
+        // Increment current bytes that worker is holding if the block is new
+        if (cache.find(msg->key) == cache.end()) {
+            currentBytes += msg->getSize();
+        }
+        // Put a clone of the message in the cache
+        cache[msg->key] = msg;
+        PC2L_DEBUG_STOP_TIMER("storeCacheBlock() on node " << MPI_GET_RANK() << " ")
+    }
+
+    void CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
+        // Get entry for key, if present in the cache
+        const auto entry = cache.find(msg->key);
+        // If the entry is found, delete the entry
+        if (entry != cache.end()) {
+            // Decrement current bytes that worker is holding
+            currentBytes -= entry->second->getSize();
+            cache.erase(entry);
+        }
+        //     // When control drops here, that means the requested block was
+        //     // not found in cache.  In this situation, we send a
+        //     // block-not-found message back.
+        //     blockNotFoundMsg->dsTag    = msg->dsTag;
+        //     blockNotFoundMsg->blockTag = msg->blockTag;
+        //     send(blockNotFoundMsg, msg->srcRank);
+        // }
+    }
+
+    void CacheWorker::sendCacheBlock(const MessagePtr& msg) {
+        PC2L_DEBUG_START_TIMER()
+        // Get entry for key, if present in the cache
+        const auto entry = cache.find(msg->key);
+        // If the entry is found, send it back to the requestor
+        if (entry != cache.end()) {
+            refer(entry->second);
+            send(entry->second, msg->srcRank);
+        }
+        //     // When control drops here, that means the requested block was
+        //     // not found in cache.  In this situation, we send a
+        //     // block-not-found message back.
+        //     blockNotFoundMsg->dsTag    = msg->dsTag;
+        //     blockNotFoundMsg->blockTag = msg->blockTag;
+        //     send(blockNotFoundMsg, msg->srcRank);
+        // }
+        PC2L_DEBUG_STOP_TIMER("sendCacheBlock() on node " << MPI_GET_RANK() << " ")
+    }
+
+    void CacheWorker::refer(const MessagePtr& msg) {
+    }
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 

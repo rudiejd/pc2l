@@ -1,5 +1,5 @@
-#ifndef TERRASORT_CPP
-#define TERRASORT_CPP
+#ifndef LRU_CACHE_WORKER_CPP
+#define LRU_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,42 +34,37 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   JD Rudie                            rudiejd@miamioh.edu
+// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
 
-#include <iostream>
-#include <pc2l.h>
-#include <climits>
-#include <ctime>
-#include <algorithm>
-int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
-        return 1;
-    }
-    auto& pc2l = pc2l::System::get();
-    pc2l.setBlockSize(atoi(argv[2]));
-    pc2l.setCacheSize(atoi(argv[3]));
-    pc2l.initialize(argc, argv);
-    pc2l.start();
-    std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
-    std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
-    pc2l::Vector<int, 100000> terraVec;
-    auto start = clock();
-    while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
-        // create one terrabyte of pseudo random ints
-        terraVec.push_back(rand() % INT_MAX);
-    }
-    if (pc2l::MPI_GET_RANK() == 0) {
-        std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
-        auto sortStart = clock();
-        std::sort(terraVec.begin(), terraVec.end());
-        std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
-    }
+#include "Exception.h"
+#include "LeastRecentlyUsedCacheWorker.h"
 
-    // Wind-up
-    pc2l.stop();
-    pc2l.finalize();
+// namespace pc2l {
+BEGIN_NAMESPACE(pc2l);
+void LeastRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
+    const auto key = msg->key;
+    if (cache.find(key) == cache.end()) {
+        // Use eviction strategy if cache is overfull
+        if (msg->getPayloadSize() * cache.size() >= cacheSize) {
+            auto last = queue.back();
+            queue.pop_back();
+            placeInQ.erase(last);
+            // send evicted block to remote cacheworker
+            MessagePtr evicted = cache[last];
+            cache.erase(last);
+            const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+            send(evicted, destRank);
+        }
+    }else {
+        // If the block is present in the cache, we need to update its place in the queue
+        queue.erase(placeInQ[key]);
+    }
+    // Update the reference in the order queue
+    queue.push_front(key);
+    placeInQ[key] = queue.begin();
 }
+END_NAMESPACE(pc2l);
+// }   // end namespace pc2l
 
 #endif

@@ -89,13 +89,25 @@ public:
     };
 
     /**
+     * Enumeration to define the cache eviction strategy for PC2L.
+     * This is the algorithm that determines how blocks will be
+     * removed from the cache manager (rank 0) node
+     */
+     enum EvictionStrategy {
+         LeastRecentlyUsed = 1,
+         MostRecentlyUsed,
+         LeastFrequentlyUsed,
+         TimeAwareLeastRecentlyUsed
+     };
+
+    /**
      * Obtain a reference to the process-wide unique (singleton)
      * instance of the PC2L system object for further use.
      */
     static System& get() noexcept {
         return system;
     }
-    
+
     /**
      * This method must be invoked prior to performing any operations
      * with the PC2L library.  This method is typically called at the
@@ -146,7 +158,7 @@ public:
      * for this run.  The default value is OneWriter_DistributedCache;
      * \param[in] enable
      */
-    void start(const OpMode mode = pc2l::System::OneWriter_DistributedCache, bool doProfile = false);
+    void start(const EvictionStrategy es = LeastRecentlyUsed, const OpMode mode = pc2l::System::OneWriter_DistributedCache);
 
     /**
      * This method can be be used to shutdown the PC2L cache and
@@ -220,6 +232,10 @@ protected:
      */
     OpMode mode = InvalidMode;
 
+    /**
+     * Current eviction strategy. This is set in the start method
+     */
+     EvictionStrategy evictionStrategy;
 
     /**
      * The process-wide unique singleton instance of this class.

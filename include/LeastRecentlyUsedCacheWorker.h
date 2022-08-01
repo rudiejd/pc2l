@@ -1,5 +1,5 @@
-#ifndef TERRASORT_CPP
-#define TERRASORT_CPP
+#ifndef LRU_CACHE_WORKER_H
+#define LRU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,42 +34,38 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   JD Rudie                            rudiejd@miamioh.edu
+// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file CacheWorker.h
+ * @brief Definition of Least Recently Used Cache Worker which implements the
+ * Least Recently Used (LRU) algorithm
+ * @author JD Rudie
+ * @version 0.1
+ *
+ */
 
-#include <iostream>
-#include <pc2l.h>
-#include <climits>
-#include <ctime>
-#include <algorithm>
-int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
-        return 1;
-    }
-    auto& pc2l = pc2l::System::get();
-    pc2l.setBlockSize(atoi(argv[2]));
-    pc2l.setCacheSize(atoi(argv[3]));
-    pc2l.initialize(argc, argv);
-    pc2l.start();
-    std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
-    std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
-    pc2l::Vector<int, 100000> terraVec;
-    auto start = clock();
-    while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
-        // create one terrabyte of pseudo random ints
-        terraVec.push_back(rand() % INT_MAX);
-    }
-    if (pc2l::MPI_GET_RANK() == 0) {
-        std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
-        auto sortStart = clock();
-        std::sort(terraVec.begin(), terraVec.end());
-        std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
-    }
+#include "CacheWorker.h"
+#include "Utilities.h"
+#include <list>
 
-    // Wind-up
-    pc2l.stop();
-    pc2l.finalize();
-}
+// namespace pc2l {
+BEGIN_NAMESPACE(pc2l);
+class LeastRecentlyUsedCacheWorker: public CacheWorker {
+public:
+    /**
+     * Refer the key for a block to our eviction scheme
+     * @param key the key to place into eviction scheme
+     */
+    virtual void refer(const MessagePtr& msg) override;
+private:
+    /**
+     * Keys of blocks in queue in their removal order under LRU
+     */
+    std::list<size_t> queue;
+};
+
+END_NAMESPACE(pc2l);
+// }   // end namespace pc2l
 
 #endif

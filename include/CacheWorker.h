@@ -48,21 +48,12 @@
 #include <unordered_map>
 #include <list>
 #include "Worker.h"
-
 #include <iostream>
 #include "Utilities.h"
 #include "Exception.h"
-#include "System.h"
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-enum EvictionStrategy {
-    LeastRecentlyUsed = 1,
-    MostRecentlyUsed,
-    TimeAwareLeastRecentlyUsed,
-    PseudoLeastRecentlyUsed,
-    LowInterReferenceRecencySet
-};
 /**
  * A convenience synonym for caching data associated with different
  * data structures.  The key in the map is computed as:
@@ -83,7 +74,6 @@ using DataCache = std::unordered_map<size_t, MessagePtr>;
  * to effectively utlize the main-memory/RAM.
  */
 
-template<EvictionStrategy Strategy = LeastRecentlyUsed>
 class CacheWorker : public Worker {
 public:
     // Maximum cache size in bytes of this cacheworker
@@ -92,12 +82,7 @@ public:
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
      */
-    CacheWorker() {
-        // Do not perform MPI-related operation in the constructor.
-        // Instead do them in the initialize method.
-        cacheSize = System::get().cacheManager().cacheSize;
-        blockNotFoundMsg = Message::create(0, Message::BLOCK_NOT_FOUND);
-    }
+    CacheWorker();
 
     /**
      * The destructor.
@@ -110,25 +95,7 @@ public:
      * running (processing messages) until the manager process sends a
      * message to stop the worker.
      */
-    virtual void run() override {
-        // Keep processing messages until we get a message with finish tag.
-        for (MessagePtr msg = recv(); msg->tag != Message::FINISH; msg = recv()) {
-            switch (msg->tag) {
-                case Message::STORE_BLOCK:
-                    storeCacheBlock(msg);
-                    break;
-                case Message::GET_BLOCK:
-                    sendCacheBlock(msg);
-                    break;
-                case Message::ERASE_BLOCK:
-                    eraseCacheBlock(msg);
-                    break;
-                default:
-                    throw PC2L_EXP("Received unhandled message. Tag=%d",
-                                   "Need to implement?", msg->tag);
-            }
-        }
-    }
+    virtual void run() override;
 
     /**
      * Method that computes hash and stores a block of cache data from
@@ -137,23 +104,7 @@ public:
      * \param[in] msg The message that contains a block of cache data
      * to be stored.
      */
-    void storeCacheBlock(const MessagePtr& msgIn) {
-        PC2L_DEBUG_START_TIMER()
-        MessagePtr msg = msgIn;
-        // Clone this message for storing into our cache if it resides in a temporary buffer
-        if (!msg->ownBuf) {
-            msg = Message::create(*msg);
-        }
-        // Refer to our eviction structure
-        refer(msg);
-        // Increment current bytes that worker is holding if the block is new
-        if (cache.find(msg->key) == cache.end()) {
-            currentBytes += msg->getSize();
-        }
-        // Put a clone of the message in the cache
-        cache[msg->key] = msg;
-        PC2L_DEBUG_STOP_TIMER("storeCacheBlock() on node " << MPI_GET_RANK() << " ")
-    }
+    void storeCacheBlock(const MessagePtr& msgIn);
 
     /**
      * Method that computes hash and erases a block of cache data from
@@ -161,23 +112,7 @@ public:
      *
      * \param[in] msg The message that contains information about a block that needs to be erased.
      */
-    void eraseCacheBlock(const MessagePtr& msg) {
-        // Get entry for key, if present in the cache
-        const auto entry = cache.find(msg->key);
-        // If the entry is found, delete the entry
-        if (entry != cache.end()) {
-            // Decrement current bytes that worker is holding
-            currentBytes -= entry->second->getSize();
-            cache.erase(entry);
-        }
-        //     // When control drops here, that means the requested block was
-        //     // not found in cache.  In this situation, we send a
-        //     // block-not-found message back.
-        //     blockNotFoundMsg->dsTag    = msg->dsTag;
-        //     blockNotFoundMsg->blockTag = msg->blockTag;
-        //     send(blockNotFoundMsg, msg->srcRank);
-        // }
-    }
+    void eraseCacheBlock(const MessagePtr& msg);
 
     /**
      * Method that computes hash and sends the requested block of
@@ -186,67 +121,13 @@ public:
      * \param[in] msg The message that contains information about the
      * block of cache requested by the sender of the message.
      */
-    void sendCacheBlock(const MessagePtr& msg) {
-        PC2L_DEBUG_START_TIMER()
-        // Get entry for key, if present in the cache
-        const auto entry = cache.find(msg->key);
-        // If the entry is found, send it back to the requestor
-        if (entry != cache.end()) {
-            refer(entry->second);
-            send(entry->second, msg->srcRank);
-        }
-        //     // When control drops here, that means the requested block was
-        //     // not found in cache.  In this situation, we send a
-        //     // block-not-found message back.
-        //     blockNotFoundMsg->dsTag    = msg->dsTag;
-        //     blockNotFoundMsg->blockTag = msg->blockTag;
-        //     send(blockNotFoundMsg, msg->srcRank);
-        // }
-        PC2L_DEBUG_STOP_TIMER("sendCacheBlock() on node " << MPI_GET_RANK() << " ")
-    }
+    void sendCacheBlock(const MessagePtr& msg);
 
     /**
      * Refer the key for a block to our eviction scheme
      * @param key the key to place into eviction scheme
      */
-    void refer(const MessagePtr& msg) {
-        // for now, only do eviction stuff on MANAGER
-        if (MPI_GET_RANK() != 0) return;
-        const auto key = msg->key;
-        if (cache.find(key) == cache.end()) {
-            // Use eviction strategy if cache is overfull
-            if (msg->getSize() + currentBytes > cacheSize) {
-                MessagePtr evicted;
-                if constexpr(Strategy == LeastRecentlyUsed) {
-                    auto last = lruBlock.back();
-                    evicted = cache[last];
-                    lruBlock.pop_back();
-                    placeInQ.erase(last);
-                    eraseCacheBlock(cache[last]);
-                } else if constexpr(Strategy == MostRecentlyUsed) {
-                    auto first = lruBlock.front();
-                    evicted = cache[first];
-                    lruBlock.pop_front();
-                    placeInQ.erase(first);
-                    eraseCacheBlock(cache[first]);
-                }
-                // send evicted block to remote cacheworker
-                const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
-                send(evicted, destRank);
-            }
-        }else {
-            // If the block is present in the cache, we need to update its place in the queue
-            lruBlock.erase(placeInQ[key]);
-        }
-        // Update the reference in the order queue
-        if constexpr(Strategy == LeastRecentlyUsed) {
-            lruBlock.push_front(key);
-            placeInQ[key] = lruBlock.begin();
-        } else if constexpr(Strategy == MostRecentlyUsed) {
-            lruBlock.push_back(key);
-            placeInQ[key] = lruBlock.end();
-        }
-    }
+    virtual void refer(const MessagePtr& msg);
 protected:
     /**
      * The in-memory data cache managed by this worker process.

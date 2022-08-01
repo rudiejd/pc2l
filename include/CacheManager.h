@@ -38,14 +38,18 @@
 //---------------------------------------------------------------------
 #include <thread>
 #include "CacheWorker.h"
+#include "LeastRecentlyUsedCacheWorker.h"
+#include "MostRecentlyUsedCacheWorker.h"
+
 /**
  * @file CacheManager.h
- * @brief Definition of CacheManager class which manages cache entries
- * in conjunction with worker processes.
- * @author Dhananjai M. Rao
+ *
+ * @brief Definition of abstract CacheManager class which manages cache entries
+ * in conjunction with worker processes. Also includes trivial definitions
+ * for cache managers with different eviction strategies
+ * @author Dhananjai M. Rao, JD Rudie
  * @version 0.1
  * @date 2020-04-23
- * 
  */
 // namespace pc2l {
 #include <queue>
@@ -59,8 +63,7 @@ BEGIN_NAMESPACE(pc2l);
  * for maintaining a local cache and updating caches on distributed
  * worker processes.
  */
-template<EvictionStrategy Strategy = LeastRecentlyUsed>
-class CacheManager: public CacheWorker<Strategy> {
+class CacheManager : public CacheWorker {
 public:
     /**
      * The default constructor.  Currently, the constructor does not
@@ -127,6 +130,16 @@ private:
     MPI_Request prefetchReq;
     MessagePtr prefetchMsg;
 };
+
+/**
+ * CacheManager which implements the Least Recently Used (LRU) cache eviction algorithm
+ */
+class LeastRecentlyUsedCacheManager : public CacheManager, public LeastRecentlyUsedCacheWorker {};
+
+/**
+ * CacheManager which implements the Most Recently Used (MRU) cache eviction algorithm
+ */
+ class MostRecentlyUsedCacheManager : public CacheManager, public MostRecentlyUsedCacheWorker {};
 
 
 END_NAMESPACE(pc2l);

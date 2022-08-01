@@ -9,6 +9,9 @@ set(HEADER_LIST
 	"${pc2l_SOURCE_DIR}/include/Exception.h"
 	"${pc2l_SOURCE_DIR}/include/Vector.h"
 	"${pc2l_SOURCE_DIR}/include/Map.h"
+	"${pc2l_SOURCE_DIR}/include/LeastRecentlyUsedCacheWorker.h"
+	"${pc2l_SOURCE_DIR}/include/MostRecentlyUsedCacheWorker.h"
+	"${pc2l_SOURCE_DIR}/include/LeastFrequentlyUsedCacheWorker.h"
 	)
 set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Message.cpp"
@@ -20,6 +23,9 @@ set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Utilities.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Worker.cpp"
                    "${pc2l_SOURCE_DIR}/src/Vector.cpp"
+		           "${pc2l_SOURCE_DIR}/src/LeastRecentlyUsedCacheWorker.cpp"
+		           "${pc2l_SOURCE_DIR}/src/MostRecentlyUsedCacheWorker.cpp"
+		           "${pc2l_SOURCE_DIR}/src/LeastFrequentlyUsedCacheWorker.cpp"
 		../test/Environment.h)
 
 add_library(pc2l_lib ${SRCFILES} ${HEADER_LIST})

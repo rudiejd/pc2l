@@ -73,9 +73,20 @@ System::initialize(int& argc, char *argv[], bool initMPI) {
 }
 
 void
-System::start(const OpMode mode, bool doProfile) {
-    // Set profiling mode
-    profile = doProfile;
+System::start(const EvictionStrategy es, const OpMode mode) {
+    // First, choose our cache manager based on eviction stategy
+    switch(es) {
+        case LeastRecentlyUsed:
+            manager = LeastRecentlyUsedCacheManager();
+            break;
+        case MostRecentlyUsed:
+            manager = MostRecentlyUsedCacheManager();
+            break;
+        case LeastFrequentlyUsed:
+            break;
+        case TimeAwareLeastRecentlyUsed:
+            break;
+    }
     // Next, based on our operation mode, perform different initialization.
     switch (mode) {
     case OneWriter_DistributedCache:
