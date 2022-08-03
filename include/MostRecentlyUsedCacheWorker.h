@@ -60,8 +60,11 @@ public:
 private:
     /**
      * Keys of blocks in the queue in their removal order under MRU
+     *
      */
     std::list<size_t> queue;
+
+    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
 };
 
 END_NAMESPACE(pc2l);

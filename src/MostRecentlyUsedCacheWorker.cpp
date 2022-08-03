@@ -47,12 +47,13 @@ void MostRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
         if (msg->getPayloadSize() * cache.size() >= cacheSize) {
-            auto first = queue.front();
-            queue.pop_front();
-            placeInQ.erase(first);
+            // Get the most recently used block and erase it
+            auto last = queue.back();
+            queue.pop_back();
+            placeInQ.erase(last);
             // send evicted block to remote cacheworker
-            MessagePtr evicted = cache[first];
-            cache.erase(first);
+            MessagePtr evicted = cache[last];
+            cache.erase(last);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
@@ -60,9 +61,10 @@ void MostRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
         // If the block is present in the cache, we need to update its place in the queue
         queue.erase(placeInQ[key]);
     }
-    // Update the reference in the order queue
+    // new block goes to the end (it is the most recently used)
     queue.push_back(key);
-    placeInQ[key] = queue.end();
+    // Note that the place must the one before queue.end() since end() is an invalid iterator
+    placeInQ[key] = std::prev(queue.end());
 }
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l

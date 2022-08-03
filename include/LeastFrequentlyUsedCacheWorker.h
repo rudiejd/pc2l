@@ -53,15 +53,32 @@ BEGIN_NAMESPACE(pc2l);
 class LeastFrequentlyUsedCacheWorker: public CacheWorker {
 public:
     /**
-     * Refer the key for a block to our eviction scheme
+     * Refer the key for a block to our eviction scheme. If the cache is full,
+     * this removes the least frequently used block in the cache. If there is a tie
+     * for the least frequency, it removes the least recently used item with the least
+     * frequency.
      * @param key the key to place into eviction scheme
      */
     virtual void refer(const MessagePtr& msg) override;
 private:
+    struct CacheItem {
+        CacheItem(size_t key) : key(key) {};
+        size_t key;
+        size_t frequency = 1;
+    };
     /**
-     * Keys of blocks in the queue in their removal order under MRU
+     * Unordered map for finding position of the block in one of the frequency queues
      */
-    std::list<size_t> queue;
+     std::unordered_map<size_t, std::list<CacheItem>::iterator> placeInQueue;
+    /**
+     * Ordered map with a separate queue for every frequency in the range of access
+     * frequencies for each block currently stored in the cache. Note that we use
+     * a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
+     * but also because of its unique properties for iterator invalidation;
+     * insertion leaves all iterators unaffected AND erasing only affects the erased
+     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+     */
+    std::map<int, std::list<CacheItem>> queues;
 };
 
 END_NAMESPACE(pc2l);

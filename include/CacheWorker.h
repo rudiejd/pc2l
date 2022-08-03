@@ -138,7 +138,6 @@ protected:
     std::list<size_t> lruBlock;
 
     // Stores a key and a reference to that key's place in the LRU/MRU/etc queue
-    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
 private:
     /**
      * This is a convenience message that is created in the

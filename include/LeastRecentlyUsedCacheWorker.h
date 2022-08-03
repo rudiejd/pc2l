@@ -59,8 +59,13 @@ public:
      */
     virtual void refer(const MessagePtr& msg) override;
 private:
+    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
     /**
      * Keys of blocks in queue in their removal order under LRU
+     * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
+     * but also because of its unique properties for iterator invalidation;
+     * insertion leaves all iterators unaffected AND erasing only affects the erased
+     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
      */
     std::list<size_t> queue;
 };

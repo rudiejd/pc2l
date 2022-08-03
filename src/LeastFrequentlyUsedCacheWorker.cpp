@@ -45,24 +45,40 @@ BEGIN_NAMESPACE(pc2l);
 void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
-        // Use eviction strategy if cache is overfull
+        // Use eviction strategy if cache is at capacity
         if (msg->getPayloadSize() * cache.size() >= cacheSize) {
-            auto first = queue.front();
-            queue.pop_front();
-            placeInQ.erase(first);
+            // Get the queue for the smallest frequency (always at the beginning of the map of queues)
+            auto& smallestFreqQueue = queues.begin()->second;
+            // Item at the end of this queue is the LRU
+            auto evictedItem = smallestFreqQueue.back();
+            smallestFreqQueue.pop_back();
+            // if this frequency queue is now empty, erase the frequency from the map of all freq. queues
+            if (smallestFreqQueue.empty()) {
+                queues.erase(evictedItem.frequency);
+            }
             // send evicted block to remote cacheworker
-            MessagePtr evicted = cache[first];
-            cache.erase(first);
+            MessagePtr evicted = cache[evictedItem.key];
+            cache.erase(evictedItem.key);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
-    }else {
-        // If the block is present in the cache, we need to update its place in the queue
-        queue.erase(placeInQ[key]);
+        // Insert cache item representing this block into our data structures
+        CacheItem ci(key);
+        queues[1].push_front(ci);
+        placeInQueue[key] = queues[1].begin();
+    } else {
+        // If the block is present in the cache, we need to update which frequency queue it is in
+        auto item = *placeInQueue[key];
+        auto& itemQueue = queues[item.frequency];
+        itemQueue.erase(placeInQueue[key]);
+        // if this frequency queue is now empty, erase the frequency from the map of all freq. queues
+        if (itemQueue.empty()) {
+            queues.erase(item.frequency);
+        }
+        item.frequency++;
+        queues[item.frequency].push_front(item);
+        placeInQueue[key] = queues[item.frequency].begin();
     }
-    // Update the reference in the order queue
-    queue.push_back(key);
-    placeInQ[key] = queue.end();
 }
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
