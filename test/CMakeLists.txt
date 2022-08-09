@@ -10,7 +10,7 @@ function(add_mpi_test name no_mpi_proc)
     # Make sure to link MPI here too:
     target_link_libraries(test_${name} ${MPI_CXX_LIBRARY})
     # and link with testing library, discover tests??
-    target_link_libraries(test_${name} gtest_main)
+    target_link_libraries(test_${name} gtest gtest_main)
     # execute with mpi (e.g. mpirun -n 2, mpiexec, whatever)
     set(test_parameters "./test_${name}" ${MPIEXEC_NUMPROC_FLAG} ${no_mpi_proc})
     add_test(NAME test_${name} COMMAND ${MPIEXEC} ${test_parameters})
@@ -18,3 +18,4 @@ endfunction(add_mpi_test)
 
 add_mpi_test(vector 2)
 add_mpi_test(map 2)
+add_mpi_test(lfu 2)

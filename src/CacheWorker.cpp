@@ -78,10 +78,8 @@ BEGIN_NAMESPACE(pc2l);
         }
         // Refer to our eviction structure
         refer(msg);
-        // Increment current bytes that worker is holding if the block is new
-        if (cache.find(msg->key) == cache.end()) {
-            currentBytes += msg->getSize();
-        }
+        // Bring bytes that cache holds up to date
+        currentBytes += msg->getSize();
         // Put a clone of the message in the cache
         cache[msg->key] = msg;
         PC2L_DEBUG_STOP_TIMER("storeCacheBlock() on node " << MPI_GET_RANK() << " ")
