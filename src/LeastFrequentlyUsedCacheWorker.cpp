@@ -43,10 +43,11 @@
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr& msg) {
+    if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is at capacity
-        if (msg->getPayloadSize() * cache.size() >= cacheSize) {
+        if (currentBytes + msg->getSize() >= cacheSize) {
             // Get the queue for the smallest frequency (always at the beginning of the map of queues)
             auto& smallestFreqQueue = queues.begin()->second;
             // Item at the end of this queue is the LRU
@@ -58,7 +59,7 @@ void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr& msg) {
             }
             // send evicted block to remote cacheworker
             MessagePtr evicted = cache[evictedItem.key];
-            cache.erase(evictedItem.key);
+            eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }

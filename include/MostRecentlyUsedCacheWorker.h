@@ -50,13 +50,13 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-class MostRecentlyUsedCacheWorker: public CacheWorker {
+class MostRecentlyUsedCacheWorker: public virtual CacheWorker {
 public:
     /**
      * Refer the key for a block to our eviction scheme
      * @param key the key to place into eviction scheme
      */
-    virtual void refer(const MessagePtr& msg) override;
+    void refer(const MessagePtr& msg) override;
 private:
     /**
      * Keys of blocks in the queue in their removal order under MRU

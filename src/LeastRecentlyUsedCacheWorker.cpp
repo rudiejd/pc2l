@@ -43,20 +43,21 @@
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 void LeastRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
+    if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
-        if (msg->getPayloadSize() * cache.size() >= cacheSize) {
+        if (currentBytes + msg->getSize() >= cacheSize) {
             auto last = queue.back();
             queue.pop_back();
             placeInQ.erase(last);
             // send evicted block to remote cacheworker
             MessagePtr evicted = cache[last];
-            cache.erase(last);
+            eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
-    }else {
+    } else {
         // If the block is present in the cache, we need to update its place in the queue
         queue.erase(placeInQ[key]);
     }

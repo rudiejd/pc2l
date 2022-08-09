@@ -50,7 +50,7 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-class LeastFrequentlyUsedCacheWorker: public CacheWorker {
+class LeastFrequentlyUsedCacheWorker: public virtual CacheWorker {
 public:
     /**
      * Refer the key for a block to our eviction scheme. If the cache is full,
@@ -59,7 +59,7 @@ public:
      * frequency.
      * @param key the key to place into eviction scheme
      */
-    virtual void refer(const MessagePtr& msg) override;
+    void refer(const MessagePtr& msg) override;
 private:
     struct CacheItem {
         CacheItem(size_t key) : key(key) {};

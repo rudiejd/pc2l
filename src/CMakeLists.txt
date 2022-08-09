@@ -12,7 +12,8 @@ set(HEADER_LIST
 	"${pc2l_SOURCE_DIR}/include/LeastRecentlyUsedCacheWorker.h"
 	"${pc2l_SOURCE_DIR}/include/MostRecentlyUsedCacheWorker.h"
 	"${pc2l_SOURCE_DIR}/include/LeastFrequentlyUsedCacheWorker.h"
-	)
+		"${pc2l_SOURCE_DIR}/include/PseudoLRUCacheWorker.h"
+		)
 set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 				   "${pc2l_SOURCE_DIR}/src/Message.cpp"
              	   "${pc2l_SOURCE_DIR}/src/CacheManager.cpp"
@@ -26,6 +27,7 @@ set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 		           "${pc2l_SOURCE_DIR}/src/LeastRecentlyUsedCacheWorker.cpp"
 		           "${pc2l_SOURCE_DIR}/src/MostRecentlyUsedCacheWorker.cpp"
 		           "${pc2l_SOURCE_DIR}/src/LeastFrequentlyUsedCacheWorker.cpp"
+		           "${pc2l_SOURCE_DIR}/src/PseudoLRUCacheWorker.cpp"
 		../test/Environment.h)
 
 add_library(pc2l_lib ${SRCFILES} ${HEADER_LIST})

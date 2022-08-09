@@ -1,5 +1,5 @@
-#ifndef LRU_CACHE_WORKER_H
-#define LRU_CACHE_WORKER_H
+#ifndef TALRU_CACHE_WORKER_H
+#define TALRU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,12 +34,12 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 /**
- * @file CacheWorker.h
+ * @file PseudoLRU.h
  * @brief Definition of Least Recently Used Cache Worker which implements the
- * Least Recently Used (LRU) algorithm
+ *  Bit Pseudo-LRU algorithm
  * @author JD Rudie
  * @version 0.1
  *
@@ -51,7 +51,7 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-class LeastRecentlyUsedCacheWorker: public virtual CacheWorker {
+class PseudoLRUCacheWorker: public virtual CacheWorker {
 public:
     /**
      * Refer the key for a block to our eviction scheme
@@ -59,15 +59,13 @@ public:
      */
     void refer(const MessagePtr& msg) override;
 private:
-    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
     /**
-     * Keys of blocks in queue in their removal order under LRU
-     * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
-     * but also because of its unique properties for iterator invalidation;
-     * insertion leaves all iterators unaffected AND erasing only affects the erased
-     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+     * Message is set to true if it is recently used. Once
+     * all messages in cache are set to true, the cache
+     * is reset.
      */
-    std::list<size_t> queue;
+    std::unordered_map<size_t, bool> wasUsed;
+    size_t trueCount = 0;
 };
 
 END_NAMESPACE(pc2l);

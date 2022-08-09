@@ -45,7 +45,7 @@ BEGIN_NAMESPACE(pc2l);
     CacheWorker::CacheWorker() {
         // Do not perform MPI-related operation in the constructor.
         // Instead do them in the initialize method.
-        cacheSize = System::get().cacheManager().cacheSize;
+        cacheSize = System::get().cacheSize;
         blockNotFoundMsg = Message::create(0, Message::BLOCK_NOT_FOUND);
     }
 
@@ -92,10 +92,12 @@ BEGIN_NAMESPACE(pc2l);
         const auto entry = cache.find(msg->key);
         // If the entry is found, delete the entry
         if (entry != cache.end()) {
+            PC2L_PROFILE(cacheHits++;)
             // Decrement current bytes that worker is holding
             currentBytes -= entry->second->getSize();
             cache.erase(entry);
         }
+        PC2L_PROFILE(accesses++;)
         //     // When control drops here, that means the requested block was
         //     // not found in cache.  In this situation, we send a
         //     // block-not-found message back.
@@ -111,9 +113,11 @@ BEGIN_NAMESPACE(pc2l);
         const auto entry = cache.find(msg->key);
         // If the entry is found, send it back to the requestor
         if (entry != cache.end()) {
+            PC2L_PROFILE(cacheHits++;)
             refer(entry->second);
             send(entry->second, msg->srcRank);
         }
+        PC2L_PROFILE(accesses++;)
         //     // When control drops here, that means the requested block was
         //     // not found in cache.  In this situation, we send a
         //     // block-not-found message back.
@@ -122,9 +126,6 @@ BEGIN_NAMESPACE(pc2l);
         //     send(blockNotFoundMsg, msg->srcRank);
         // }
         PC2L_DEBUG_STOP_TIMER("sendCacheBlock() on node " << MPI_GET_RANK() << " ")
-    }
-
-    void CacheWorker::refer(const MessagePtr& msg) {
     }
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l

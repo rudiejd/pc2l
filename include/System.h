@@ -73,8 +73,8 @@ public:
     // Whether we should collect profiling data
     bool profile;
 
-    // default block size is 32MB
-    unsigned int blockSize = 32000000;
+    // default cache size
+    unsigned long long cacheSize;
     /**
      * Enumeration to define the global operation mode for a specific
      * run of PC2L.  Currently, the library only supports a single
@@ -97,7 +97,7 @@ public:
          LeastRecentlyUsed = 1,
          MostRecentlyUsed,
          LeastFrequentlyUsed,
-         TimeAwareLeastRecentlyUsed
+         PseudoLRU
      };
 
     /**
@@ -196,26 +196,12 @@ public:
     int worldSize() noexcept;
 
     /**
-     * Size of a block in the current instance of pc2l
-     * @return size of block in byte
-     */
-    unsigned int getBlockSize() noexcept;
-
-
-    /**
      * Set the cache size of the System's cache manager
-     * @param cSize maximum size in bytes of CCM's cache
+     * @param cSize maximum size in bytes of CM's cache
      */
     void setCacheSize(unsigned long long cSize) noexcept;
 
-    /**
-     * Set the block size system-wide
-     * @param bSize size of block in bytes
-     */
-    void setBlockSize(unsigned int bSize) noexcept;
-
     pc2l::CacheManager& cacheManager();
-
 protected:
     /**
      * Helper method to facilitate the PC2L system to run in
@@ -224,7 +210,7 @@ protected:
      * runs it.  On the manager-process (i.e., MPI-rank == 0), this
      * method just initializes the CacheManager object in this class.
      */
-    void oneWriterDistribCache();
+    void oneWriterDistribCache(EvictionStrategy es);
 protected:
     /**
      * The current mode of operation in which the system is currently

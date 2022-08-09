@@ -46,8 +46,11 @@ class VectorTest : public ::testing::Test {
 int main(int argc, char *argv[]) {
     ::testing::InitGoogleTest(&argc, argv);
     auto& pc2l = pc2l::System::get();
-    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
     auto env = new PC2LEnvironment();
+    pc2l.initialize(argc, argv);
+    // 3 blocks of 8 ints
+    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+    pc2l.start(pc2l::System::EvictionStrategy::MostRecentlyUsed);
     env->argc = argc;
     env->argv = argv;
     ::testing::AddGlobalTestEnvironment(env);

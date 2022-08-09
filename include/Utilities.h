@@ -108,6 +108,29 @@ namespace std {
 #endif
 #endif
 
+/** \def PC2L_PROFILE(x)
+
+    \brief Define a convenient macro for conditionally compiling
+    additional profiling information
+
+    Define a custom macro PC2L_PROFILE (note the all caps) macro to be used
+    to conditionally compile in debugging code to generate detailed
+    profiling messages. This mostly toggles whether we should calculate
+    cache hit probabilties.
+*/
+#ifndef PC2L_PROFILE
+#ifdef PC2L_PROFILE_MODE
+
+#define PC2L_PROFILE(x) x
+
+#else // !PC2L_PROFILE_MODE
+
+#define PC2L_PROFILE(x)
+
+#endif
+#endif
+
+
 /**
  * Start a timer for debugging purposes. Note that there can only
  * be one timer going at a time

@@ -1,5 +1,5 @@
-#ifndef LRU_CACHE_WORKER_H
-#define LRU_CACHE_WORKER_H
+#ifndef LRU_CACHE_WORKER_CPP
+#define LRU_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -36,40 +36,45 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
-/**
- * @file CacheWorker.h
- * @brief Definition of Least Recently Used Cache Worker which implements the
- * Least Recently Used (LRU) algorithm
- * @author JD Rudie
- * @version 0.1
- *
- */
 
-#include "CacheWorker.h"
-#include "Utilities.h"
-#include <list>
+#include "Exception.h"
+#include "PseudoLRUCacheWorker.h"
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-class LeastRecentlyUsedCacheWorker: public virtual CacheWorker {
-public:
-    /**
-     * Refer the key for a block to our eviction scheme
-     * @param key the key to place into eviction scheme
-     */
-    void refer(const MessagePtr& msg) override;
-private:
-    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
-    /**
-     * Keys of blocks in queue in their removal order under LRU
-     * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
-     * but also because of its unique properties for iterator invalidation;
-     * insertion leaves all iterators unaffected AND erasing only affects the erased
-     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
-     */
-    std::list<size_t> queue;
-};
-
+void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
+    if (MPI_GET_RANK() != 0) return;
+    const auto key = msg->key;
+    if (cache.find(key) == cache.end()) {
+        // Use eviction strategy if cache is overfull
+        if (currentBytes + msg->getSize() >= cacheSize) {
+            // the first cache item without MRU bit set is removed
+            MessagePtr evicted;
+            for (auto e : cache) {
+                if (!wasUsed[e.first]) {
+                    evicted = e.second;
+                    break;
+                }
+            }
+            wasUsed.erase(evicted->key);
+            eraseCacheBlock(evicted);
+            const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+            send(evicted, destRank);
+        }
+    }else {
+        // If the block is present in the cache, we need to update its MRU bit
+        wasUsed[key] = true;
+        trueCount++;
+        if (trueCount == cache.size()) {
+            // when all MRU bools set, reset all MRU bits to zero
+            // Note that we can just clear the map since the bool map
+            // operator defaults to false
+            wasUsed.clear();
+            // reset the count of MRU bools set
+            trueCount = 0;
+        }
+    }
+}
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 

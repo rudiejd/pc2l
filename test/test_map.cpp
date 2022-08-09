@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < argc; i++) std::cout << argv[i] << std::endl;
     ::testing::InitGoogleTest(&argc, argv);
     auto& pc2l = pc2l::System::get();
-    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 4096));
     auto env = new PC2LEnvironment();
+    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 4096));
     env->argc = argc;
     env->argv = argv;
     ::testing::AddGlobalTestEnvironment(env);

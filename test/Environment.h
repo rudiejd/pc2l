@@ -20,11 +20,10 @@ public:
 
     ~PC2LEnvironment() override {};
     void SetUp() override {
-        auto& pc2l = pc2l::System::get();
-        pc2l.setBlockSize(blockSize);
+//        auto& pc2l = pc2l::System::get();
 //        pc2l.setCacheSize(cacheSize);
-        pc2l.initialize(argc, argv);
-        pc2l.start();
+//        pc2l.initialize(argc, argv);
+//        pc2l.start();
         ::testing::TestEventListeners& listeners =
                 ::testing::UnitTest::GetInstance()->listeners();
         int rank;

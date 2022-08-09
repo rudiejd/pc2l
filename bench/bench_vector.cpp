@@ -106,7 +106,6 @@ int main(int argc, char** argv) {
     auto& pc2l = pc2l::System::get();
     // Override the default block size to 8 ints
     const int BlockSize = sizeof(int) * 8;
-    pc2l.setBlockSize(BlockSize);
     // set cache size to 3 blocks
     pc2l.setCacheSize(3 * (BlockSize + sizeof(pc2l::Message)));
     pc2l.initialize(argc, argv);

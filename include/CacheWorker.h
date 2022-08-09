@@ -127,7 +127,7 @@ public:
      * Refer the key for a block to our eviction scheme
      * @param key the key to place into eviction scheme
      */
-    virtual void refer(const MessagePtr& msg);
+    virtual void refer(const MessagePtr& msg) = 0;
 protected:
     /**
      * The in-memory data cache managed by this worker process.
@@ -137,7 +137,20 @@ protected:
     // Queue: front is block to remove
     std::list<size_t> lruBlock;
 
-    // Stores a key and a reference to that key's place in the LRU/MRU/etc queue
+    /**
+     * If in profiling mode: keep a counter for cache hits
+     */
+    PC2L_PROFILE(size_t cacheHits = 0;)
+
+    /**
+     * Profiling mode: keep a counter of total attempted accesses
+     */
+     PC2L_PROFILE(size_t accesses = 0;)
+/**
+ * The amount of bytes currently stored in the cache manager (incremented each time a message is
+ * added
+ */
+unsigned int currentBytes = 0;
 private:
     /**
      * This is a convenience message that is created in the
@@ -146,11 +159,6 @@ private:
      * This message is reused to minimize message creation overheads.
      */
     MessagePtr blockNotFoundMsg;
-    /**
-     * The amount of bytes currently stored in the cache manager (incremented each time a message is
-     * added
-     */
-    unsigned int currentBytes = 0;
 };
 
 END_NAMESPACE(pc2l);

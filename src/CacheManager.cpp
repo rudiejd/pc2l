@@ -51,6 +51,9 @@ CacheManager::finalize() {
     for (int rank = 1; (rank < workers); rank++) {
         send(finMsg, rank);
     }
+    // Profile mode: print hit statistics
+    PC2L_PROFILE(std::cout << "Cache hits: " << cacheHits << std::endl << " Cache accesses: " << accesses << std::endl
+    << " Hit rate: " << static_cast<double>(cacheHits) / static_cast<double>(accesses) << std::endl;)
 }
 
 MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
@@ -61,9 +64,11 @@ MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
         return wait(prefetchReq);
     }
     size_t key = Message::getKey(dsTag, blockTag);
-    try {
+    PC2L_PROFILE(accesses++;)
+    if (cache.find(key) != cache.end()) {
+        PC2L_PROFILE(cacheHits++;)
         return cache.at(key);
-    } catch (const std::out_of_range& e) {
+    } else {
         return nullptr;
     }
 }

@@ -57,10 +57,10 @@ System System::system;
  * that, the manager instance is defined here. Not a perfect design,
  * but a practical one.
  */
-CacheManager manager;
-    
+CacheManager* manager;
+
 CacheManager& System::cacheManager() {
-    return manager;
+    return *manager;
 }
 
 void
@@ -77,20 +77,23 @@ System::start(const EvictionStrategy es, const OpMode mode) {
     // First, choose our cache manager based on eviction stategy
     switch(es) {
         case LeastRecentlyUsed:
-            manager = LeastRecentlyUsedCacheManager();
+            manager = new LeastRecentlyUsedCacheManager();
             break;
         case MostRecentlyUsed:
-            manager = MostRecentlyUsedCacheManager();
+            manager = new MostRecentlyUsedCacheManager();
             break;
         case LeastFrequentlyUsed:
+            manager = new LeastFrequentlyUsedCacheManager();
             break;
-        case TimeAwareLeastRecentlyUsed:
+        case PseudoLRU:
+            manager = new PseudoLRUCacheManager();
             break;
     }
+    manager->cacheSize = cacheSize;
     // Next, based on our operation mode, perform different initialization.
     switch (mode) {
     case OneWriter_DistributedCache:
-        oneWriterDistribCache();
+        oneWriterDistribCache(es);
         break;
     case InvalidMode:
     default:
@@ -108,7 +111,7 @@ System::stop() {
     // If this is the manager process, then send finish messages to
     // all the workers to let them them know they need to stop running.
     if (MPI_GET_RANK() == 0) {
-        manager.finalize();
+        manager->finalize();
     }
 }
 
@@ -120,31 +123,37 @@ System::finalize(bool finMPI) noexcept {
 }
 
 void
-System::oneWriterDistribCache() {
+System::oneWriterDistribCache(EvictionStrategy es) {
     if (MPI_GET_RANK() == 0) {
         // We assume this process is the manager.
-        manager.initialize();
-        manager.run();
+        cacheManager().initialize();
+        cacheManager().run();
     } else {
         // Here this process is running as a worker.  So perform the
         // worker's lifecycle activities here.
-        CacheWorker worker;
-        worker.initialize();  // Initalize
-        worker.run();         // This method runs until manager send finish
-        worker.finalize();    // Do any clean-ups for this run
+        CacheWorker* worker;
+        switch(es) {
+            case LeastRecentlyUsed:
+                worker = new LeastRecentlyUsedCacheWorker();
+                break;
+            case MostRecentlyUsed:
+                worker = new MostRecentlyUsedCacheWorker();
+                break;
+            case LeastFrequentlyUsed:
+                worker = new LeastFrequentlyUsedCacheWorker();
+                break;
+            case PseudoLRU:
+                worker = new PseudoLRUCacheWorker();
+                break;
+        }
+        worker->initialize();  // Initalize
+        worker->run();         // This method runs until manager send finish
+        worker->finalize();    // Do any clean-ups for this run
     }
 }
 
 void System::setCacheSize(unsigned long long cSize) noexcept {
-    manager.cacheSize = cSize;
-}
-
-void System::setBlockSize(unsigned int bSize) noexcept {
-    blockSize = bSize;
-}
-
-unsigned int System::getBlockSize() noexcept {
-    return blockSize;
+    cacheSize = cSize;
 }
 
 END_NAMESPACE(pc2l);

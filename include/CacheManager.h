@@ -40,6 +40,8 @@
 #include "CacheWorker.h"
 #include "LeastRecentlyUsedCacheWorker.h"
 #include "MostRecentlyUsedCacheWorker.h"
+#include "PseudoLRUCacheWorker.h"
+#include "LeastFrequentlyUsedCacheWorker.h"
 
 /**
  * @file CacheManager.h
@@ -63,7 +65,7 @@ BEGIN_NAMESPACE(pc2l);
  * for maintaining a local cache and updating caches on distributed
  * worker processes.
  */
-class CacheManager : public CacheWorker {
+class CacheManager : public virtual CacheWorker {
 public:
     /**
      * The default constructor.  Currently, the constructor does not
@@ -134,13 +136,22 @@ private:
 /**
  * CacheManager which implements the Least Recently Used (LRU) cache eviction algorithm
  */
-class LeastRecentlyUsedCacheManager : public CacheManager, public LeastRecentlyUsedCacheWorker {};
+class LeastRecentlyUsedCacheManager : public LeastRecentlyUsedCacheWorker, public CacheManager{};
 
 /**
  * CacheManager which implements the Most Recently Used (MRU) cache eviction algorithm
  */
- class MostRecentlyUsedCacheManager : public CacheManager, public MostRecentlyUsedCacheWorker {};
+class MostRecentlyUsedCacheManager : public MostRecentlyUsedCacheWorker, public CacheManager{};
 
+/**
+ * CacheManager which implements the Least Frequently Used (LFU) cache eviction algorithm
+ */
+class LeastFrequentlyUsedCacheManager : public LeastFrequentlyUsedCacheWorker, public CacheManager{};
+
+/**
+ * CacheManager which implements the Pseudo-LRU cache eviction algorithm
+ */
+class PseudoLRUCacheManager : public PseudoLRUCacheWorker, public CacheManager{};
 
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
