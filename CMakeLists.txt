@@ -27,33 +27,16 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 ## External library dependencies
 find_package(Threads REQUIRED)
 
-# We need MPI for this project to work
+# We need MPI, GoogleTest, GoogleBenchmark for this project to work
 find_package(MPI REQUIRED)
-
-include(FetchContent)
-find_package(GTest)
-find_package(benchmark)
-if (!GTest_Found)
-	FetchContent_Declare(googletest
-			GIT_REPOSITORY https://github.com/google/googletest.git
-			GIT_TAG main)
-	FetchContent_MakeAvailable(googletest)
-endif()
-if (!benchmark_FOUND)
-	#disable tests for google benchmark
-	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
-	FetchContent_Declare(googlebenchmark
-			GIT_REPOSITORY https://github.com/google/benchmark.git
-			GIT_TAG master) # need master for benchmark::benchmark
-	FetchContent_MakeAvailable(googlebenchmark)
-endif()
-
+find_package(GTest REQUIRED)
+find_package(benchmark REQUIRED)
 ## Add all child directories
 add_subdirectory(src)
 
 # Only build examples when explicitly requested
 if (pc2l_BUILD_EXAMPLES)
-add_subdirectory(examples)
+	add_subdirectory(examples)
 endif()
 
 add_subdirectory(test)
