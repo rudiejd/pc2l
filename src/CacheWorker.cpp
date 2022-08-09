@@ -79,6 +79,10 @@ BEGIN_NAMESPACE(pc2l);
         // Refer to our eviction structure
         refer(msg);
         // Bring bytes that cache holds up to date
+        auto existingEntry = cache.find(msg->key);
+        if (existingEntry != cache.end()) {
+            currentBytes -= existingEntry->second->getSize();
+        }
         currentBytes += msg->getSize();
         // Put a clone of the message in the cache
         cache[msg->key] = msg;

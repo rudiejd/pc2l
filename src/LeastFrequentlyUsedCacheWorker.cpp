@@ -47,7 +47,7 @@ void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is at capacity
-        if (currentBytes + msg->getSize() >= cacheSize) {
+        if (currentBytes + msg->getSize() > cacheSize) {
             // Get the queue for the smallest frequency (always at the beginning of the map of queues)
             auto& smallestFreqQueue = queues.begin()->second;
             // Item at the end of this queue is the LRU

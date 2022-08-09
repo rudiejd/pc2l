@@ -47,7 +47,7 @@ void LeastRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
-        if (currentBytes + msg->getSize() >= cacheSize) {
+        if (currentBytes + msg->getSize() > cacheSize) {
             auto last = queue.back();
             queue.pop_back();
             placeInQ.erase(last);

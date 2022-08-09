@@ -47,7 +47,7 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
-        if (currentBytes + msg->getSize() >= cacheSize) {
+        if (currentBytes + msg->getSize() > cacheSize) {
             // the first cache item without MRU bit set is removed
             MessagePtr evicted;
             for (auto e : cache) {

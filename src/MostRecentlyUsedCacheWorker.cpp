@@ -47,7 +47,7 @@ void MostRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     const auto key = msg->key;
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
-        if (currentBytes + msg->getSize() >= cacheSize) {
+        if (currentBytes + msg->getSize() > cacheSize) {
             // Get the most recently used block and erase it
             auto last = queue.back();
             queue.pop_back();
