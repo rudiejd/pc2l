@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
     ::testing::InitGoogleTest(&argc, argv);
     auto& pc2l = pc2l::System::get();
     pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+    pc2l.initialize(argc, argv);
+    pc2l.start(pc2l::System::LeastFrequentlyUsed);
     auto env = new PC2LEnvironment();
     env->argc = argc;
     env->argv = argv;
@@ -59,17 +61,18 @@ TEST_F(LFUTest, test_lfu_caching) {
     const int listSize = 100;
     pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
     // cache should now be the last 3 blocks inserted (defaults to LRU)
-    // but calling get block increments the usage counts
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
 
-    // front of cache is the last block, rear of cache is the third-last (LRU)
-    // increment usage count for the last block one more time
-    intVec[99] = 0;
-    // now put a new one into cache. 11 and 10 are tied for frequency and 11 is LRU, so 11 removed
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
+
+    // now put the zero block back in cache
+    intVec[0] = 1;
+    // LRU order: 10 11 12
+    // freq(10) = 9, freq(11) = 9, freq(12) = 5 (this block only contains 4 elements)
+    // 12 should be removed
+    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
     ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
 }

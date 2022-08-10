@@ -56,7 +56,7 @@ CacheManager::finalize() {
     << " Hit rate: " << static_cast<double>(cacheHits) / static_cast<double>(accesses) << std::endl;)
 }
 
-MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
+MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag, bool debug) {
     // see if this is something we've prefetched. if so, just wait on the request
     if (prefetchMsg != nullptr &&
         dsTag == prefetchMsg->dsTag && blockTag == prefetchMsg->dsTag) {
@@ -64,9 +64,10 @@ MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag) {
         return wait(prefetchReq);
     }
     size_t key = Message::getKey(dsTag, blockTag);
-    PC2L_PROFILE(accesses++;)
-    if (cache.find(key) != cache.end()) {
-        PC2L_PROFILE(cacheHits++;)
+    PC2L_PROFILE(if(!debug) accesses++;)
+    if (auto entry = cache.find(key); entry != cache.end()) {
+        PC2L_PROFILE(if(!debug) cacheHits++;)
+        if (!debug) refer(entry->second);
         return cache.at(key);
     } else {
         return nullptr;

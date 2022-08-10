@@ -99,9 +99,11 @@ public:
      * Retrieve a block from the manager cache. If it's not there, return nullptr
      * \param[in] dsTag the data structure tag associated with this message
      * \param[in] blockTag the block tag associated with this message
+     * \param[in] debug whether this is a debug check - if true, this check does
+     * not change the order of the cache - useful for testing
      * \return message associated with the key formed by combining these tags
      */
-    MessagePtr getBlock(size_t dsTag, size_t blockTag);
+    MessagePtr getBlock(size_t dsTag, size_t blockTag, bool debug = false);
 
     /**
      * Retrieve a block from the manager cache. If it's not there, fallback to remote CacheWorker
