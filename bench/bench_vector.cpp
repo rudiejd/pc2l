@@ -1,11 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <pc2l.h>
-
-class PC2LFixture : public benchmark::Fixture {
-public:
-    PC2LFixture() {
-    }
-};
+#include "Benchmark.h"
 
 // Benchmark pc2l::Vector.at(i) when block containing index i is currently on the manager cache
 static void BM_at(benchmark::State& state) {
@@ -20,7 +15,7 @@ static void BM_at(benchmark::State& state) {
         v.at(state.range(0));
     }
 }
-BENCHMARK(BM_at)->DenseRange(0, 100);
+BENCHMARK(BM_at)->Args({0});
 
 static void BM_at_prefetch(benchmark::State& state) {
     pc2l::Vector<int, 8 * sizeof(int), 5, pc2l::FORWARD_SEQUENTIAL> v;
@@ -34,7 +29,7 @@ static void BM_at_prefetch(benchmark::State& state) {
         v.at(state.range(0));
     }
 }
-BENCHMARK(BM_at_prefetch)->DenseRange(0, 100);
+BENCHMARK(BM_at_prefetch)->Args({0});
 
 static void BM_insert(benchmark::State& state) {
     pc2l::Vector<int, 8 * sizeof(int)> v;
@@ -45,7 +40,7 @@ static void BM_insert(benchmark::State& state) {
         v.push_back(state.range(0));
     }
 }
-BENCHMARK(BM_insert)->DenseRange(0, 10);
+BENCHMARK(BM_insert)->Args({0});
 
 static void BM_replace(benchmark::State& state) {
     pc2l::Vector<int, 8 * sizeof(int)> v;
@@ -112,6 +107,14 @@ int main(int argc, char** argv) {
     pc2l.start();
 
     benchmark::Initialize(&argc, argv);
-    benchmark::RunSpecifiedBenchmarks();
+    if (pc2l::MPI_GET_RANK() == 0) {
+        benchmark::RunSpecifiedBenchmarks();
+    } else {
+        NullReporter null;
+        benchmark::RunSpecifiedBenchmarks(&null);
+    }
     benchmark::Shutdown();
+
+    pc2l.stop();
+    pc2l.finalize();
 }

@@ -65,7 +65,14 @@ private:
      * is reset.
      */
     std::unordered_map<size_t, bool> wasUsed;
+    /**
+     * Count of items in the cache with MRU bit set
+     */
     size_t trueCount = 0;
+    /**
+     * Flag to say whether the cache is full
+     */
+     bool full = false;
 };
 
 END_NAMESPACE(pc2l);

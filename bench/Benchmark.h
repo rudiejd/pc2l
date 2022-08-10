@@ -1,17 +1,17 @@
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -33,52 +33,22 @@
 // --------------------------------------------------------------------
 // Authors:   JD Rudie                            rudiejd@miamioh.edu
 //---------------------------------------------------------------------
+#ifndef PC2L_BENCHMARK_H
 
-#include <iostream>
-#include <random>
-#include "Environment.h"
+#include <benchmark/benchmark.h>
 
-
-class MRUTest : public ::testing::Test {
-
+/**
+ * This NullReporter class does nothing. We use it to suppress
+ * output on non-zero mpi processes
+ */
+class NullReporter : public ::benchmark::BenchmarkReporter {
+public:
+    NullReporter() {}
+    virtual bool ReportContext(const Context &) {return true;}
+    virtual void ReportRuns(const std::vector<Run> &) {}
+    virtual void Finalize() {}
 };
 
-int main(int argc, char *argv[]) {
-    ::testing::InitGoogleTest(&argc, argv);
-    auto& pc2l = pc2l::System::get();
-    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
-    pc2l.initialize(argc, argv);
-    pc2l.start(pc2l::System::MostRecentlyUsed);
-    auto env = new PC2LEnvironment();
-    env->argc = argc;
-    env->argv = argv;
-    ::testing::AddGlobalTestEnvironment(env);
-    return RUN_ALL_TESTS();
-}
+#define PC2L_BENCHMARK_H
 
-TEST_F(MRUTest, test_mru_caching) {
-    auto& pc2l = pc2l::System::get();
-    const int listSize = 100;
-    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
-    // cache should now be the last 3 blocks inserted
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
-
-
-    // now put the zero block back in cache
-    // MRU order: 12 11 10
-    intVec[0] = 1;
-    // MRU order: 0 11 10
-    // 12 should be removed
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
-    intVec[9] = 1;
-    // 0 should be removed
-    // New MRU order: 1 11 10
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
-}
-
-
+#endif //PC2L_BENCHMARK_H

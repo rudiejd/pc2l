@@ -28,7 +28,7 @@ set(SRCFILES "${pc2l_SOURCE_DIR}/src/ArgParser.cpp"
 		           "${pc2l_SOURCE_DIR}/src/MostRecentlyUsedCacheWorker.cpp"
 		           "${pc2l_SOURCE_DIR}/src/LeastFrequentlyUsedCacheWorker.cpp"
 		           "${pc2l_SOURCE_DIR}/src/PseudoLRUCacheWorker.cpp"
-		../test/Environment.h)
+		../test/Environment.h ../bench/Benchmark.h)
 
 add_library(pc2l_lib ${SRCFILES} ${HEADER_LIST})
 target_include_directories(pc2l_lib PUBLIC ${pc2l_SOURCE_DIR}/include)

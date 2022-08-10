@@ -48,6 +48,8 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
     if (cache.find(key) == cache.end()) {
         // Use eviction strategy if cache is overfull
         if (currentBytes + msg->getSize() > cacheSize) {
+            // the cache is full now and we can start resetting the mru bits
+            full = true;
             // the first cache item without MRU bit set is removed
             MessagePtr evicted;
             for (auto e : cache) {
@@ -65,8 +67,8 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
         // If the block is present in the cache, we need to update its MRU bit
         wasUsed[key] = true;
         trueCount++;
-        if (trueCount == cache.size()) {
-            // when all MRU bools set, reset all MRU bits to zero
+        if (trueCount == cache.size() && full) {
+            // when all MRU bools set AND the cache is full, reset all MRU bits to zero
             // Note that we can just clear the map since the bool map
             // operator defaults to false
             wasUsed.clear();
