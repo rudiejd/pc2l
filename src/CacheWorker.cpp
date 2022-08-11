@@ -79,25 +79,26 @@ BEGIN_NAMESPACE(pc2l);
         // Refer to our eviction structure
         refer(msg);
         // Bring bytes that cache holds up to date
-        auto existingEntry = cache.find(msg->key);
-        if (existingEntry != cache.end()) {
-            currentBytes -= existingEntry->second->getSize();
+        const auto& existingEntry = getFromCache(msg->key);
+        if (existingEntry != blockNotFoundMsg) {
+            currentBytes -= existingEntry->getSize();
         }
         currentBytes += msg->getSize();
         // Put a clone of the message in the cache
-        cache[msg->key] = msg;
+//        cache[msg->key] = msg;
+        addToCache(msg);
         PC2L_DEBUG_STOP_TIMER("storeCacheBlock() on node " << MPI_GET_RANK() << " ")
     }
 
     void CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
-        // Get entry for key, if present in the cache
-        const auto entry = cache.find(msg->key);
-        // If the entry is found, delete the entry
-        if (entry != cache.end()) {
+        // If the cache block found, delete it
+        if (getFromCache(msg->key) != blockNotFoundMsg) {
             PC2L_PROFILE(cacheHits++;)
             // Decrement current bytes that worker is holding
-            currentBytes -= entry->second->getSize();
-            cache.erase(entry);
+            eraseFromCache(msg->key);
+//            currentBytes -= entry->second->getSize();
+//            cache.erase(entry);
+
         }
         PC2L_PROFILE(accesses++;)
         //     // When control drops here, that means the requested block was
@@ -112,12 +113,12 @@ BEGIN_NAMESPACE(pc2l);
     void CacheWorker::sendCacheBlock(const MessagePtr& msg) {
         PC2L_DEBUG_START_TIMER()
         // Get entry for key, if present in the cache
-        const auto entry = cache.find(msg->key);
+        const auto& entry = getFromCache(msg->key);
         // If the entry is found, send it back to the requestor
-        if (entry != cache.end()) {
+        if (entry != blockNotFoundMsg) {
             PC2L_PROFILE(cacheHits++;)
-            refer(entry->second);
-            send(entry->second, msg->srcRank);
+            refer(entry);
+            send(entry, msg->srcRank);
         }
         PC2L_PROFILE(accesses++;)
         //     // When control drops here, that means the requested block was

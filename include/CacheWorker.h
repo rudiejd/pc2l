@@ -134,8 +134,32 @@ protected:
      */
     DataCache cache;
 
-    // Queue: front is block to remove
-    std::list<size_t> lruBlock;
+    /**
+     * Add an item to the cache data structure. This is a pure
+     * virtual method since adding items can be different
+     * depending upon the data stored for different eviction
+     * strategies
+     * \param[in] msg reference to a message
+     */
+    virtual void addToCache(MessagePtr& msg) = 0;
+
+    /**
+     * Get an item from the cache. Pure virtual method needed
+     * since the data structure used for the cache can vary
+     * by cache eviction strategy
+     * \param[in] key the key associated with the requested item
+     * \return blockNotFoundMsg if not in cache, otherwise reference
+     * to the MessagePtr associated with the block
+     */
+     virtual MessagePtr& getFromCache(size_t key) = 0;
+
+    /**
+     * Erase a given key from the cache, then decrement the current number
+     * of bytes that the cache is holding
+     * @param key key of message to erase
+     */
+    virtual void eraseFromCache(size_t key) = 0;
+
 
     /**
      * If in profiling mode: keep a counter for cache hits
