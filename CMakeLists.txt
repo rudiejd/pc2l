@@ -26,6 +26,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 ## External library dependencies
 find_package(Threads REQUIRED)
+find_package(MPI REQUIRED)
 
 if (PC2L_DOWNLOAD_EXTERNALS)
     include(FetchContent)
@@ -39,12 +40,11 @@ if (PC2L_DOWNLOAD_EXTERNALS)
             GIT_REPOSITORY https://github.com/google/benchmark.git
             GIT_TAG master) # need master for benchmark::benchmark
     FetchContent_MakeAvailable(googletest googlebenchmark)
+else()
+    # We need MPI, GoogleTest, GoogleBenchmark for this project to work
+    find_package(GTest REQUIRED)
+    find_package(benchmark REQUIRED)
 endif()
-
-# We need MPI, GoogleTest, GoogleBenchmark for this project to work
-find_package(MPI REQUIRED)
-find_package(GTest REQUIRED)
-find_package(benchmark REQUIRED)
 ## Add all child directories
 add_subdirectory(src)
 
