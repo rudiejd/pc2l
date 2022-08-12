@@ -130,11 +130,6 @@ public:
     virtual void refer(const MessagePtr& msg) = 0;
 protected:
     /**
-     * The in-memory data cache managed by this worker process.
-     */
-    DataCache cache;
-
-    /**
      * Add an item to the cache data structure. This is a pure
      * virtual method since adding items can be different
      * depending upon the data stored for different eviction
@@ -175,14 +170,13 @@ protected:
  * added
  */
 unsigned int currentBytes = 0;
-private:
-    /**
-     * This is a convenience message that is created in the
-     * constructor.  This is used to quickly send a "block-not-found"
-     * response in case a block was requested and it was not found.
-     * This message is reused to minimize message creation overheads.
-     */
-    MessagePtr blockNotFoundMsg;
+/**
+ * This is a convenience message that is created in the
+ * constructor.  This is used to quickly send a "block-not-found"
+ * response in case a block was requested and it was not found.
+ * This message is reused to minimize message creation overheads.
+ */
+MessagePtr blockNotFoundMsg;
 };
 
 END_NAMESPACE(pc2l);

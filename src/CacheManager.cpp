@@ -65,10 +65,10 @@ MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag, bool debug) {
     }
     size_t key = Message::getKey(dsTag, blockTag);
     PC2L_PROFILE(if(!debug) accesses++;)
-    if (auto entry = cache.find(key); entry != cache.end()) {
+    if (auto entry = getFromCache(key); entry != blockNotFoundMsg) {
         PC2L_PROFILE(if(!debug) cacheHits++;)
-        if (!debug) refer(entry->second);
-        return cache.at(key);
+        if (!debug) refer(entry);
+        return entry;
     } else {
         return nullptr;
     }
@@ -90,9 +90,9 @@ MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
         // then put the object at retrieved index into cache
         storeCacheBlock(ret);
     }
-    refer(cache[ret->key]);
-
-    return cache[ret->key];
+    auto entry = getFromCache(ret->key);
+    refer(entry);
+    return entry;
 }
 
 void CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {

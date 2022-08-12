@@ -1,6 +1,9 @@
 #include <benchmark/benchmark.h>
 #include <pc2l.h>
+#include <algorithm>
+#include <numeric>
 #include "Benchmark.h"
+
 
 // Benchmark pc2l::Vector.at(i) when block containing index i is currently on the manager cache
 static void BM_at(benchmark::State& state) {
@@ -77,15 +80,44 @@ BENCHMARK(BM_insert_at_beginning)->Args({0});
 
 static void BM_find_out_of_cache(benchmark::State& state) {
     pc2l::Vector<int, 8 * sizeof(int)> v;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < state.range(0); i++) {
         v.push_back(i);
     }
     while (state.KeepRunning()) {
-        std::find(v.begin(), v.end(), 50);
+        std::find(v.begin(), v.end(), state.range(0) / 2);
     }
 }
-BENCHMARK(BM_find_out_of_cache);
+BENCHMARK(BM_find_out_of_cache)->RangeMultiplier(10)->Range(10, 10000000000);
 
+static void BM_project_euler(benchmark::State& state) {
+    pc2l::Vector<unsigned long long> vec(state.range(0));
+
+    while (state.KeepRunning()) {
+        // fill vector with values from 1 to n
+        std::iota(vec.begin(), vec.end(), 1);
+
+        // every number that does not have a 3 or 5 as a factor is set to 0
+        std::replace_if(vec.begin(), vec.end(), [](auto i) {
+            return !((i % 3) || (i % 5));
+        }, 0);
+
+        // sum all elements in the vector
+        auto total = std::accumulate(vec.begin(), vec.end(), 0ULL);
+    }
+}
+BENCHMARK(BM_project_euler)->RangeMultiplier(10)->Range(10, 10000000000);
+
+static void BM_std_sort(benchmark::State& state) {
+    pc2l::Vector<unsigned long long> vec;
+    for (auto i = 0; i < state.range(0); i++) {
+        vec.push_back(i);
+    }
+    while(state.KeepRunning()) {
+        std::sort(vec.begin(), vec.end());
+    }
+}
+
+BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 10000000000);
 static void BM_find_in_cache(benchmark::State& state) {
     pc2l::Vector<int, 8 * sizeof(int)> v;
     for (int i = 0; i < 100; i++) {

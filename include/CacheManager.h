@@ -121,15 +121,6 @@ public:
      */
     void getRemoteBlockNonblocking(size_t dsTag, size_t blockTag);
 
-    /**
-     * Gives a reference to the manager's cache for use in insertion
-     * logic
-     * @return reference to manager's cache
-     */
-    DataCache& managerCache() {
-        return cache;
-    }
-
 private:
     MPI_Request prefetchReq;
     MessagePtr prefetchMsg;

@@ -39,32 +39,26 @@
 /**
  * @file CacheWorker.h
  * @brief Definition of Most Recently Used Cache Worker which implements the
- * Most Recently Used (MRU) algorithm
+ * Most Recently Used (MRU) algorithm. Inherits from Least Recently Used
+ * (LRU) Cache Worker since most of the code is reused
  * @author JD Rudie
  * @version 0.1
  */
 
 #include "CacheWorker.h"
 #include "Utilities.h"
+#include "LeastRecentlyUsedCacheWorker.h"
 #include <list>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-class MostRecentlyUsedCacheWorker: public virtual CacheWorker {
+class MostRecentlyUsedCacheWorker: public virtual CacheWorker, public virtual LeastRecentlyUsedCacheWorker {
 public:
     /**
      * Refer the key for a block to our eviction scheme
      * @param key the key to place into eviction scheme
      */
     void refer(const MessagePtr& msg) override;
-private:
-    /**
-     * Keys of blocks in the queue in their removal order under MRU
-     *
-     */
-    std::list<size_t> queue;
-
-    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
 };
 
 END_NAMESPACE(pc2l);

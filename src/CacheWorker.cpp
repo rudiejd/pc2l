@@ -80,6 +80,7 @@ BEGIN_NAMESPACE(pc2l);
         refer(msg);
         // Bring bytes that cache holds up to date
         const auto& existingEntry = getFromCache(msg->key);
+        // if there is already an entry for this key, we have to make sure size is correct (it could change)
         if (existingEntry != blockNotFoundMsg) {
             currentBytes -= existingEntry->getSize();
         }
@@ -92,11 +93,11 @@ BEGIN_NAMESPACE(pc2l);
 
     void CacheWorker::eraseCacheBlock(const MessagePtr& msg) {
         // If the cache block found, delete it
-        if (getFromCache(msg->key) != blockNotFoundMsg) {
+        if (auto entry = getFromCache(msg->key); entry != blockNotFoundMsg) {
             PC2L_PROFILE(cacheHits++;)
             // Decrement current bytes that worker is holding
-            eraseFromCache(msg->key);
-//            currentBytes -= entry->second->getSize();
+            eraseFromCache(entry->key);
+            currentBytes -= entry->getSize();
 //            cache.erase(entry);
 
         }

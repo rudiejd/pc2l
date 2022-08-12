@@ -40,12 +40,38 @@
 #include "Exception.h"
 #include "LeastFrequentlyUsedCacheWorker.h"
 
+
+
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+
+void LeastFrequentlyUsedCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+    // this only is needed if it's a new insert. If it's not, refer already
+    // updated the cache stuff
+    if (placeInQueue.find(msg->key) != placeInQueue.end()) {
+        CacheItem ci{msg, msg->key};
+        queues[1].push_front(ci);
+        placeInQueue[msg->key] = queues[1].begin();
+    }
+}
+
+void LeastFrequentlyUsedCacheWorker::eraseFromCache(size_t key) {
+    // by the time this is called, refer has already fixed cache details
+    placeInQueue.erase(key);
+}
+
+MessagePtr& LeastFrequentlyUsedCacheWorker::getFromCache(size_t key) {
+    if (placeInQueue.find(key) != placeInQueue.end()) {
+        return placeInQueue[key]->msg;
+    } else {
+        return blockNotFoundMsg;
+    }
+}
+
 void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
-    if (cache.find(key) == cache.end()) {
+    if (auto msgPlace = placeInQueue.find(key); msgPlace == placeInQueue.end()) {
         // Use eviction strategy if cache is at capacity
         if (currentBytes + msg->getSize() > cacheSize) {
             // Get the queue for the smallest frequency (always at the beginning of the map of queues)
@@ -58,15 +84,11 @@ void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr& msg) {
                 queues.erase(evictedItem.frequency);
             }
             // send evicted block to remote cacheworker
-            MessagePtr evicted = cache[evictedItem.key];
+            MessagePtr evicted = evictedItem.msg;
             eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
-        // Insert cache item representing this block into our data structures
-        CacheItem ci(key);
-        queues[1].push_front(ci);
-        placeInQueue[key] = queues[1].begin();
     } else {
         // If the block is present in the cache, we need to update which frequency queue it is in
         auto item = *placeInQueue[key];

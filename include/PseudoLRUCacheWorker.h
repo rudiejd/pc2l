@@ -60,14 +60,26 @@ public:
     void refer(const MessagePtr& msg) override;
 private:
     /**
-     * Message is set to true if it is recently used. Once
-     * all messages in cache are set to true, the cache
-     * is reset.
+     * Cache items in the PLRU cache require only a flag
+     * to say whether they were MRU (MRU bit)
      */
-    std::unordered_map<size_t, bool> wasUsed;
+    struct CacheItem {
+        MessagePtr msg;
+        bool wasUsed = false;
+    };
+
+    void eraseFromCache(size_t key) override;
+
+    void addToCache(pc2l::MessagePtr &msg) override;
+
+    MessagePtr & getFromCache(size_t key) override;
+
+    std::unordered_map<size_t, CacheItem> cache;
+
     /**
      * Count of items in the cache with MRU bit set
      */
+
     size_t trueCount = 0;
     /**
      * Flag to say whether the cache is full

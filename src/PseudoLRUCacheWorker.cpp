@@ -42,10 +42,26 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+    void PseudoLRUCacheWorker::eraseFromCache(size_t key) {
+        cache.erase(key);
+    }
+
+    void PseudoLRUCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+       cache[msg->key] = {msg};
+    }
+
+    MessagePtr &PseudoLRUCacheWorker::getFromCache(size_t key) {
+        if (cache.find(key) != cache.end()) {
+            return cache[key].msg;
+        } else {
+            return blockNotFoundMsg;
+        }
+    }
+
 void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
     if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
-    if (cache.find(key) == cache.end()) {
+    if (auto entry = cache.find(key); entry == cache.end()) {
         // Use eviction strategy if cache is overfull
         if (currentBytes + msg->getSize() > cacheSize) {
             // the cache is full now and we can start resetting the mru bits
@@ -53,25 +69,23 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
             // the first cache item without MRU bit set is removed
             MessagePtr evicted;
             for (auto e : cache) {
-                if (!wasUsed[e.first]) {
-                    evicted = e.second;
+                if (!e.second.wasUsed) {
+                    evicted = e.second.msg;
                     break;
                 }
             }
-            wasUsed.erase(evicted->key);
             eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
     }else {
         // If the block is present in the cache, we need to update its MRU bit
-        wasUsed[key] = true;
+        entry->second.wasUsed = true;
         trueCount++;
         if (trueCount == cache.size() && full) {
-            // when all MRU bools set AND the cache is full, reset all MRU bits to zero
-            // Note that we can just clear the map since the bool map
-            // operator defaults to false
-            wasUsed.clear();
+            for (auto e : cache) {
+                e.second.wasUsed = false;
+            }
             // reset the count of MRU bools set
             trueCount = 0;
         }

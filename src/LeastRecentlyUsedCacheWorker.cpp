@@ -40,30 +40,47 @@
 #include "Exception.h"
 #include "LeastRecentlyUsedCacheWorker.h"
 
+
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+
+void LeastRecentlyUsedCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+    cache[msg->key] = {msg, queue.begin()};
+}
+
+MessagePtr& LeastRecentlyUsedCacheWorker::getFromCache(size_t key) {
+    if (cache.find(key) != cache.end()) {
+        return cache[key].msg;
+    } else {
+        return blockNotFoundMsg;
+    }
+}
+
+void LeastRecentlyUsedCacheWorker::eraseFromCache(size_t key) {
+    cache.erase(key);
+}
+
 void LeastRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
-    if (cache.find(key) == cache.end()) {
+    if (auto entry = cache.find(key); entry == cache.end()) {
         // Use eviction strategy if cache is overfull
         if (currentBytes + msg->getSize() > cacheSize) {
             auto last = queue.back();
             queue.pop_back();
-            placeInQ.erase(last);
             // send evicted block to remote cacheworker
-            MessagePtr evicted = cache[last];
+            // this copies right now (do I want this?)
+            MessagePtr evicted = cache[last].msg;
             eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
     } else {
         // If the block is present in the cache, we need to update its place in the queue
-        queue.erase(placeInQ[key]);
+        queue.erase(entry->second.placeInQueue);
     }
     // Update the reference in the order queue
     queue.push_front(key);
-    placeInQ[key] = queue.begin();
 }
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l

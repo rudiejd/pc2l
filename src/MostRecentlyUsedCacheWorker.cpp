@@ -45,27 +45,24 @@ BEGIN_NAMESPACE(pc2l);
 void MostRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
     if (MPI_GET_RANK() != 0) return;
     const auto key = msg->key;
-    if (cache.find(key) == cache.end()) {
+    if (auto entry = cache.find(key); entry == cache.end()) {
         // Use eviction strategy if cache is overfull
         if (currentBytes + msg->getSize() > cacheSize) {
-            // Get the most recently used block and erase it
-            auto last = queue.back();
-            queue.pop_back();
-            placeInQ.erase(last);
+            // Get the most recently used and erase it
+            auto first = queue.front();
+            queue.pop_front();
             // send evicted block to remote cacheworker
-            MessagePtr evicted = cache[last];
+            MessagePtr evicted = getFromCache(key);
             eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);
         }
     }else {
         // If the block is present in the cache, we need to update its place in the queue
-        queue.erase(placeInQ[key]);
+        queue.erase(entry->second.placeInQueue);
     }
-    // new block goes to the end (it is the most recently used)
-    queue.push_back(key);
-    // Note that the place must the one before queue.end() since end() is an invalid iterator
-    placeInQ[key] = std::prev(queue.end());
+    // new block goes to the beginning (it is mru)
+    queue.push_front(key);
 }
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l

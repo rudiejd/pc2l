@@ -60,12 +60,19 @@ public:
      * @param key the key to place into eviction scheme
      */
     void refer(const MessagePtr& msg) override;
+protected:
+    void addToCache(pc2l::MessagePtr &msg) override;
+
+    void eraseFromCache(size_t key) override;
+
+    MessagePtr & getFromCache(size_t key) override;
 private:
     struct CacheItem {
-        CacheItem(size_t key) : key(key) {};
+        MessagePtr msg;
         size_t key;
         size_t frequency = 1;
     };
+
     /**
      * Unordered map for finding position of the block in one of the frequency queues
      */

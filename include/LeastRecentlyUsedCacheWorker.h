@@ -58,16 +58,34 @@ public:
      * @param key the key to place into eviction scheme
      */
     void refer(const MessagePtr& msg) override;
-private:
-    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
+protected:
+    void addToCache(MessagePtr& msg) override;
+
+    MessagePtr& getFromCache(size_t key) override;
+
+    void eraseFromCache(size_t key) override;
+
+/**
+ * Keys of blocks in queue in their removal order under LRU
+ * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
+ * but also because of its unique properties for iterator invalidation;
+ * insertion leaves all iterators unaffected AND erasing only affects the erased
+ * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+ */
+std::list<size_t> queue;
     /**
-     * Keys of blocks in queue in their removal order under LRU
-     * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
-     * but also because of its unique properties for iterator invalidation;
-     * insertion leaves all iterators unaffected AND erasing only affects the erased
-     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+     * An internal structure that stores an item in this cache. It consists
+     * of a MessagePtr and an iterator for this MessagePtr's current place in
+     * the LRU queue, and can be bracket initialized
      */
-    std::list<size_t> queue;
+    struct CacheItem {
+        MessagePtr msg;
+        std::list<size_t>::iterator placeInQueue;
+    };
+
+    std::unordered_map<size_t, CacheItem> cache;
+private:
+
 };
 
 END_NAMESPACE(pc2l);

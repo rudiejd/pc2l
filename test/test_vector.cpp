@@ -134,16 +134,15 @@ TEST_F(VectorTest, test_lru_caching) {
     const int listSize = 100;
     pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
     // cache should now be the last 3 blocks inserted
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10, true), nullptr);
 
     // front of cache is the last block, rear of cache is the third-last (LRU)
     // now retrieve another block
     intVec.at(0);
-    ASSERT_EQ(pc2l.cacheManager().managerCache().size(), 3);
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
+    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 10, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
 }
 
 TEST_F(VectorTest, test_delete) {
