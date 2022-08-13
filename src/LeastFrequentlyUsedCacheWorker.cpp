@@ -48,7 +48,7 @@ BEGIN_NAMESPACE(pc2l);
 void LeastFrequentlyUsedCacheWorker::addToCache(pc2l::MessagePtr &msg) {
     // this only is needed if it's a new insert. If it's not, refer already
     // updated the cache stuff
-    if (placeInQueue.find(msg->key) != placeInQueue.end()) {
+    if (placeInQueue.find(msg->key) == placeInQueue.end()) {
         CacheItem ci{msg, msg->key};
         queues[1].push_front(ci);
         placeInQueue[msg->key] = queues[1].begin();
