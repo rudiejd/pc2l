@@ -39,7 +39,7 @@
 #include "Environment.h"
 
 
-class MRUTest : public ::testing::Test {
+class PLRUTest : public ::testing::Test {
 
 };
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     return RUN_ALL_TESTS();
 }
 
-TEST_F(MRUTest, test_mru_caching) {
+TEST_F(PLRUTest, test_plru_caching) {
     auto& pc2l = pc2l::System::get();
     const int listSize = 100;
     pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);

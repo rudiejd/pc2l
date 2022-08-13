@@ -80,7 +80,6 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
         }
     }else {
         // If the block is present in the cache, we need to update its MRU bit
-        entry->second.wasUsed = true;
         trueCount++;
         if (trueCount == cache.size() && full) {
             for (auto e : cache) {
@@ -89,6 +88,7 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
             // reset the count of MRU bools set
             trueCount = 0;
         }
+        entry->second.wasUsed = true;
     }
 }
 END_NAMESPACE(pc2l);
