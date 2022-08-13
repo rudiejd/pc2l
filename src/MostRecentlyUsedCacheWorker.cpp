@@ -52,7 +52,7 @@ void MostRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
             auto first = queue.front();
             queue.pop_front();
             // send evicted block to remote cacheworker
-            MessagePtr evicted = getFromCache(key);
+            MessagePtr evicted = getFromCache(first);
             eraseCacheBlock(evicted);
             const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
             send(evicted, destRank);

@@ -60,25 +60,24 @@ TEST_F(MRUTest, test_mru_caching) {
     auto& pc2l = pc2l::System::get();
     const int listSize = 100;
     pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
-    // cache should now be the last 3 blocks inserted
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
+    // cache should now be the MRU block, the 2nd LRU block, and the LRU block
+    // MRU order 12 1 0
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1, true), nullptr);
 
 
-    // now put the zero block back in cache
+    // now put the eleven block back in cache
     // MRU order: 12 11 10
-    intVec[0] = 1;
+    intVec[90] = 1;
     // MRU order: 0 11 10
     // 12 should be removed
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
+    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
     intVec[9] = 1;
-    // 0 should be removed
-    // New MRU order: 1 11 10
-    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
-    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
+    // New MRU order: 11 1 0
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11, true), nullptr);
 }
 
 

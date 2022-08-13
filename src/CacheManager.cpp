@@ -65,7 +65,7 @@ MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag, bool debug) {
     }
     size_t key = Message::getKey(dsTag, blockTag);
     PC2L_PROFILE(if(!debug) accesses++;)
-    if (auto entry = getFromCache(key); entry != blockNotFoundMsg) {
+    if (auto entry = getFromCache(key); entry->tag != Message::BLOCK_NOT_FOUND) {
         PC2L_PROFILE(if(!debug) cacheHits++;)
         if (!debug) refer(entry);
         return entry;
