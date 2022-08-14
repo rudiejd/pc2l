@@ -1,5 +1,5 @@
-#ifndef UTILITIES_CPP
-#define UTILITIES_CPP
+#ifndef LRU_CACHE_WORKER_H
+#define LRU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,56 +34,52 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
+// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file StorageCacheWorker.h
+ * @brief Definition of "Dumb" Cache Worker which just stores messages.
+ * It will never evict anything. Used when eviction is only needed on
+ * the rank 0 node
+ * @author JD Rudie
+ * @version 0.1
+ *
+ */
 
+#include "CacheWorker.h"
 #include "Utilities.h"
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <list>
 
-char*
-getTimeStamp(const char *fileName, char *buffer) {
-    if (fileName == NULL) {
-        // Nothing further to be done here.
-        return buffer;
-    }
-    // The follwing structure will contain the file information.
-    struct stat fileInfo;
-    int returnValue = 0;
-#ifdef _WINDOWS
-    returnValue = _stat(fileName, &fileInfo);
-#else
-    // The only difference between windows and Linux is the extra "_"
-    // at the beginning of stat() method.
-    returnValue = stat(fileName, &fileInfo);
-#endif
-    // Check to ensure there were no errors.  If there were errors
-    // exit immediately.
-    if (returnValue == -1) {
-        // O!o! there was an error.
-        return buffer;
-    }
-    // Convert the last modification time to string and return it back
-    // to the caller.
-    return getSystemTime(buffer, &fileInfo.st_mtime);
-}
+// namespace pc2l {
+BEGIN_NAMESPACE(pc2l);
+class LeastRecentlyUsedCacheWorker: public virtual CacheWorker {
+public:
+    /**
+     * Refer the key for a block to our eviction scheme
+     * @param key the key to place into eviction scheme
+     */
+    void refer(const MessagePtr& msg) override;
+protected:
+    void addToCache(MessagePtr& msg) override;
 
-// Returns a date as in -- "Wed Jun 30 21:49:08 1993"
-char* getSystemTime(char *buffer, const time_t *encodedTime) {
-    if (buffer == NULL) {
-        // Nothing more to do.
-        return NULL;
-    }
-    // Get instant system time.
-    time_t timeToConv = time(NULL);
-    if (encodedTime != NULL) {
-        // If we have a valid time supplied, then override system time.
-        timeToConv = *encodedTime;
-    }
-    // Convert the time.
-    ctime_s(buffer, 128, &timeToConv);
-    // Return the buffer back to the caller
-    return buffer;
-}
+    MessagePtr& getFromCache(size_t key) override;
+
+    void eraseFromCache(size_t key) override;
+
+/**
+ * Keys of blocks in queue in their removal order under LRU
+ * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
+ * but also because of its unique properties for iterator invalidation;
+ * insertion leaves all iterators unaffected AND erasing only affects the erased
+ * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+ */
+    std::list<size_t> queue;
+    std::unordered_map<size_t, MessagePtr> cache;
+private:
+
+};
+
+END_NAMESPACE(pc2l);
+// }   // end namespace pc2l
 
 #endif

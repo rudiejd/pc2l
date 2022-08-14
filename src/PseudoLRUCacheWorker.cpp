@@ -34,7 +34,7 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 
 #include "Exception.h"
@@ -81,7 +81,7 @@ void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
     }else {
         // If the block is present in the cache, we need to update its MRU bit
         trueCount++;
-        if (trueCount == cache.size() && full) {
+        if (trueCount >= cache.size() && full) {
             for (auto e : cache) {
                 e.second.wasUsed = false;
             }

@@ -1,5 +1,5 @@
-#ifndef UTILITIES_CPP
-#define UTILITIES_CPP
+#ifndef LRU_CACHE_WORKER_CPP
+#define LRU_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,56 +34,34 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
+// Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "Utilities.h"
-#include <sys/types.h>
-#include <sys/stat.h>
+#include "Exception.h"
+#include "StorageCacheWorker.h"
 
-char*
-getTimeStamp(const char *fileName, char *buffer) {
-    if (fileName == NULL) {
-        // Nothing further to be done here.
-        return buffer;
-    }
-    // The follwing structure will contain the file information.
-    struct stat fileInfo;
-    int returnValue = 0;
-#ifdef _WINDOWS
-    returnValue = _stat(fileName, &fileInfo);
-#else
-    // The only difference between windows and Linux is the extra "_"
-    // at the beginning of stat() method.
-    returnValue = stat(fileName, &fileInfo);
-#endif
-    // Check to ensure there were no errors.  If there were errors
-    // exit immediately.
-    if (returnValue == -1) {
-        // O!o! there was an error.
-        return buffer;
-    }
-    // Convert the last modification time to string and return it back
-    // to the caller.
-    return getSystemTime(buffer, &fileInfo.st_mtime);
+
+// namespace pc2l {
+BEGIN_NAMESPACE(pc2l);
+
+void StorageCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+    cache[msg->key] = msg;
 }
 
-// Returns a date as in -- "Wed Jun 30 21:49:08 1993"
-char* getSystemTime(char *buffer, const time_t *encodedTime) {
-    if (buffer == NULL) {
-        // Nothing more to do.
-        return NULL;
+MessagePtr& StorageCacheWorker::getFromCache(size_t key) {
+    if (cache.find(key) != cache.end()) {
+        return cache[key];
+    } else {
+        return blockNotFoundMsg;
     }
-    // Get instant system time.
-    time_t timeToConv = time(NULL);
-    if (encodedTime != NULL) {
-        // If we have a valid time supplied, then override system time.
-        timeToConv = *encodedTime;
-    }
-    // Convert the time.
-    ctime_s(buffer, 128, &timeToConv);
-    // Return the buffer back to the caller
-    return buffer;
 }
+
+void StorageCacheWorker::eraseFromCache(size_t key) {
+    cache.erase(key);
+}
+
+void StorageCacheWorker::refer(const MessagePtr& msg) { }
+END_NAMESPACE(pc2l);
+// }   // end namespace pc2l
 
 #endif
