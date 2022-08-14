@@ -1,5 +1,5 @@
-#ifndef LRU_CACHE_WORKER_CPP
-#define LRU_CACHE_WORKER_CPP
+#ifndef STORAGE_CACHE_WORKER_CPP
+#define STORAGE_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 

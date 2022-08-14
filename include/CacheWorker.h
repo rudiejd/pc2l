@@ -165,18 +165,18 @@ protected:
      * Profiling mode: keep a counter of total attempted accesses
      */
      PC2L_PROFILE(size_t accesses = 0;)
-/**
- * The amount of bytes currently stored in the cache manager (incremented each time a message is
- * added
- */
-unsigned int currentBytes = 0;
-/**
- * This is a convenience message that is created in the
- * constructor.  This is used to quickly send a "block-not-found"
- * response in case a block was requested and it was not found.
- * This message is reused to minimize message creation overheads.
- */
-MessagePtr blockNotFoundMsg;
+    /**
+     * The amount of bytes currently stored in the cache manager (incremented each time a message is
+     * added
+     */
+    unsigned int currentBytes = 0;
+    /**
+     * This is a convenience message that is created in the
+     * constructor.  This is used to quickly send a "block-not-found"
+     * response in case a block was requested and it was not found.
+     * This message is reused to minimize message creation overheads.
+     */
+    MessagePtr blockNotFoundMsg;
 };
 
 END_NAMESPACE(pc2l);

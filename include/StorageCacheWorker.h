@@ -1,5 +1,5 @@
-#ifndef LRU_CACHE_WORKER_H
-#define LRU_CACHE_WORKER_H
+#ifndef STORAGE_CACHE_WORKER_H
+#define STORAGE_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -52,7 +52,7 @@
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-class LeastRecentlyUsedCacheWorker: public virtual CacheWorker {
+class StorageCacheWorker: public virtual CacheWorker {
 public:
     /**
      * Refer the key for a block to our eviction scheme
@@ -65,18 +65,8 @@ protected:
     MessagePtr& getFromCache(size_t key) override;
 
     void eraseFromCache(size_t key) override;
-
-/**
- * Keys of blocks in queue in their removal order under LRU
- * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
- * but also because of its unique properties for iterator invalidation;
- * insertion leaves all iterators unaffected AND erasing only affects the erased
- * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
- */
-    std::list<size_t> queue;
-    std::unordered_map<size_t, MessagePtr> cache;
 private:
-
+    std::unordered_map<size_t, MessagePtr> cache;
 };
 
 END_NAMESPACE(pc2l);

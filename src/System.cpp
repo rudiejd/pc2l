@@ -131,21 +131,7 @@ System::oneWriterDistribCache(EvictionStrategy es) {
     } else {
         // Here this process is running as a worker.  So perform the
         // worker's lifecycle activities here.
-        CacheWorker* worker;
-        switch(es) {
-            case LeastRecentlyUsed:
-                worker = new LeastRecentlyUsedCacheWorker();
-                break;
-            case MostRecentlyUsed:
-                worker = new MostRecentlyUsedCacheWorker();
-                break;
-            case LeastFrequentlyUsed:
-                worker = new LeastFrequentlyUsedCacheWorker();
-                break;
-            case PseudoLRU:
-                worker = new PseudoLRUCacheWorker();
-                break;
-        }
+        CacheWorker* worker = new StorageCacheWorker();
         worker->initialize();  // Initalize
         worker->run();         // This method runs until manager send finish
         worker->finalize();    // Do any clean-ups for this run
