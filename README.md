@@ -1,19 +1,8 @@
-
---------------------------------------------------------------------
-               ____         ____       ____        _     
-              |  _ \       / ___|     |___ \      | |    
-              | |_) |     | |           __) |     | |    
-              |  __/      | |___       / __/      | |___ 
-              |_|          \____|     |_____|     |_____|
-
-              A Parallel & Cloud Computing Library (PC2L)
-               <http://www.pc2lab.cec.miamioh.edu/pc2l>
-
----------------------------------------------------------------------
-                       ___             _           
-                      | _ \___ __ _ __| |_ __  ___ 
-                      |   / -_) _` / _` | '  \/ -_)
-                      |_|_\___\__,_\__,_|_|_|_\___|
+# Overview
+The Parallel & Cloud Computing Library (PC2L) is a simple library containing 
+implementations of distributed data structures  intended for use in a 
+clustered computing environment with MPI. This was developed in Dr. DJ Rao's
+Lab at Miami University. You can read more about the lab [here](http://www.pc2lab.cec.miamioh.edu/pc2l>)
 
 
 # Compiling
