@@ -13,6 +13,7 @@ cd pc2l
 mkdir build
 cd build
 cmake ..
+```
 
 # Running programs that utilize PC2L
 
