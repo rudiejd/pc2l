@@ -16,6 +16,20 @@
                       |_|_\___\__,_\__,_|_|_|_\___|
 
 
+# Compiling
+```shell
+git clone https://github.com/rudiejd/pc2l.git
+cd pc2l
+mkdir build
+cd build
+cmake ..```
+
+# Running programs that utilize PC2L
+
+Programs that utilize PC2L must be run using MPI via `mpirun` or a 
+similar shell program. Failing to do so will result in undefined
+behavior.
+
 # License
 
 A Parallel & Cloud Computing Library (PC2L) is free software: you can
@@ -48,13 +62,4 @@ By using or  copying  this  Software,  Licensee  agree to
 abide  by the intellectual  property laws,  and all other
 applicable  laws of  the U.S.,  and the terms of the  GNU
 General  Public  License  (version 3).
-
-
-# Compiling
-```shell
-git clone https://github.com/rudiejd/pc2l.git
-cd pc2l
-mkdir build
-cd build
-cmake ..```
 

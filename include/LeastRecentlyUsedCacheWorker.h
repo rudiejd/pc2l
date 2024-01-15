@@ -48,6 +48,7 @@
 #include "CacheWorker.h"
 #include "Utilities.h"
 #include <list>
+#include <map>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);

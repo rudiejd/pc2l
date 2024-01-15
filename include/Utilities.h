@@ -38,7 +38,7 @@
 //---------------------------------------------------------------------
 
 #include <ctime>
-#include <chrono>
+#include <ostream>
 #include <cstring>
 #include <array>
 

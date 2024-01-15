@@ -41,6 +41,7 @@
 #include "System.h"
 #include "Exception.h"
 #include "CacheManager.h"
+#include <cassert>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
@@ -70,6 +71,7 @@ System::initialize(int& argc, char *argv[], bool initMPI) {
         MPI_INIT(argc, argv);
     }
     size = MPI_GET_SIZE();
+    assert(size > 0);
 }
 
 void
