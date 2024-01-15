@@ -70,8 +70,11 @@ public:
     // Count of data structures in the system for tagging purposes 
     int dsCount = 0;
 
-    // default block size is 32MB
-    unsigned int blockSize = 32000000;
+    // Whether we should collect profiling data
+    bool profile;
+
+    // default cache size
+    unsigned long long cacheSize;
     /**
      * Enumeration to define the global operation mode for a specific
      * run of PC2L.  Currently, the library only supports a single
@@ -86,13 +89,25 @@ public:
     };
 
     /**
+     * Enumeration to define the cache eviction strategy for PC2L.
+     * This is the algorithm that determines how blocks will be
+     * removed from the cache manager (rank 0) node
+     */
+     enum EvictionStrategy {
+         LeastRecentlyUsed = 1,
+         MostRecentlyUsed,
+         LeastFrequentlyUsed,
+         PseudoLRU
+     };
+
+    /**
      * Obtain a reference to the process-wide unique (singleton)
      * instance of the PC2L system object for further use.
      */
     static System& get() noexcept {
         return system;
     }
-    
+
     /**
      * This method must be invoked prior to performing any operations
      * with the PC2L library.  This method is typically called at the
@@ -141,8 +156,9 @@ public:
      *
      * \param[in] mode The gloabl operation mode to be used by pc2l
      * for this run.  The default value is OneWriter_DistributedCache;
+     * \param[in] enable
      */
-    void start(const OpMode mode = pc2l::System::OneWriter_DistributedCache);
+    void start(const EvictionStrategy es = LeastRecentlyUsed, const OpMode mode = pc2l::System::OneWriter_DistributedCache);
 
     /**
      * This method can be be used to shutdown the PC2L cache and
@@ -180,26 +196,12 @@ public:
     int worldSize() noexcept;
 
     /**
-     * Size of a block in the current instance of pc2l
-     * @return size of block in byte
-     */
-    unsigned int getBlockSize() noexcept;
-
-
-    /**
      * Set the cache size of the System's cache manager
-     * @param cSize maximum size in bytes of CCM's cache
+     * @param cSize maximum size in bytes of CM's cache
      */
     void setCacheSize(unsigned long long cSize) noexcept;
 
-    /**
-     * Set the block size system-wide
-     * @param bSize size of block in bytes
-     */
-    void setBlockSize(unsigned int bSize) noexcept;
-
     pc2l::CacheManager& cacheManager();
-
 protected:
     /**
      * Helper method to facilitate the PC2L system to run in
@@ -208,7 +210,7 @@ protected:
      * runs it.  On the manager-process (i.e., MPI-rank == 0), this
      * method just initializes the CacheManager object in this class.
      */
-    void oneWriterDistribCache();
+    void oneWriterDistribCache(EvictionStrategy es);
 protected:
     /**
      * The current mode of operation in which the system is currently
@@ -216,6 +218,10 @@ protected:
      */
     OpMode mode = InvalidMode;
 
+    /**
+     * Current eviction strategy. This is set in the start method
+     */
+     EvictionStrategy evictionStrategy;
 
     /**
      * The process-wide unique singleton instance of this class.

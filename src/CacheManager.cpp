@@ -34,7 +34,7 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 #include <thread>
 #include "CacheManager.h"
@@ -51,20 +51,62 @@ CacheManager::finalize() {
     for (int rank = 1; (rank < workers); rank++) {
         send(finMsg, rank);
     }
+    // Profile mode: print hit statistics
+    PC2L_PROFILE(std::cout << "Cache hits: " << cacheHits << std::endl << " Cache accesses: " << accesses << std::endl
+    << " Hit rate: " << static_cast<double>(cacheHits) / static_cast<double>(accesses) << std::endl;)
 }
 
-MessagePtr CacheManager::getBlock(size_t key) {
-    MessagePtr ret = nullptr;
-    if (cache.find(key) != cache.end()) {
-        ret = cache[key];
-        refer(cache[key]);
+MessagePtr CacheManager::getBlock(size_t dsTag, size_t blockTag, bool debug) {
+    // see if this is something we've prefetched. if so, just wait on the request
+    if (prefetchMsg != nullptr &&
+        dsTag == prefetchMsg->dsTag && blockTag == prefetchMsg->dsTag) {
+        // ask worker to wait on the result then return it
+        return wait(prefetchReq);
     }
-    return ret;
+    size_t key = Message::getKey(dsTag, blockTag);
+    PC2L_PROFILE(if(!debug) accesses++;)
+    if (auto entry = getFromCache(key); entry->tag != Message::BLOCK_NOT_FOUND) {
+        PC2L_PROFILE(if(!debug) cacheHits++;)
+        if (!debug) refer(entry);
+        return entry;
+    } else {
+        return nullptr;
+    }
+}
+
+MessagePtr CacheManager::getBlockFallbackRemote(size_t dsTag, size_t blockTag) {
+    MessagePtr ret = getBlock(dsTag, blockTag);
+    if (ret == nullptr) {
+        // otherwise, we have to get it from a remote cacheworker
+        // if we're in profiling mode, note this
+        if (System::get().profile) {
+            std::cout << "miss," << dsTag << ',' << blockTag << std::endl;
+        }
+        const unsigned long long worldSize = System::get().worldSize();
+        const int storedRank = (blockTag % (worldSize - 1)) + 1;
+        ret = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
+        send(ret, storedRank);
+        ret = recv(storedRank);
+        // then put the object at retrieved index into cache
+        storeCacheBlock(ret);
+    }
+    auto entry = getFromCache(ret->key);
+    refer(entry);
+    return entry;
+}
+
+void CacheManager::getRemoteBlockNonblocking(size_t dsTag, size_t blockTag) {
+    const unsigned long long worldSize = System::get().worldSize();
+    const int storedRank = (blockTag % (worldSize - 1)) + 1;
+    MessagePtr reqMsg = Message::create(0, Message::GET_BLOCK, 0, dsTag, blockTag);
+    send(reqMsg, storedRank);
+    // do a non-blocking receive call and store the request as a member
+    prefetchReq = startReceiveNonblocking(storedRank);
 }
 
 
-void CacheManager::run() {
-    // bgWorker = std::thread(CacheManager::runBackgroundWorker);
+    void CacheManager::run() {
+        // bgWorker = std::thread(CacheManager::runBackgroundWorker);
 }
 
 END_NAMESPACE(pc2l);

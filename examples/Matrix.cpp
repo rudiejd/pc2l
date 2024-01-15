@@ -8,7 +8,7 @@
 #include "Matrix.h"
 
 Matrix::Matrix(const size_t row, const size_t col, const Val initVal) :
-        pc2l::Vector<Val>(), rows(row), cols(col) {
+        pc2l::Vector<Val, 100 * sizeof(double)>(), rows(row), cols(col) {
     for (size_t i = 0; i < row; i++) {
         for(size_t j = 0; j < col; j++) {
             insert(i, j, initVal);

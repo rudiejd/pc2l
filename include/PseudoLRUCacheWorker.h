@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef TALRU_CACHE_WORKER_H
+#define TALRU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,66 +34,60 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file PseudoLRU.h
+ * @brief Definition of Least Recently Used Cache Worker which implements the
+ *  Bit Pseudo-LRU algorithm
+ * @author JD Rudie
+ * @version 0.1
+ *
+ */
 
-#include "MPIHelper.h"
+#include "CacheWorker.h"
+#include "Utilities.h"
+#include <list>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+class PseudoLRUCacheWorker: public virtual CacheWorker {
+public:
+    /**
+     * Refer the key for a block to our eviction scheme
+     * @param key the key to place into eviction scheme
+     */
+    void refer(const MessagePtr& msg) override;
+private:
+    /**
+     * Cache items in the PLRU cache require only a flag
+     * to say whether they were MRU (MRU bit)
+     */
+    struct CacheItem {
+        MessagePtr msg;
+        bool wasUsed = false;
+    };
 
-#ifndef MPI_FOUND
+    void eraseFromCache(size_t key) override;
 
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
-}
+    void addToCache(pc2l::MessagePtr &msg) override;
 
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
+    MessagePtr & getFromCache(size_t key) override;
 
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
+    std::unordered_map<size_t, CacheItem> cache;
 
+    /**
+     * Count of items in the cache with MRU bit set
+     */
 
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
+    size_t trueCount = 0;
+    /**
+     * Flag to say whether the cache is full
+     */
+     bool full = false;
+};
 
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
-#endif // MPI_HELPER_CPP
+#endif

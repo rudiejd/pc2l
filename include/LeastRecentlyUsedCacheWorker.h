@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef LRU_CACHE_WORKER_H
+#define LRU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -36,64 +36,60 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file CacheWorker.h
+ * @brief Definition of Least Recently Used Cache Worker which implements the
+ * Least Recently Used (LRU) algorithm
+ * @author JD Rudie
+ * @version 0.1
+ *
+ */
 
-#include "MPIHelper.h"
+#include "CacheWorker.h"
+#include "Utilities.h"
+#include <list>
+#include <map>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+class LeastRecentlyUsedCacheWorker: public virtual CacheWorker {
+public:
+    /**
+     * Refer the key for a block to our eviction scheme
+     * @param key the key to place into eviction scheme
+     */
+    void refer(const MessagePtr& msg) override;
+protected:
+    void addToCache(MessagePtr& msg) override;
 
-#ifndef MPI_FOUND
+    MessagePtr& getFromCache(size_t key) override;
 
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
-}
+    void eraseFromCache(size_t key) override;
 
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
+/**
+ * Keys of blocks in queue in their removal order under LRU
+ * Note that we use  a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
+ * but also because of its unique properties for iterator invalidation;
+ * insertion leaves all iterators unaffected AND erasing only affects the erased
+ * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+ */
+std::list<size_t> queue;
+    /**
+     * An internal structure that stores an item in this cache. It consists
+     * of a MessagePtr and an iterator for this MessagePtr's current place in
+     * the LRU queue, and can be bracket initialized
+     */
+    struct CacheItem {
+        MessagePtr msg;
+        std::list<size_t>::iterator placeInQueue;
+    };
 
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
+    std::unordered_map<size_t, CacheItem> cache;
+private:
 
-
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
+};
 
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
-#endif // MPI_HELPER_CPP
+#endif

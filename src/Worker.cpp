@@ -34,7 +34,7 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 #include "Utilities.h"
 #include "Exception.h"
@@ -53,26 +53,17 @@ Worker::send(MessagePtr msgPtr, const int destRank) {
                  msgPtr->tag);
     }
 }
-
 // Recieve a message using our recv buffer
-MessagePtr
-Worker::recv(const int srcRank, const bool blocking,
-             const int tag) {
+MessagePtr Worker::recv(const int srcRank, const int tag) {
     // First poll and find out the size of the message to read
     MPI_STATUS status;
     try {
-        if (!blocking && !MPI_IPROBE(srcRank, tag, status)) {
-            // No pending message.
-            return MessagePtr(nullptr);
-        } else if (blocking) {
-            // Wait until we get a valid message to read.
-            MPI_PROBE(srcRank, tag, status);
-        }
+        MPI_PROBE(srcRank, tag, status);
     } catch (CONST_EXP MPI_EXCEPTION& e) {
         // Rethrow MPI exception as a pc2l::Exception
         throw PC2L_EXP(e.Get_error_string(), "MPI_PROBE error (can't do much)");
     }
-    
+
     // Figure out the size of the size we need.
     const int msgSize = MPI_GET_COUNT(status, MPI_TYPE_CHAR);
     recvBuf.resize(msgSize);
@@ -86,6 +77,25 @@ Worker::recv(const int srcRank, const bool blocking,
     }
 
     // Return our buffer as if it is a message
+    return Message::create(recvBuf.data());
+}
+
+// Recieve a message using our recv buffer
+MPI_Request Worker::startReceiveNonblocking(const int srcRank, const int tag) {
+    // First poll and find out the size of the message to read
+    MPI_STATUS status;
+    // Figure out the size of the size we need.
+    const int msgSize = MPI_GET_COUNT(status, MPI_TYPE_CHAR);
+    MPI_Request req;
+    MPI_Irecv(recvBuf.data(), msgSize, MPI_CHAR, srcRank, status.MPI_TAG, MPI_COMM_WORLD, &req);
+    // Return the request asssociated with this
+    return req;
+}
+
+// Waits on a request
+MessagePtr Worker::wait(MPI_Request req) {
+    MPI_Status status;
+    MPI_Wait(&req, &status);
     return Message::create(recvBuf.data());
 }
 

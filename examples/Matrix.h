@@ -9,14 +9,13 @@
 #include <iostream>
 #include <functional>
 #include "pc2l.h"
-#include <cassert>
-#include <gtest/gtest.h>
 
 /** Shortcut for the value of each element in the matrix */
 using Val = double;
 
 /** Short cut to a 2-d vector double values to streamline the code */
-using Vec = pc2l::Vector<Val>;
+// block size is 100 doubles
+using Vec = pc2l::Vector<Val, 100 * sizeof(double)>;
 
 /** A matrix class to perform basic matrix operations.
 
@@ -127,7 +126,7 @@ public:
      * @param val value to insert into cell
      */
     void insert(size_t row, size_t col, Val val) {
-        pc2l::Vector<Val>::insert(row * rows + col, val);
+        Vec::insert(row * rows + col, val);
     };
 
     /**
@@ -137,7 +136,7 @@ public:
      * @param val value to replace into cell
      */
     void replace(size_t row, size_t col, Val val) {
-        pc2l::Vector<Val>::replace(row * rows + col, val);
+        Vec::replace(row * rows + col, val);
     };
 
     /**
@@ -147,7 +146,7 @@ public:
      * @param val value to replace into cell
      */
     void erase(size_t row, size_t col) {
-        pc2l::Vector<Val>::erase(row * rows + col);
+        Vec::erase(row * rows + col);
     };
 
     /**
@@ -157,7 +156,7 @@ public:
      * @return the data at (\p row, \p col)
      */
     Val at(size_t row, size_t col) const {
-        return pc2l::Vector<Val>::at(row * width() + col);
+        return Vec::at(row * width() + col);
     }
 
     /**

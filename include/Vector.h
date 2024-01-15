@@ -45,58 +45,184 @@
  * 
  */
 
+#include <iterator>
 #include <unordered_map>
+#include <cmath>
 #include "Worker.h"
 #include "CacheManager.h"
 #include "System.h"
 #include "MPIHelper.h"
 #include "Message.h"
 
-
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 
+enum PrefetchStrategy {
+    NONE = 0,
+    FORWARD_SEQUENTIAL,
+    BACKWARD_SEQUENTIAL,
+
+};
 
 /**
  * A distributed vector that runs across multiple machines
  * utilizing message passing through MPI. This initial  
  * implementation does not include any caching.
  */
-template <typename T>
+template <typename T, unsigned int UserBlockSize = 4096, unsigned int PrefetchCount = 5, PrefetchStrategy PFStrategy = NONE>
 class Vector {
 public:
     /**
-     * The default constructor.  Currently, the constructor calls the
-     * workhorse
+     * Customer iterator for a PC2L vector. As of right now,
+     * only an input iterator is implemented.
+     * TODO: need a custom reference to replace reference
      */
-    Vector() : blockSize(System::get().getBlockSize()), siz(0), dsTag(System::get().dsCount++){ }
+    class Iterator {
+    public:
+         using iterator_category = std::random_access_iterator_tag;
+         using value_type = T;
+         using difference_type = size_t;
+         // remove pointer type?
+         using pointer = T*;
+         using reference = T&;
+
+        Iterator();
+
+// declare friend class so only pc2l::Vector can access Iterator's private constructor
+         friend class Vector<T, UserBlockSize>;
+
+        // Maybe implement bounds check here? Or bounds check in pc2l::Vector
+        inline Iterator& operator++() { i++; return *this; }
+        inline Iterator& operator--() { i--; return *this; }
+        inline Iterator& operator=(const Iterator& rhs) {i = rhs.i; return * this; }
+        inline Iterator& operator+=(const difference_type& rhs) {i += rhs; return *this; }
+        inline Iterator& operator+=(const Iterator& rhs) {i += rhs.i; return *this; }
+        inline Iterator& operator-=(const difference_type& rhs) {i -= rhs; return *this; }
+        inline Iterator& operator-=(const Iterator& rhs) {i -= rhs.i; return *this; }
+
+
+        pointer operator->() const { return vec.ptr(i); }
+        // TODO: Redefine reference type with custom reference
+        reference operator[](const difference_type& rhs) const { return vec[rhs]; }
+        reference operator*() const { return vec[i]; };
+
+
+        difference_type operator-(const Iterator& rhs) { return i - rhs.i; }
+        Iterator operator+(const difference_type& rhs) const { return Iterator(vec, i + rhs); }
+        Iterator operator-(const difference_type& rhs) const { return Iterator(vec, i - rhs); }
+        friend Iterator operator+(const difference_type& lhs, const Iterator& rhs) { return Iterator(rhs.vec, lhs + rhs.i); }
+        friend Iterator operator-(const difference_type& lhs, const Iterator& rhs) { return Iterator(rhs.vec, lhs - rhs.i); }
+
+        bool operator==(const Iterator& rhs) const { return &rhs.vec == &vec && rhs.i == i; }
+        bool operator!=(const Iterator& rhs) const { return !(*this == rhs); }
+        bool operator<(const Iterator& rhs) const { return i < rhs.i; }
+        bool operator>(const Iterator& rhs) const { return i > rhs.i; }
+        bool operator<=(const Iterator& rhs) const { return i >= rhs.i; }
+        bool operator>=(const Iterator& rhs) const { return i >= rhs.i; }
+
+        Iterator(const Iterator& other) : vec(other.vec), i(other.i) {}
+        size_t i = 0;
+    private:
+        Iterator(Vector<T, UserBlockSize>& vec, const size_t end = 0) :
+            vec(vec), i(end) {}
+        Vector<T, UserBlockSize>& vec;
+    };
+
+
+    // Iterator methods
+    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator begin() { return Iterator(*this); }
+    Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator end() { return Iterator(*this, size()); }
 
     /**
-     *  Construct a vector by specifying the block size. Currently the
-     *  workhorse constructor
-     * @param bSize size in bytes of a block
+     * The default constructor. Increments system-wide data structure
+     * count
      */
-    explicit Vector(unsigned long long bSize) : blockSize(bSize), siz(0), dsTag(System::get().dsCount++) { }
+    Vector() : siz(0), dsTag(System::get().dsCount++) { }
+
+    Vector(unsigned long long fillCount) : siz(0), dsTag(System::get().dsCount++) {
+        for (auto i = 0; i < fillCount; i++) {
+            insert(0, T{});
+        }
+    }
     /**
      * The destructor.
      */
     virtual ~Vector() = default;
 
-    int dsTag;
-
-    // the size (in bytes) of each block in vector. Potentially offer heterogeneous
-    // block sizes on different data structures later, but for now it is uniform
-    unsigned long long blockSize;
+    // unique identifier for this data structure
+    size_t dsTag;
 
     // The number of elements currently in the vector
     unsigned long long siz;
+
+    // block tag of last retrieved block
+   mutable size_t prevBlockTag;
+
+    // reference to message containing last retrieved block
+    mutable MessagePtr prevMsg;
+    // calculate log2(n) at compile time
+    static constexpr unsigned int log2(unsigned int n) {
+        return std::log2(n);
+    }
+    // Calculate a^n at compile time
+    static constexpr unsigned int pow(unsigned int a, unsigned int n) {
+        return std::pow(a, n);
+    }
+    // If user provides a block size that isn't a power of 2, round it up to nearest power of 2
+    // the bit shift hack UserBlockSize & (UserBlockSize - 1)  is a fast way to check this (from stanford bitshift hacks)
+    static constexpr unsigned int BlockShiftBits = !(UserBlockSize & (UserBlockSize - 1)) ? log2(UserBlockSize) :
+            log2(UserBlockSize) + 1;
+    static constexpr unsigned int BlockSize = pow(2, BlockShiftBits);
+    static constexpr unsigned int TypeSize = sizeof(T);
+    static constexpr unsigned int IndexMask = BlockSize - 1;
+    // Count the number of elements of type T in a single block for prefetching purposes
+    static constexpr unsigned int BlockElementCount = BlockSize / TypeSize;
+    /**
+     * Prefetch the next block if necessary. Will eventually be a bunch of
+     * ifdefs depending on some prefetching strategy specified as a template
+     * argument
+     */
+    void prefetch(size_t inBlockIdx, size_t blockTag) const {
+        if constexpr(PFStrategy == PrefetchStrategy::FORWARD_SEQUENTIAL) {
+            if (BlockSize - inBlockIdx + 1 >= PrefetchCount && (siz / BlockSize) > blockTag + 1) {
+                auto& pc2l = pc2l::System::get();
+                pc2l.cacheManager().getBlockFallbackRemote(dsTag, blockTag + 1);
+
+            }
+        } else if constexpr(PFStrategy == PrefetchStrategy::BACKWARD_SEQUENTIAL) {
+            
+        }
+
+    }
 
     /**
      * Returns size (in values, not blocks) of vector
      * @return size (in values) of vector
      */
-    unsigned long long size() {
+    unsigned long long size() const {
         return siz;
+    }
+
+    T& operator[](size_t index){
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
+        //           << ", inBlockIdx = " << inBlockIdx << std::endl;
+
+        prefetch(inBlockIdx, blockTag);
+        if (blockTag == prevBlockTag) {
+            // if the CacheManager's cache contains this block, just get it
+            // get array of concatenated T-serializations
+            char* payload = prevMsg->getPayload();
+            return *reinterpret_cast<T*>(payload + inBlockIdx);
+        }
+        CacheManager& cm  = System::get().cacheManager();
+        MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        prevBlockTag = blockTag;
+        prevMsg = msg;
+        // if the CacheManager's cache contains this block, just get it
+        // get array of concatenated T-serializations
+        char* payload = msg->getPayload();
+        return *reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
     /**
@@ -109,32 +235,26 @@ public:
     }
 
     /**
+     * Swap value at index \p i with value at index \j
+     * @param i first index of swap
+     * @param j second index of swap
+     */
+    void swap(size_t i, size_t j) {
+        auto oldI = at(i);
+        replace(i, at(j));
+        replace(j, oldI);
+    }
+
+    /**
      * Erase the value at \p index
      * @param index the index of the value to be erased
      */
     void erase(unsigned long long index) {
+        PC2L_DEBUG_START_TIMER()
         // move all of the blocks to the right of the index left by one
         for (unsigned long long i = index; i < size() - 1; i++) { swap(i, i + 1); }
-        // clear the last index which is now junk
-//        size_t blockTag = index * sizeof(T) / blockSize;
-//        MessagePtr msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-//        if (msg == nullptr) {
-//            // if block on remote cw, we have to fetch it
-//            const unsigned long long worldSize = System::get().worldSize();
-//            const int storedRank = (blockTag % (worldSize - 1)) + 1;
-//            MessagePtr m = Message::create(0, Message::GET_BLOCK, 0);
-//            m->dsTag = dsTag;
-//            m->blockTag = size() - 1;
-//            cm.send(m, destRank);
-//            msg = cm.recv(storedRank);
-//
-//        }
-        // I think I actually don't need to clear the last block
-        // if it's outside of size it's never going to be used
-        // double check with Dr. Rao
-
-        // size() can now be decremented
         siz--;
+        PC2L_DEBUG_STOP_TIMER("erase(" << index << ")")
         //TODO: maybe some check to see if it is successfully deleted?
     }
 
@@ -145,32 +265,77 @@ public:
      * @return The value at \p index
      */
     T at(unsigned long long index) const {
-        CacheManager& cm  = System::get().cacheManager();
-        MessagePtr msg;
-        size_t blockTag = index*sizeof(T)  / blockSize;
-        // if the CacheManager's cache contains this block, just get it
-        msg = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-        if (msg == nullptr) {
-            // otherwise, we have to get it from a remote cacheworker
-            const unsigned long long worldSize = System::get().worldSize();
-            const int storedRank = (blockTag % (worldSize - 1)) + 1;
-            msg = Message::create(0, Message::GET_BLOCK, 0);
-            msg->dsTag = dsTag;
-            msg->blockTag = blockTag;
-            cm.send(msg, storedRank);
-            msg = cm.recv(storedRank);
-            // then put the object at retrieved index into cache
-            cm.storeCacheBlock(msg);
+        PC2L_DEBUG_START_TIMER()
+        // instead of div, prefer bitwise operations eventually
+        // but this will require moving to powers of 2 only
+
+        // For now we are hardcoding some of this to just test to see
+        // what is the performance improvement that we may be able to
+        // achieve with bitwise operations.
+        
+        // const auto ret = std::lldiv(index*sizeof(T), BlockSize);
+        // const size_t blockTag = ret.quot;
+        // unsigned long long inBlockIdx = ret.rem;
+
+        // @insert: index = 99, blockTag = 12, inBlockIdx = 12
+        // @at: index = 99, blockTag = 49, inBlockIdx = 4
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
+        //           << ", inBlockIdx = " << inBlockIdx << std::endl;
+
+        prefetch(inBlockIdx, blockTag);
+        if (blockTag == prevBlockTag) {
+            // if the CacheManager's cache contains this block, just get it
+            // get array of concatenated T-serializations
+            char* payload = prevMsg->getPayload();
+            return *reinterpret_cast<T*>(payload + inBlockIdx);
         }
+        CacheManager& cm  = System::get().cacheManager();
+        MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        prevBlockTag = blockTag;
+        prevMsg = msg;
+        // if the CacheManager's cache contains this block, just get it
         // get array of concatenated T-serializations
         char* payload = msg->getPayload();
-        // offset into this array and extract correct portion
-        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
-        char serializedObj[sizeof(T)];
-        // copy the block we need into a character array then reinterpret and deref it
-        std::copy(&payload[inBlockIdx], &payload[inBlockIdx + sizeof(T)], &serializedObj[0]);
-        auto ret = reinterpret_cast<T*>(serializedObj);
-        return *ret;
+        PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
+        return *reinterpret_cast<T*>(payload + inBlockIdx);
+    }
+
+    T* ptr(unsigned long long index) {
+        PC2L_DEBUG_START_TIMER()
+        // instead of div, prefer bitwise operations eventually
+        // but this will require moving to powers of 2 only
+
+        // For now we are hardcoding some of this to just test to see
+        // what is the performance improvement that we may be able to
+        // achieve with bitwise operations.
+
+        // const auto ret = std::lldiv(index*sizeof(T), BlockSize);
+        // const size_t blockTag = ret.quot;
+        // unsigned long long inBlockIdx = ret.rem;
+
+        // @insert: index = 99, blockTag = 12, inBlockIdx = 12
+        // @at: index = 99, blockTag = 49, inBlockIdx = 4
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
+        //           << ", inBlockIdx = " << inBlockIdx << std::endl;
+
+        prefetch(inBlockIdx, blockTag);
+        if (blockTag == prevBlockTag) {
+            // if the CacheManager's cache contains this block, just get it
+            // get array of concatenated T-serializations
+            char* payload = prevMsg->getPayload();
+            return reinterpret_cast<T*>(payload + inBlockIdx);
+        }
+        CacheManager& cm  = System::get().cacheManager();
+        MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        prevBlockTag = blockTag;
+        prevMsg = msg;
+        // if the CacheManager's cache contains this block, just get it
+        // get array of concatenated T-serializations
+        char* payload = msg->getPayload();
+        PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
+        return reinterpret_cast<T*>(payload + inBlockIdx);
     }
 
     /**
@@ -179,74 +344,150 @@ public:
      * @param value value to be inserted
      */
     void insert(unsigned long long index, T value) {
-        CacheManager& cm = System::get().cacheManager();
-        // always insert into the cache manager's local cache - only move to cache worker on eviction
-        size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-        if (m == nullptr) {
-            // otherwise construct message and fill the buffer with data to insert
-            m = Message::create(blockSize, Message::STORE_BLOCK, 0);
-            m->dsTag = dsTag;
-            m->blockTag = blockTag;
-        }
-        char* block = m->getPayload();
-        // if we're not inserting at end of list
+        PC2L_DEBUG_START_TIMER()
+        auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        CacheManager &cm = System::get().cacheManager();
         if (index < size()) {
-            // last value moves up one index
-            insert(size(), at(size()-1));
-            // all other values shifted right one index
-            for (auto i = index; i < size(); i++) {
-                replace(i, at(i-1));
+            // all other values shifted right one index (size incremented here)
+            // we have to do this BEFORE the (potentially evicted) message with
+            // this value in it is retrieved
+            insert(size(), at(size() - 1));
+            for (auto i = size() - 2; i > index; i--) {
+                replace(i, at(i - 1));
+//                for(size_t j = 0; j < size(); j++) {
+//                    if (MPI_GET_RANK() == 0)
+//                        std::cout << at(j) << std::endl;
+//                }
             }
-            // now we can insert
         }
-        // offset into the block array of serializations and insert val
-        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
-        char* serialized = reinterpret_cast<char*>(&value);
-        std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+        MessagePtr msg;
+        if (prevBlockTag == blockTag && size() > 0) {
+            msg = prevMsg;
+        } else if (index < size()) {
+            // fetch from cache manager or remote CW
+            msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+        } else {
+            // if insert at end, make new block+
+            msg = Message::create(BlockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
+        }
+        char *block = msg->getPayload();
+        // std::cout << "@insert: index = " << index << ", blockTag = "
+        //         << blockTag << ", inBlockIdx = " << inBlockIdx << std::endl;
+        char *serialized = reinterpret_cast<char *>(&value);
+        std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
         // then put the object at retrieved index into cache
-        cm.storeCacheBlock(m);
+        prevMsg = msg;
+        prevBlockTag = blockTag;
+        cm.storeCacheBlock(msg);
+        // if it's an insert at the end, we haven't yet incremented size. otherwise we have
+        if (index == size()) siz++;
+        PC2L_DEBUG_STOP_TIMER("insert(" << index << ", " << value << ")")
+    }
 
-        siz++;
+    Iterator insert(const Iterator& index, T value) {
+        insert(index.i, value);
+        return Iterator(*this, index.i);
+    }
+
+    /**
+     * Alias for inserting at "back" (largest index) of vector
+     * @param value value to be inserted
+     */
+    Iterator push_back(T value) {
+       return insert(Iterator(*this, size()), value);
     }
 
     /**
      * Replace value at \p index with \p value
-     * @param index
-     * @param value
+     * @param index index in vector which should be replaced
+     * @param value object to put in the index
      */
     void replace(unsigned long long index, T value) {
-        // obtain world size() and compute destination rank for replacement
+        PC2L_DEBUG_START_TIMER()
+        const auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+        prefetch(inBlockIdx, blockTag);
+        MessagePtr msg;
         CacheManager& cm = System::get().cacheManager();
-        auto& mgrCache = cm.managerCache();
-        size_t blockTag = index * sizeof(T) / blockSize;
-        MessagePtr m = cm.getBlock(CacheWorker::getKey(dsTag, blockTag));
-        if (m == nullptr) {
-            // if the block with this element is not in CM cache, get from remote CW
-            const int rank = (index % (System::get().worldSize() - 1)) + 1;
-            m = Message::create(0, Message::GET_BLOCK, 0);
-            m->dsTag = dsTag;
-            m->blockTag = blockTag;
-            cm.send(m, rank);
-            m = cm.recv(rank);
+        if (blockTag == prevBlockTag) {
+            msg = prevMsg;
+        } else {
+            msg = cm.getBlockFallbackRemote(dsTag, blockTag);
         }
-        char* block = m->getPayload();
+        char* block = msg->getPayload();
         // fill the buffer with new datum at correct in-blok offset
-        unsigned long long inBlockIdx = ((index * sizeof(T)) % blockSize);
         char* serialized = reinterpret_cast<char*>(&value);
-        std::copy(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
-        cm.storeCacheBlock(m);
+        std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+        prevMsg = msg;
+        prevBlockTag = blockTag;
+        cm.storeCacheBlock(msg);
+        PC2L_DEBUG_STOP_TIMER("replace(" << index << ", " << value << ")")
     }
 
     /**
-     * Swap value at index \p i with value at index \j
-     * @param i first index of swap
-     * @param j second index of swap
+     * Sort vector in ascending order using mergesort
      */
-    void swap(size_t i, size_t j) {
-        auto oldI = at(i);
-        replace(i, at(j));
-        replace(j, oldI);
+    void sort() {
+        mergesort(0, size() - 1);
+    }
+private:
+    /**
+     * Calculate the block tag and position within a block where the item at
+     * position \p index should be stored.
+     * @param index the index for which we perform calculations
+     * @return tuple of (offset, blockTag, inBlockIdx)
+     */
+    const static std::tuple<size_t, size_t, size_t> indexCalculation(unsigned long long index) {
+        const size_t offset   = index * TypeSize;
+        const size_t blockTag = (offset >> BlockShiftBits),
+                inBlockIdx = (offset & IndexMask);
+        return std::tie(offset, blockTag, inBlockIdx);
+    }
+
+    // Merges the sorted and unsorted portions of the Vector
+    void merge(int low, int mid, int high) {
+        auto secondLow = mid + 1;
+
+        // if merge already sorted
+        if (at(mid) <= at(secondLow)) {
+           return;
+        }
+
+        while (low <= mid && secondLow <= high) {
+            // first element is in right place
+            if (at(low) <= at(secondLow)) {
+                low++;
+            } else {
+                auto val = at(secondLow);
+                auto idx = secondLow;
+
+                // Shift all shit between low and 2nd low right by one
+               while (idx != low) {
+                   replace(idx, at(idx -1));
+                   idx--;
+               }
+               replace(low, val);
+
+               // update indices
+               low++;
+               mid++;
+               secondLow++;
+            }
+        }
+    }
+
+// Iteratively sort subarray `A[low…high]` using a temporary array
+    void mergesort(unsigned long long low, unsigned long long high) {
+        if (low < high) {
+
+            // avoid overflow for large low/high indices
+            auto mid = low + (high - low)  / 2;
+
+            mergesort(low, mid);
+            mergesort(mid + 1, high);
+
+            merge(low, mid, high);
+
+        }
     }
 };
 

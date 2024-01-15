@@ -281,9 +281,9 @@ END_NAMESPACE(pc2l);
     \brief Macro to ease throwing a pc2l::Exception.
 
     This macro provides a convenient mechanism to create a pc2l::Exception,
-    depending on wether the DEVELOPER_ASSERTIONS flag has been turned
+    depending on whether the DEVELOPER_ASSERTIONS flag has been turned
     on or off.  In case the DEVELOPER_ASSERTIONS flag has been
-    sepcified, then this macro automatically tags the source code file
+    specified, then this macro automatically tags the source code file
     name and source code line number from where the exception was
     raised.  This makes debugging much faster.
 */

@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef MRU_CACHE_WORKER_H
+#define MRU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -36,64 +36,32 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
+/**
+ * @file CacheWorker.h
+ * @brief Definition of Most Recently Used Cache Worker which implements the
+ * Most Recently Used (MRU) algorithm. Inherits from Least Recently Used
+ * (LRU) Cache Worker since most of the code is reused
+ * @author JD Rudie
+ * @version 0.1
+ */
 
-#include "MPIHelper.h"
+#include "CacheWorker.h"
+#include "Utilities.h"
+#include "LeastRecentlyUsedCacheWorker.h"
+#include <list>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-
-#ifndef MPI_FOUND
-
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
-}
-
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
-
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
-
-
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
+class MostRecentlyUsedCacheWorker: public virtual CacheWorker, public virtual LeastRecentlyUsedCacheWorker {
+public:
+    /**
+     * Refer the key for a block to our eviction scheme
+     * @param key the key to place into eviction scheme
+     */
+    void refer(const MessagePtr& msg) override;
+};
 
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
-#endif // MPI_HELPER_CPP
+#endif

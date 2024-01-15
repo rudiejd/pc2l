@@ -1,6 +1,7 @@
 #ifndef MPI_HELPER_H
 #define MPI_HELPER_H
 
+#define MPI_FOUND 1
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -48,6 +49,7 @@
     development of MUSE.
 */
 
+#include "mpi.h"
 #include "Utilities.h"
 #include <string>
 
@@ -65,7 +67,6 @@ BEGIN_NAMESPACE(pc2l);
 #endif
 
 #define OMPI_SKIP_MPICXX 1
-#include <mpi.h>
 
 #ifdef __GNUC__
 #pragma GCC diagnostic warning "-Wunused-parameter"
@@ -122,7 +123,7 @@ inline int MPI_GET_RANK() {
     MPI_Comm_size() method. However, if MPI is not available, this
     macro reduces to the constant 1 (one) making it appear as if there
     is only one process to work with. </p>
-   
+
     This macro can be used as shown below:
 
     \code

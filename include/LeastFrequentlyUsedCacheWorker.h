@@ -1,5 +1,5 @@
-#ifndef UNORDERED_MAP_H
-#define UNORDERED_MAP_H
+#ifndef LFU_CACHE_WORKER_H
+#define LFU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,84 +34,62 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   JD Rudie               rudiejd@miamioh.edu
+// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
 /**
- * @file unordered_map.h
- * @brief Definition of unordered_map
+ * @file CacheWorker.h
+ * @brief Definition of Most Recently Used Cache Worker which implements the
+ * Least Frequently Used (LFU) algorithm
  * @author JD Rudie
  * @version 0.1
- * @date 2021-08-30
- * 
  */
 
-#include <unordered_map>
-#include "Worker.h"
-#include "CacheManager.h"
-#include "System.h"
-#include "MPIHelper.h"
-#include "Message.h"
-#include "Vector.h"
-
+#include "CacheWorker.h"
+#include "Utilities.h"
+#include <list>
+#include <map>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-
-/**
- * A distributed vector that runs across multiple machines
- * utilizing message passing through MPI. This initial  
- * implementation does not include any caching.
- */
- // T is key type, U is value type
-template <typename T, typename U>
-class unordered_map {
+class LeastFrequentlyUsedCacheWorker: public virtual CacheWorker {
 public:
-    // underlying vector representation of the hashmap
-    Vector<U> vec;
-
-
-    // hash function for this map
-    std::hash<T> mapHash;
     /**
-     * The default constructor.  Currently, the consructor initializes
-     * some of the instance variables in this class.
+     * Refer the key for a block to our eviction scheme. If the cache is full,
+     * this removes the least frequently used block in the cache. If there is a tie
+     * for the least frequency, it removes the least recently used item with the least
+     * frequency.
+     * @param key the key to place into eviction scheme
      */
-    unordered_map() {
-        dsTag = System::get().dsCount++;
-        siz = 0;
-    }
+    void refer(const MessagePtr& msg) override;
+protected:
+    void addToCache(pc2l::MessagePtr &msg) override;
+
+    void eraseFromCache(size_t key) override;
+
+    MessagePtr & getFromCache(size_t key) override;
+private:
+    struct CacheItem {
+        MessagePtr msg;
+        size_t key;
+        size_t frequency = 1;
+    };
 
     /**
-     * The destructor.
+     * Unordered map for finding position of the block in one of the frequency queues
      */
-    virtual ~unordered_map() {}
-
-    int dsTag;
-
-    void insert(T key, U value) {
-        // obtain world size and compute destination rank
-        const int worldSize = System::get().worldSize();
-        unsigned int index = mapHash(key) % index;
-        // linear probing: if the slot is full, go to the next slot. If that's full, go to next
-        // etc. New probe method must be implemented to prevent sending whole object to check
-        // whether a cache block is full
-        CacheManager& cm = System::get().cacheManager();
-        bool full = true;
-        while (full) {
-            MessagePtr probePtr = Message::create(1, Message::PROBE_BLOCK, index);
-            probePtr->dsTag = vec.dsTag;
-            probePtr->blockTag = index;
-            cm.send(m, destRank);
-            MessagePtr probeRes = cm.recv();
-            full = reinterpret_cast<bool*>(probeRes->getPayload());
-            if (full) index++;
-        }
-        vec.insert(index, value);
-    }
+     std::unordered_map<size_t, std::list<CacheItem>::iterator> placeInQueue;
+    /**
+     * Ordered map with a separate queue for every frequency in the range of access
+     * frequencies for each block currently stored in the cache. Note that we use
+     * a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
+     * but also because of its unique properties for iterator invalidation;
+     * insertion leaves all iterators unaffected AND erasing only affects the erased
+     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+     */
+    std::map<int, std::list<CacheItem>> queues;
 };
 
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif
-

@@ -46,6 +46,7 @@
  */
 
 #include <memory>
+#include <list>
 #include "Utilities.h"
 #include "MPIHelper.h"
 
@@ -134,7 +135,31 @@ public:
      * The destructor to free the memory owned by this message, if any
      */
     ~Message() {}
-    
+
+    /**
+     * Convenience helper method to get an aggregate key for a given
+     * message. This method combines Message::dsTag (32-bits) and
+     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
+     *
+     * \param[in] msg The message from where the dsTag and blockTag
+     * are to be obtained to create a composite key.
+     *
+     * \return The a 64-bit key associated with this message.
+     */
+    static size_t getKey(unsigned int dsTag, unsigned int blockTag) noexcept;
+
+    /**
+     * Convenience helper method to get an aggregate key for a given
+     * message. This method combines Message::dsTag (32-bits) and
+     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
+     *
+     * \param[in] dsTag tag associated with given data structure
+     * \param[in] blockTag tag associated with selected block
+     *
+     * \return The a 64-bit key associated with this message.
+     */
+    static size_t getKey(const MessagePtr& msg) noexcept;
+
     /**
      * Convenience method to create a message to send data to another
      * process.
@@ -155,8 +180,31 @@ public:
      * populated.
      */
     static MessagePtr create(const int dataSize, const MsgTag tag,
-                             const int srcRank = MPI_ANY_SOURCE);
+                             const int srcRank, size_t dsTag, size_t blockTag);
 
+    /**
+     * Convenience constructor which constructs a message without specifying
+     * dsTag/blockTag
+     *
+     * \param[in] dataSize The size of the data that will be sent with
+     * this message.  This value is used to create a flat message with
+     * necessary space at the end to send the data.  Use the getData()
+     * method to update the raw reference.
+     *
+     * \param[in] tag The tag to be set for this message.  The tag can
+     * always be changed at anytime.
+     *
+     * \param[in] srcRank The rank of the source process (if any) from
+     * where the message was received.  Note that this value can be
+     * changed at any time.
+     *
+     * \return A newly created message object whose payload can be
+     * populated.
+     */
+    static MessagePtr create(const int dataSize, const MsgTag tag,
+                             const int srcRank = MPI_ANY_SOURCE) {
+        return create(dataSize, tag, srcRank, -1U, -1U);
+    }
     /**
      * Convenience method to create a message from a buffer containing
      * data received from another process.  This method essentially
@@ -249,7 +297,7 @@ public:
     unsigned int dsTag = -1U;
 
     /**
-     * A uique identifier for a block of data associated with a given
+     * A unique identifier for a block of data associated with a given
      * data structure.  The pair of values {dsTag, blockTag} is used
      * to uniquely identify a cache block in a given data structure.
      * This limits the number of blocks associatable with a data
@@ -257,6 +305,13 @@ public:
      * arbitrarly large.
      */
     unsigned int blockTag = -1U;
+
+    /**
+     * Key calculated through hashing of dsTag and blockTag. Stored with
+     * Message object to avoid repeated computation. Uniquely identifies a
+     * Message globally within a given PC2L instance.
+     */
+    size_t key;
 
     /**
      * A buffer that contains the binary-data blob associated with

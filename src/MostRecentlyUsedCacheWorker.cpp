@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef MRU_CACHE_WORKER_CPP
+#define MRU_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,66 +34,37 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "MPIHelper.h"
+#include "Exception.h"
+#include "MostRecentlyUsedCacheWorker.h"
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-
-#ifndef MPI_FOUND
-
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
+void MostRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
+    if (MPI_GET_RANK() != 0) return;
+    const auto key = msg->key;
+    if (auto entry = cache.find(key); entry == cache.end()) {
+        // Use eviction strategy if cache is overfull
+        if (currentBytes + msg->getSize() > cacheSize) {
+            // Get the most recently used and erase it
+            auto first = queue.front();
+            queue.pop_front();
+            // send evicted block to remote cacheworker
+            MessagePtr evicted = getFromCache(first);
+            eraseCacheBlock(evicted);
+            const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+            send(evicted, destRank);
+        }
+    }else {
+        // If the block is present in the cache, we need to update its place in the queue
+        queue.erase(entry->second.placeInQueue);
+    }
+    // new block goes to the beginning (it is mru)
+    queue.push_front(key);
 }
-
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
-
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
-
-
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
-
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
-#endif // MPI_HELPER_CPP
+#endif

@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef LRU_CACHE_WORKER_CPP
+#define LRU_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,66 +34,55 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "MPIHelper.h"
+#include "Exception.h"
+#include "LeastRecentlyUsedCacheWorker.h"
+
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
 
-#ifndef MPI_FOUND
-
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
+void LeastRecentlyUsedCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+    cache[msg->key] = {msg, queue.begin()};
 }
 
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
-
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
+MessagePtr& LeastRecentlyUsedCacheWorker::getFromCache(size_t key) {
+    if (cache.find(key) != cache.end()) {
+        return cache[key].msg;
+    } else {
+        return blockNotFoundMsg;
+    }
 }
 
-
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
+void LeastRecentlyUsedCacheWorker::eraseFromCache(size_t key) {
+    cache.erase(key);
 }
 
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
+void LeastRecentlyUsedCacheWorker::refer(const MessagePtr& msg) {
+    if (MPI_GET_RANK() != 0) return;
+    const auto key = msg->key;
+    if (auto entry = cache.find(key); entry == cache.end()) {
+        // Use eviction strategy if cache is overfull
+        if (currentBytes + msg->getSize() > cacheSize) {
+            auto last = queue.back();
+            queue.pop_back();
+            // send evicted block to remote cacheworker
+            // this copies right now (do I want this?)
+            MessagePtr evicted = cache[last].msg;
+            eraseCacheBlock(evicted);
+            const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+            send(evicted, destRank);
+        }
+    } else {
+        // If the block is present in the cache, we need to update its place in the queue
+        queue.erase(entry->second.placeInQueue);
+    }
+    // Update the reference in the order queue
+    queue.push_front(key);
 }
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
-
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
-#endif // MPI_HELPER_CPP
+#endif

@@ -37,8 +37,10 @@
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
 
-#include <time.h>
+#include <ctime>
+#include <ostream>
 #include <cstring>
+#include <array>
 
 /** \file Utilities.h
  *
@@ -46,6 +48,18 @@
  *  operations of PC2L at compile-time.
  */
 
+
+// for debugging purposes we need some way to print std arrays
+// just print every element
+namespace std {
+    template<typename T, size_t N>
+    std::ostream& operator<< (std::ostream& os, const std::array<T, N>& arr) {
+        for (auto i = 0; i < arr.size() - 1; i++) {
+            os << arr.at(i) << " ";
+        }
+        return os << arr.at(arr.size() - 1);
+    }
+}
 /** \def ASSERT(x)
 
     \brief Define a convenient macro for using c asserts.
@@ -72,27 +86,79 @@
 #endif
 #endif
 
-/** \def DEBUG(x)
+/** \def PC2L_DEBUG(x)
 
     \brief Define a convenient macro for conditionally compiling
     additional debugging information.
 
-    Define a custom macro DEBUG (note the all caps) macro to be used
+    Define a custom macro PC2L_DEBUG (note the all caps) macro to be used
     to conditionally compile in debugging code to generate detailed
     logs.  This helps to minimize code modification to insert and
     remove debugging messages.
 */
-#ifndef DEBUG
-#ifdef DEBUG_OUTPUT
+#ifndef PC2L_DEBUG
+#ifdef PC2L_DEBUG_MODE
 
-#define DEBUG(x) x
+#define PC2L_DEBUG(x) x
 
-#else // !DEBUG_OUTPUT
+#else // !PC2L_DEBUG_MODE
 
-#define DEBUG(x)
+#define PC2L_DEBUG(x)
 
 #endif
 #endif
+
+/** \def PC2L_PROFILE(x)
+
+    \brief Define a convenient macro for conditionally compiling
+    additional profiling information
+
+    Define a custom macro PC2L_PROFILE (note the all caps) macro to be used
+    to conditionally compile in debugging code to generate detailed
+    profiling messages. This mostly toggles whether we should calculate
+    cache hit probabilties.
+*/
+#ifndef PC2L_PROFILE
+#ifdef PC2L_PROFILE_MODE
+
+#define PC2L_PROFILE(x) x
+
+#else // !PC2L_PROFILE_MODE
+
+#define PC2L_PROFILE(x)
+
+#endif
+#endif
+
+
+/**
+ * Start a timer for debugging purposes. Note that there can only
+ * be one timer going at a time
+ */
+#ifndef PC2L_DEBUG_START_TIMER
+
+#define PC2L_DEBUG_START_TIMER() PC2L_DEBUG(auto start = std::chrono::high_resolution_clock::now();)
+
+#endif
+
+/**
+ * Stop the debug timer and print the name of what was being timed
+ */
+#ifndef PC2L_DEBUG_STOP_TIMER
+
+#define PC2L_DEBUG_STOP_TIMER(X) PC2L_DEBUG(std::cout << X << " took " << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count() << "ns" << std::endl;)
+
+#endif
+
+/**
+ * Prints a given string if debug flags are enabled
+ */
+#ifndef PC2L_DEBUG_PRINT
+
+#define PC2L_DEBUG_PRINT(x) PC2L_DEBUG(std::cout << x << std::endl;)
+
+#endif
+
 
 /** \def END_NAMESPACE(pc2l)
 
@@ -219,3 +285,4 @@ char* getSystemTime(char *buffer, const time_t *codedTime = NULL);
 #define UNUSED_PARAM(x) (void) x
 
 #endif
+

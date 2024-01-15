@@ -1,6 +1,3 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
-
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -34,66 +31,53 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie                            rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "MPIHelper.h"
+#include <iostream>
+#include <random>
+#include "Environment.h"
 
-// namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
 
-#ifndef MPI_FOUND
+class MRUTest : public ::testing::Test {
 
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
+};
+
+int main(int argc, char *argv[]) {
+    ::testing::InitGoogleTest(&argc, argv);
+    auto& pc2l = pc2l::System::get();
+    pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+    pc2l.initialize(argc, argv);
+    pc2l.start(pc2l::System::MostRecentlyUsed);
+    auto env = new PC2LEnvironment();
+    env->argc = argc;
+    env->argv = argv;
+    ::testing::AddGlobalTestEnvironment(env);
+    return RUN_ALL_TESTS();
 }
 
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
+TEST_F(MRUTest, test_mru_caching) {
+    auto& pc2l = pc2l::System::get();
+    const int listSize = 100;
+    pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
+    // cache should now be the MRU block, the 2nd LRU block, and the LRU block
+    // MRU order 12 1 0
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1, true), nullptr);
 
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
+
+    // now put the eleven block back in cache
+    // MRU order: 12 11 10
+    intVec[90] = 1;
+    // MRU order: 0 11 10
+    // 12 should be removed
+    ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
+    intVec[9] = 1;
+    // New MRU order: 11 1 0
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1, true), nullptr);
+    ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11, true), nullptr);
 }
 
 
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
-
-END_NAMESPACE(pc2l);
-// }   // end namespace pc2l
-
-#endif // MPI_HELPER_CPP

@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef LRU_CACHE_WORKER_CPP
+#define LRU_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,66 +34,64 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "MPIHelper.h"
+#include "Exception.h"
+#include "PseudoLRUCacheWorker.h"
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
+    void PseudoLRUCacheWorker::eraseFromCache(size_t key) {
+        cache.erase(key);
+    }
 
-#ifndef MPI_FOUND
+    void PseudoLRUCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+       cache[msg->key] = {msg};
+    }
 
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
+    MessagePtr &PseudoLRUCacheWorker::getFromCache(size_t key) {
+        if (cache.find(key) != cache.end()) {
+            return cache[key].msg;
+        } else {
+            return blockNotFoundMsg;
+        }
+    }
+
+void PseudoLRUCacheWorker::refer(const MessagePtr& msg) {
+    if (MPI_GET_RANK() != 0) return;
+    const auto key = msg->key;
+    if (auto entry = cache.find(key); entry == cache.end()) {
+        // Use eviction strategy if cache is overfull
+        if (currentBytes + msg->getSize() > cacheSize) {
+            // the cache is full now and we can start resetting the mru bits
+            full = true;
+            // the first cache item without MRU bit set is removed
+            MessagePtr evicted;
+            for (auto e : cache) {
+                if (!e.second.wasUsed) {
+                    evicted = e.second.msg;
+                    break;
+                }
+            }
+            eraseCacheBlock(evicted);
+            const int destRank = (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+            send(evicted, destRank);
+        }
+    }else {
+        // If the block is present in the cache, we need to update its MRU bit
+        trueCount++;
+        if (trueCount >= cache.size() && full) {
+            for (auto e : cache) {
+                e.second.wasUsed = false;
+            }
+            // reset the count of MRU bools set
+            trueCount = 0;
+        }
+        entry->second.wasUsed = true;
+    }
 }
-
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
-
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
-
-
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
-
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
-#endif // MPI_HELPER_CPP
+#endif

@@ -34,7 +34,7 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
 #include <iostream>
@@ -42,13 +42,22 @@
 #include "Matrix.h"
 
 int main(int argc, char *argv[]) {
+    auto start = clock();
     auto& pc2l = pc2l::System::get();
+    unsigned long long size = strtoull(argv[1], NULL, 0);
     pc2l.initialize(argc, argv);
+    // 50 block cache
+    pc2l.setCacheSize(50 * 100 * sizeof(double));
     pc2l.start();
+    Matrix m1(size, size, 1);
+    Matrix m2(size, size, 1);
+    std::cout << "setup took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
 
-    Matrix m1(50000, 50000, 1);
-    Matrix m2(50000, 50000, 2);
-    std::cout << m1 * m2;
+    start = clock();
+
+    Matrix res = m1.dot(m2);
+
+    std::cout << "dot took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
 
     // Wind-up
     pc2l.stop();

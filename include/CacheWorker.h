@@ -1,8 +1,6 @@
 #ifndef CACHE_WORKER_H
 #define CACHE_WORKER_H
 
-#include <iostream>
-
 //---------------------------------------------------------------------
 //  ____ 
 // |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
@@ -50,11 +48,12 @@
 #include <unordered_map>
 #include <list>
 #include "Worker.h"
-
+#include <iostream>
+#include "Utilities.h"
+#include "Exception.h"
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
-
 /**
  * A convenience synonym for caching data associated with different
  * data structures.  The key in the map is computed as:
@@ -74,18 +73,11 @@ using DataCache = std::unordered_map<size_t, MessagePtr>;
  * 0). Each worker process is run on an independen compute-node so as
  * to effectively utlize the main-memory/RAM.
  */
+
 class CacheWorker : public Worker {
 public:
-    enum EvictionStrategy : int {
-        LRU = 1,
-        MRU,
-        LFU
-    };
-
     // Maximum cache size in bytes of this cacheworker
     unsigned long long cacheSize = 16000000000;
-    // Eviction strategy used to remove from the cache when cache size exceeded
-    EvictionStrategy evictionStrategy = EvictionStrategy::LRU;
     /**
      * The default constructor.  Currently, the consructor initializes
      * some of the instance variables in this class.
@@ -106,44 +98,13 @@ public:
     virtual void run() override;
 
     /**
-     * Convenience helper method to get an aggregate key for a given
-     * message. This method combines Message::dsTag (32-bits) and
-     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
-     *
-     * \param[in] msg The message from where the dsTag and blockTag
-     * are to be obtained to create a composite key.
-     *
-     * \return The a 64-bit key associated with this message.
-     */
-    static size_t getKey(const MessagePtr& msg) noexcept {
-        return getKey(msg->dsTag, msg->blockTag);
-    }
-
-    /**
-     * Convenience helper method to get an aggregate key for a given
-     * message. This method combines Message::dsTag (32-bits) and
-     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
-     *
-     * \param[in] dsTag tag associated with given data structure
-     * \param[in] blockTag tag associated with selected block
-     *
-     * \return The a 64-bit key associated with this message.
-     */
-    static size_t getKey(size_t dsTag, size_t blockTag) noexcept {
-        size_t key = dsTag;
-        key <<= sizeof(dsTag);
-        key  |= blockTag;
-        return key;
-    }
-
-    /**
      * Method that computes hash and stores a block of cache data from
      * a given message.
      *
      * \param[in] msg The message that contains a block of cache data
      * to be stored.
      */
-    void storeCacheBlock(const MessagePtr& msg);
+    void storeCacheBlock(const MessagePtr& msgIn);
 
     /**
      * Method that computes hash and erases a block of cache data from
@@ -166,19 +127,49 @@ public:
      * Refer the key for a block to our eviction scheme
      * @param key the key to place into eviction scheme
      */
-     void refer(const MessagePtr& msg);
+    virtual void refer(const MessagePtr& msg) = 0;
 protected:
     /**
-     * The in-memory data cache managed by this worker process.
+     * Add an item to the cache data structure. This is a pure
+     * virtual method since adding items can be different
+     * depending upon the data stored for different eviction
+     * strategies
+     * \param[in] msg reference to a message
      */
-    DataCache cache;
+    virtual void addToCache(MessagePtr& msg) = 0;
 
-    // Queue: front is block to remove
-    std::list<size_t> lruBlock;
+    /**
+     * Get an item from the cache. Pure virtual method needed
+     * since the data structure used for the cache can vary
+     * by cache eviction strategy
+     * \param[in] key the key associated with the requested item
+     * \return blockNotFoundMsg if not in cache, otherwise reference
+     * to the MessagePtr associated with the block
+     */
+     virtual MessagePtr& getFromCache(size_t key) = 0;
 
-    // Stores a key and a reference to that key's place in the LRU/MRU/etc queue
-    std::unordered_map<size_t, std::list<size_t>::iterator> placeInQ;
-private:
+    /**
+     * Erase a given key from the cache, then decrement the current number
+     * of bytes that the cache is holding
+     * @param key key of message to erase
+     */
+    virtual void eraseFromCache(size_t key) = 0;
+
+
+    /**
+     * If in profiling mode: keep a counter for cache hits
+     */
+    PC2L_PROFILE(size_t cacheHits = 0;)
+
+    /**
+     * Profiling mode: keep a counter of total attempted accesses
+     */
+     PC2L_PROFILE(size_t accesses = 0;)
+    /**
+     * The amount of bytes currently stored in the cache manager (incremented each time a message is
+     * added
+     */
+    unsigned int currentBytes = 0;
     /**
      * This is a convenience message that is created in the
      * constructor.  This is used to quickly send a "block-not-found"

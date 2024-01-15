@@ -1,5 +1,5 @@
-#ifndef MPI_HELPER_CPP
-#define MPI_HELPER_CPP
+#ifndef TERRASORT_CPP
+#define TERRASORT_CPP
 
 //---------------------------------------------------------------------
 //  ____ 
@@ -34,66 +34,41 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   JD Rudie                            rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "MPIHelper.h"
+#include <iostream>
+#include <pc2l.h>
+#include <climits>
+#include <ctime>
+#include <algorithm>
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
+        return 1;
+    }
+    auto& pc2l = pc2l::System::get();
+    pc2l.setCacheSize(atoi(argv[3]));
+    pc2l.initialize(argc, argv);
+    pc2l.start();
+    std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
+    std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
+    pc2l::Vector<int, 100000> terraVec;
+    auto start = clock();
+    while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
+        // create one terrabyte of pseudo random ints
+        terraVec.push_back(rand() % INT_MAX);
+    }
+    if (pc2l::MPI_GET_RANK() == 0) {
+        std::cout << "Creation of vector took " << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
+        auto sortStart = clock();
+        std::sort(terraVec.begin(), terraVec.end());
+        std::cout << "Sorting of vector took " << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
+    }
 
-// namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
-
-#ifndef MPI_FOUND
-
-#ifndef _WINDOWS
-// A simple implementation for MPI_WTIME on linux
-#include <sys/time.h>
-double MPI_WTIME() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / 1e6);
+    // Wind-up
+    pc2l.stop();
+    pc2l.finalize();
 }
 
-#else
-// A simple implementation for MPI_WTIME on Windows
-#include <windows.h>
-
-double MPI_WTIME() {
-    FILETIME st;
-    GetSystemTimeAsFileTime(&st);
-    long long time = st.dwHighDateTime;
-    time <<= 32;
-    time |= st.dwLowDateTime;
-    return (double) time;
-}
-
-
-#endif  // _Windows
-
-// Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void MPI_INIT(int argc, char* argv[]) {
-    UNUSED_PARAM(argc);
-    UNUSED_PARAM(argv);
-}
-
-bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
-    UNUSED_PARAM(src);
-    UNUSED_PARAM(tag);
-    UNUSED_PARAM(status);
-    return false;
-}
-
-int MPI_SEND(const void* data, int count, int type, int rank, int tag) {
-    UNUSED_PARAM(data);
-    UNUSED_PARAM(count);
-    UNUSED_PARAM(type);
-    UNUSED_PARAM(rank);
-    UNUSED_PARAM(tag);
-    return -1;
-}
-
-#endif  // Don't have MPI
-
-END_NAMESPACE(pc2l);
-// }   // end namespace pc2l
-
-#endif // MPI_HELPER_CPP
+#endif

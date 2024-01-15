@@ -34,16 +34,26 @@
 //            from <http://www.gnu.org/licenses/>.
 //
 // --------------------------------------------------------------------
-// Authors:   Dhananjai M. Rao          raodm@miamioh.edu
+// Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 
 #include <iostream>
 #include "STDMatrix.h"
 
-int main() {
-    STDMatrix m1(50000, 50000, 1);
-    STDMatrix m2(50000, 50000, 2);
-    std::cout << m1 * m2;
+int main(int argc, char* argv[]) {
+    unsigned int size = atoi(argv[1]);
+    auto start = clock();
+
+    STDMatrix m1(size, size, 1);
+    STDMatrix m2(size, size, 1);
+
+    std::cout << "setup took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
+
+    start = clock();
+
+    auto res = m1.dot(m2);
+
+    std::cout << "dot took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
 }
 
 #endif

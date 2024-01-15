@@ -38,14 +38,20 @@
 //---------------------------------------------------------------------
 #include <thread>
 #include "CacheWorker.h"
+#include "LeastRecentlyUsedCacheWorker.h"
+#include "MostRecentlyUsedCacheWorker.h"
+#include "PseudoLRUCacheWorker.h"
+#include "LeastFrequentlyUsedCacheWorker.h"
+
 /**
  * @file CacheManager.h
- * @brief Definition of CacheManager class which manages cache entries
- * in conjunction with worker processes.
- * @author Dhananjai M. Rao
+ *
+ * @brief Definition of abstract CacheManager class which manages cache entries
+ * in conjunction with worker processes. Also includes trivial definitions
+ * for cache managers with different eviction strategies
+ * @author Dhananjai M. Rao, JD Rudie
  * @version 0.1
  * @date 2020-04-23
- * 
  */
 // namespace pc2l {
 #include <queue>
@@ -59,7 +65,7 @@ BEGIN_NAMESPACE(pc2l);
  * for maintaining a local cache and updating caches on distributed
  * worker processes.
  */
-class CacheManager : public CacheWorker {
+class CacheManager : public virtual CacheWorker {
 public:
     /**
      * The default constructor.  Currently, the constructor does not
@@ -90,22 +96,55 @@ public:
     void finalize() override;
 
     /**
-     * Retrieve a block from the manager cache
-     * @param key the key of a given block calculated via block and DS tag
-     * @return message associated with @param key
+     * Retrieve a block from the manager cache. If it's not there, return nullptr
+     * \param[in] dsTag the data structure tag associated with this message
+     * \param[in] blockTag the block tag associated with this message
+     * \param[in] debug whether this is a debug check - if true, this check does
+     * not change the order of the cache - useful for testing
+     * \return message associated with the key formed by combining these tags
      */
-    MessagePtr getBlock(size_t key);
+    MessagePtr getBlock(size_t dsTag, size_t blockTag, bool debug = false);
 
     /**
-     * Gives a reference to the manager's cache for use in insertion
-     * logic
-     * @return reference to manager's cache
+     * Retrieve a block from the manager cache. If it's not there, fallback to remote CacheWorker
+     * \param[in] dsTag the data structure tag associated with this block
+     * \param[in] blockTag the block tag associated with this block
+     * \return message containing block requested
      */
-    DataCache& managerCache() {
-        return cache;
-    }
+    MessagePtr getBlockFallbackRemote(size_t dsTag, size_t blockTag);
+
+    /**
+     *  Retrieve a block from a remote CacheWorker in a non-blocking fashion
+     * \param[in] dsTag the data structure tag associated with this block
+     * \param[in] blockTag the block tag associated with this block
+     *
+     */
+    void getRemoteBlockNonblocking(size_t dsTag, size_t blockTag);
+
+private:
+    MPI_Request prefetchReq;
+    MessagePtr prefetchMsg;
 };
 
+/**
+ * CacheManager which implements the Least Recently Used (LRU) cache eviction algorithm
+ */
+class LeastRecentlyUsedCacheManager : public LeastRecentlyUsedCacheWorker, public CacheManager{};
+
+/**
+ * CacheManager which implements the Most Recently Used (MRU) cache eviction algorithm
+ */
+class MostRecentlyUsedCacheManager : public MostRecentlyUsedCacheWorker, public CacheManager{};
+
+/**
+ * CacheManager which implements the Least Frequently Used (LFU) cache eviction algorithm
+ */
+class LeastFrequentlyUsedCacheManager : public LeastFrequentlyUsedCacheWorker, public CacheManager{};
+
+/**
+ * CacheManager which implements the Pseudo-LRU cache eviction algorithm
+ */
+class PseudoLRUCacheManager : public PseudoLRUCacheWorker, public CacheManager{};
 
 END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
