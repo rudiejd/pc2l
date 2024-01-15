@@ -16,26 +16,14 @@
                       |_|_\___\__,_\__,_|_|_|_\___|
 
 
-<<<<<<< HEAD
-# Compiling
-```shell
-=======
-<<<<<<< Updated upstream
-=======
 # Compiling
 
 ```sh
->>>>>>> 543b2fb (fix: format on readme)
 git clone https://github.com/rudiejd/pc2l.git
 cd pc2l
 mkdir build
 cd build
-<<<<<<< HEAD
-cmake ..```
-=======
 cmake ..
-```
->>>>>>> 543b2fb (fix: format on readme)
 
 # Running programs that utilize PC2L
 
@@ -43,10 +31,6 @@ Programs that utilize PC2L must be run using MPI via `mpirun` or a
 similar shell program. Failing to do so will result in undefined
 behavior.
 
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 543b2fb (fix: format on readme)
 # License
 
 A Parallel & Cloud Computing Library (PC2L) is free software: you can
