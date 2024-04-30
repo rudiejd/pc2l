@@ -6,15 +6,26 @@ Lab at Miami University. You can read more about the lab [here](http://www.pc2la
 
 
 # Compiling
+You must be running linux, and you must have an MPI compiler installed 
+and linked in your /usr/bin folderas `/usr/bin/mpicxx`. Many MPI 
+distributions have this as default behavior, but you should double check. 
 
 ```sh
 git clone https://github.com/rudiejd/pc2l.git
 cd pc2l
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_C
 ```
 
+## Running the tests
+```sh  
+# functional tests
+mpirun -n 10 ./bin/test_vector
+
+# load tests/benchmarks
+mpirun -n 10 /bin/bench_vector
+```
 # Running programs that utilize PC2L
 
 Programs that utilize PC2L must be run using MPI via `mpirun` or a 
