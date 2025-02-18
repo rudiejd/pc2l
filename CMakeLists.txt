@@ -28,30 +28,33 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(Threads REQUIRED)
 find_package(MPI REQUIRED)
 
-if (PC2L_DOWNLOAD_EXTERNALS)
-    include(FetchContent)
-    FetchContent_Declare(
-            googletest
-            URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-    )
-    include(GoogleTest)
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
-    FetchContent_Declare(googlebenchmark
-            GIT_REPOSITORY https://github.com/google/benchmark.git
-            GIT_TAG master) # need master for benchmark::benchmark
-    FetchContent_MakeAvailable(googletest googlebenchmark)
-else()
-    # We need MPI, GoogleTest, GoogleBenchmark for this project to work
-    find_package(GTest REQUIRED)
-    find_package(benchmark REQUIRED)
-endif()
 ## Add all child directories
 add_subdirectory(src)
 
-# Only build examples when explicitly requested
-if (pc2l_BUILD_EXAMPLES)
+# Only build examples or tests when explicitly requested
+if(PC2L_ENABLE_TESTS)
+	if (PC2L_DOWNLOAD_EXTERNALS)
+	    include(FetchContent)
+	    FetchContent_Declare(
+		    googletest
+		    URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+	    )
+	    include(GoogleTest)
+	    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
+	    FetchContent_Declare(googlebenchmark
+		    GIT_REPOSITORY https://github.com/google/benchmark.git
+		    GIT_TAG master) # need master for benchmark::benchmark
+	    FetchContent_MakeAvailable(googletest googlebenchmark)
+	else()
+	    # We need MPI, GoogleTest, GoogleBenchmark for this project to work
+	    find_package(GTest REQUIRED)
+	    find_package(benchmark REQUIRED)
+	endif()
+	add_subdirectory(test)
+	add_subdirectory(bench)
+endif()
+
+if (PC2L_BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
 
-add_subdirectory(test)
-add_subdirectory(bench)

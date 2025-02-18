@@ -6,16 +6,26 @@ Lab at Miami University. You can read more about the lab [here](http://www.pc2la
 
 
 # Compiling
-You must be running linux, and you must have an MPI compiler installed 
-and linked in your /usr/bin folderas `/usr/bin/mpicxx`. Many MPI 
+- You must be running linux, and you must have an MPI compiler installed 
+and linked in your /usr/bin folder as `/usr/bin/mpicxx`. Many MPI 
 distributions have this as default behavior, but you should double check. 
+## Dependencies
+- Google's [Benchmark library](https://github.com/google/benchmark) for framework-level benchmarks 
+- [GoogleTest](https://github.com/google/googletest) for running tests
 
+To download all dependencies, you can set the build option `PC2L_DOWNLOAD_EXTERNALS=truu`
+
+To disable tests, set `PC2L_ENABLE_TESTS=false`. If you aren't building tests,
+need either of the external dependencies. You should disable tests if you are using
+PC2L as a library.
+
+## Example
 ```sh
 git clone https://github.com/rudiejd/pc2l.git
 cd pc2l
 mkdir build
 cd build
-cmake .. -DCMAKE_C
+cmake .. -DPC2L_DOWNLOAD_EXTERNALS=true
 ```
 
 ## Running the tests
