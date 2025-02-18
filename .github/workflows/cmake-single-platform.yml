@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install dependencies
-      run: yes | sudo apt-get install -y openmpi libgtest-dev libbenchmark-dev
+      run: sudo apt-get -y install libopenmpi-dev libgtest-dev libbenchmark-dev
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
