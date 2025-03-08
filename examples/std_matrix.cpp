@@ -2,19 +2,19 @@
 #define STD_MATRIX_CPP_TEST
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -37,23 +37,29 @@
 // Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 
-#include <iostream>
 #include "STDMatrix.h"
+#include <iostream>
 
-int main(int argc, char* argv[]) {
-    unsigned int size = atoi(argv[1]);
-    auto start = clock();
+int
+main (int argc, char *argv[])
+{
+  unsigned int size = atoi (argv[1]);
+  auto start = clock ();
 
-    STDMatrix m1(size, size, 1);
-    STDMatrix m2(size, size, 1);
+  STDMatrix m1 (size, size, 1);
+  STDMatrix m2 (size, size, 1);
 
-    std::cout << "setup took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
+  std::cout << "setup took "
+            << ((clock () - start) * 1000000000) / CLOCKS_PER_SEC << "ns"
+            << std::endl;
 
-    start = clock();
+  start = clock ();
 
-    auto res = m1.dot(m2);
+  auto res = m1.dot (m2);
 
-    std::cout << "dot took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns" << std::endl;
+  std::cout << "dot took "
+            << ((clock () - start) * 1000000000) / CLOCKS_PER_SEC << "ns"
+            << std::endl;
 }
 
 #endif

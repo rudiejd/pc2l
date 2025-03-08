@@ -2,19 +2,19 @@
 #define SYSTEM_CPP
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -37,14 +37,14 @@
 // Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "MPIHelper.h"
 #include "System.h"
-#include "Exception.h"
 #include "CacheManager.h"
+#include "Exception.h"
+#include "MPIHelper.h"
 #include <cassert>
 
 // namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
+BEGIN_NAMESPACE (pc2l);
 
 // The process-wide singleton object for further use
 System System::system;
@@ -58,93 +58,112 @@ System System::system;
  * that, the manager instance is defined here. Not a perfect design,
  * but a practical one.
  */
-CacheManager* manager;
+CacheManager *manager;
 
-CacheManager& System::cacheManager() {
-    return *manager;
+CacheManager &
+System::cacheManager ()
+{
+  return *manager;
 }
 
 void
-System::initialize(int& argc, char *argv[], bool initMPI) {
-    // Check an iniitalize MPI
-    if (initMPI) {
-        MPI_INIT(argc, argv);
+System::initialize (int &argc, char *argv[], bool initMPI)
+{
+  // Check an iniitalize MPI
+  if (initMPI)
+    {
+      MPI_INIT (argc, argv);
     }
-    size = MPI_GET_SIZE();
-    assert(size > 0);
+  size = MPI_GET_SIZE ();
+  assert (size > 0);
 }
 
 void
-System::start(const EvictionStrategy es, const OpMode mode) {
-    // First, choose our cache manager based on eviction stategy
-    switch(es) {
-        case LeastRecentlyUsed:
-            manager = new LeastRecentlyUsedCacheManager();
-            break;
-        case MostRecentlyUsed:
-            manager = new MostRecentlyUsedCacheManager();
-            break;
-        case LeastFrequentlyUsed:
-            manager = new LeastFrequentlyUsedCacheManager();
-            break;
-        case PseudoLRU:
-            manager = new PseudoLRUCacheManager();
-            break;
+System::start (const EvictionStrategy es, const OpMode mode)
+{
+  // First, choose our cache manager based on eviction stategy
+  switch (es)
+    {
+    case LeastRecentlyUsed:
+      manager = new LeastRecentlyUsedCacheManager ();
+      break;
+    case MostRecentlyUsed:
+      manager = new MostRecentlyUsedCacheManager ();
+      break;
+    case LeastFrequentlyUsed:
+      manager = new LeastFrequentlyUsedCacheManager ();
+      break;
+    case PseudoLRU:
+      manager = new PseudoLRUCacheManager ();
+      break;
     }
-    manager->cacheSize = cacheSize;
-    // Next, based on our operation mode, perform different initialization.
-    switch (mode) {
+  manager->cacheSize = cacheSize;
+  // Next, based on our operation mode, perform different initialization.
+  switch (mode)
+    {
     case OneWriter_DistributedCache:
-        oneWriterDistribCache(es);
-        break;
+      oneWriterDistribCache (es);
+      break;
     case InvalidMode:
     default:
-        throw PC2L_EXP("Invalid OpMode in initMPI %d",
-                       "Ensure OpMode is valid", mode);
-    }    
+      throw PC2L_EXP ("Invalid OpMode in initMPI %d", "Ensure OpMode is valid",
+                      mode);
+    }
 }
 
-int System::worldSize() noexcept {
-    return size;
+int
+System::worldSize () noexcept
+{
+  return size;
 }
 
 void
-System::stop() {
-    // If this is the manager process, then send finish messages to
-    // all the workers to let them them know they need to stop running.
-    if (MPI_GET_RANK() == 0) {
-        manager->finalize();
+System::stop ()
+{
+  // If this is the manager process, then send finish messages to
+  // all the workers to let them them know they need to stop running.
+  if (MPI_GET_RANK () == 0)
+    {
+      manager->finalize ();
     }
 }
 
 void
-System::finalize(bool finMPI) noexcept {
-    if (finMPI) {
-        MPI_FINALIZE();
+System::finalize (bool finMPI) noexcept
+{
+  if (finMPI)
+    {
+      MPI_FINALIZE ();
     }
 }
 
 void
-System::oneWriterDistribCache(EvictionStrategy es) {
-    if (MPI_GET_RANK() == 0) {
-        // We assume this process is the manager.
-        cacheManager().initialize();
-        cacheManager().run();
-    } else {
-        // Here this process is running as a worker.  So perform the
-        // worker's lifecycle activities here.
-        CacheWorker* worker = new StorageCacheWorker();
-        worker->initialize();  // Initalize
-        worker->run();         // This method runs until manager send finish
-        worker->finalize();    // Do any clean-ups for this run
+System::oneWriterDistribCache (EvictionStrategy es)
+{
+  if (MPI_GET_RANK () == 0)
+    {
+      // We assume this process is the manager.
+      cacheManager ().initialize ();
+      cacheManager ().run ();
+    }
+  else
+    {
+      // Here this process is running as a worker.  So perform the
+      // worker's lifecycle activities here.
+      CacheWorker *worker = new StorageCacheWorker ();
+      worker->initialize (); // Initalize
+      worker->run ();        // This method runs until manager send finish
+      worker->finalize ();   // Do any clean-ups for this run
     }
 }
 
-void System::setCacheSize(unsigned long long cSize) noexcept {
-    cacheSize = cSize;
+void
+System::setCacheSize (unsigned long long cSize) noexcept
+{
+  cacheSize = cSize;
 }
 
-END_NAMESPACE(pc2l);
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
 
 #endif

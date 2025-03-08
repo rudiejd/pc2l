@@ -2,19 +2,19 @@
 #define STORAGE_CACHE_WORKER_CPP
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -37,31 +37,42 @@
 // Authors:   JD Rudie          rudiejd@miamioh.edu
 //---------------------------------------------------------------------
 
-#include "Exception.h"
 #include "StorageCacheWorker.h"
-
+#include "Exception.h"
 
 // namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
+BEGIN_NAMESPACE (pc2l);
 
-void StorageCacheWorker::addToCache(pc2l::MessagePtr &msg) {
-    cache[msg->key] = msg;
+void
+StorageCacheWorker::addToCache (pc2l::MessagePtr &msg)
+{
+  cache[msg->key] = msg;
 }
 
-MessagePtr& StorageCacheWorker::getFromCache(size_t key) {
-    if (cache.find(key) != cache.end()) {
-        return cache[key];
-    } else {
-        return blockNotFoundMsg;
+MessagePtr &
+StorageCacheWorker::getFromCache (size_t key)
+{
+  if (cache.find (key) != cache.end ())
+    {
+      return cache[key];
+    }
+  else
+    {
+      return blockNotFoundMsg;
     }
 }
 
-void StorageCacheWorker::eraseFromCache(size_t key) {
-    cache.erase(key);
+void
+StorageCacheWorker::eraseFromCache (size_t key)
+{
+  cache.erase (key);
 }
 
-void StorageCacheWorker::refer(const MessagePtr& msg) { }
-END_NAMESPACE(pc2l);
+void
+StorageCacheWorker::refer (const MessagePtr &msg)
+{
+}
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
 
 #endif

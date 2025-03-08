@@ -2,19 +2,19 @@
 #define MESSAGE_H
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -38,20 +38,21 @@
 //---------------------------------------------------------------------
 /**
  * @file Message.h
- * @author Dhananjai M. Rao (raodm@miamioh.edu) and JD Rudie (rudiejd@miamioh.edu)
+ * @author Dhananjai M. Rao (raodm@miamioh.edu) and JD Rudie
+ * (rudiejd@miamioh.edu)
  * @brief Definition of Message class for sharing information between
- * distributed processes. 
+ * distributed processes.
  * @version 0.1
  * @date 2021-04-23
  */
 
-#include <memory>
-#include <list>
-#include "Utilities.h"
 #include "MPIHelper.h"
+#include "Utilities.h"
+#include <list>
+#include <memory>
 
 // namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
+BEGIN_NAMESPACE (pc2l);
 
 class Message;
 using MessagePtr = std::shared_ptr<Message>;
@@ -95,316 +96,341 @@ using MessagePtr = std::shared_ptr<Message>;
  *
  * </ol>
  */
-class Message {
-    friend class MessageDeleter;
+class Message
+{
+  friend class MessageDeleter;
+
 public:
-    /**
-     * Enumeration to define the different types of messages that can
-     * be sent/received by various classes in PC2L
-     */
-    enum MsgTag : int {
-        STORE_BLOCK = 1, /**< Binary blob with cache data */
-        GET_BLOCK,       /**< Send requested cache block back */
-        ERASE_BLOCK,     /**< Send requested cache block back */
-        BLOCK_NOT_FOUND, /**< Requested block not found in cache */ 
-        FINISH,          /**< Message to ask the worker to finish */
-        PROBE_BLOCK,     /**< Check whether block is full without sending anything */
-        INVALID_MSG      /**< Just a placeholder */
-    };
+  /**
+   * Enumeration to define the different types of messages that can
+   * be sent/received by various classes in PC2L
+   */
+  enum MsgTag : int
+  {
+    STORE_BLOCK = 1, /**< Binary blob with cache data */
+    GET_BLOCK,       /**< Send requested cache block back */
+    ERASE_BLOCK,     /**< Send requested cache block back */
+    BLOCK_NOT_FOUND, /**< Requested block not found in cache */
+    FINISH,          /**< Message to ask the worker to finish */
+    PROBE_BLOCK, /**< Check whether block is full without sending anything */
+    INVALID_MSG  /**< Just a placeholder */
+  };
 
-    /**
-     * Messages constructed via the overloaded \c create method (in
-     * this class) have a non-standard memory model to ease sending,
-     * receiving, and processing messages.  Hence, messages cannot be
-     * copied using a standard copy-constructor.  Use an appropriate
-     * call to the \c create method to clone/copy a message.
-     */
-    Message(const Message&) = delete;
+  /**
+   * Messages constructed via the overloaded \c create method (in
+   * this class) have a non-standard memory model to ease sending,
+   * receiving, and processing messages.  Hence, messages cannot be
+   * copied using a standard copy-constructor.  Use an appropriate
+   * call to the \c create method to clone/copy a message.
+   */
+  Message (const Message &) = delete;
 
-    /**
-     * Messages constructed via the overloaded \c create method (in
-     * this class) have a non-standard memory model to ease sending,
-     * receiving, and processing messages.  Hence, messages cannot be
-     * moved using a standard move-constructor.  Instead use the \c
-     * MessagePtr (a std::shared_ptr) to pass messages to other
-     * methods.
-     */
-    Message(Message &&) = delete;    
-    
-    /**
-     * The destructor to free the memory owned by this message, if any
-     */
-    ~Message() {}
+  /**
+   * Messages constructed via the overloaded \c create method (in
+   * this class) have a non-standard memory model to ease sending,
+   * receiving, and processing messages.  Hence, messages cannot be
+   * moved using a standard move-constructor.  Instead use the \c
+   * MessagePtr (a std::shared_ptr) to pass messages to other
+   * methods.
+   */
+  Message (Message &&) = delete;
 
-    /**
-     * Convenience helper method to get an aggregate key for a given
-     * message. This method combines Message::dsTag (32-bits) and
-     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
-     *
-     * \param[in] msg The message from where the dsTag and blockTag
-     * are to be obtained to create a composite key.
-     *
-     * \return The a 64-bit key associated with this message.
-     */
-    static size_t getKey(unsigned int dsTag, unsigned int blockTag) noexcept;
+  /**
+   * The destructor to free the memory owned by this message, if any
+   */
+  ~Message () {}
 
-    /**
-     * Convenience helper method to get an aggregate key for a given
-     * message. This method combines Message::dsTag (32-bits) and
-     * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
-     *
-     * \param[in] dsTag tag associated with given data structure
-     * \param[in] blockTag tag associated with selected block
-     *
-     * \return The a 64-bit key associated with this message.
-     */
-    static size_t getKey(const MessagePtr& msg) noexcept;
+  /**
+   * Convenience helper method to get an aggregate key for a given
+   * message. This method combines Message::dsTag (32-bits) and
+   * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
+   *
+   * \param[in] msg The message from where the dsTag and blockTag
+   * are to be obtained to create a composite key.
+   *
+   * \return The a 64-bit key associated with this message.
+   */
+  static size_t getKey (unsigned int dsTag, unsigned int blockTag) noexcept;
 
-    /**
-     * Convenience method to create a message to send data to another
-     * process.
-     *
-     * \param[in] dataSize The size of the data that will be sent with
-     * this message.  This value is used to create a flat message with
-     * necessary space at the end to send the data.  Use the getData()
-     * method to update the raw reference.
-     *
-     * \param[in] tag The tag to be set for this message.  The tag can
-     * always be changed at anytime.
-     *
-     * \param[in] srcRank The rank of the source process (if any) from
-     * where the message was received.  Note that this value can be
-     * changed at any time.
-     *
-     * \return A newly created message object whose payload can be
-     * populated.
-     */
-    static MessagePtr create(const int dataSize, const MsgTag tag,
-                             const int srcRank, size_t dsTag, size_t blockTag);
+  /**
+   * Convenience helper method to get an aggregate key for a given
+   * message. This method combines Message::dsTag (32-bits) and
+   * Message::blockTag (32-bit) to create an aggreagte (64-bit) key.
+   *
+   * \param[in] dsTag tag associated with given data structure
+   * \param[in] blockTag tag associated with selected block
+   *
+   * \return The a 64-bit key associated with this message.
+   */
+  static size_t getKey (const MessagePtr &msg) noexcept;
 
-    /**
-     * Convenience constructor which constructs a message without specifying
-     * dsTag/blockTag
-     *
-     * \param[in] dataSize The size of the data that will be sent with
-     * this message.  This value is used to create a flat message with
-     * necessary space at the end to send the data.  Use the getData()
-     * method to update the raw reference.
-     *
-     * \param[in] tag The tag to be set for this message.  The tag can
-     * always be changed at anytime.
-     *
-     * \param[in] srcRank The rank of the source process (if any) from
-     * where the message was received.  Note that this value can be
-     * changed at any time.
-     *
-     * \return A newly created message object whose payload can be
-     * populated.
-     */
-    static MessagePtr create(const int dataSize, const MsgTag tag,
-                             const int srcRank = MPI_ANY_SOURCE) {
-        return create(dataSize, tag, srcRank, -1U, -1U);
-    }
-    /**
-     * Convenience method to create a message from a buffer containing
-     * data received from another process.  This method essentially
-     * just type-casts the supplied buffer and sets the data pointer
-     * to point back into the buffer.
-     *
-     * \note The lifetime of the supplied buffer should exceed the
-     * lifetime of the Message object returned by this method.  If you
-     * want to make a true-copy then use the create(const Message&)
-     * method.
-     *
-     * \param[in] buffer The buffer to be used as the backing store to
-     * the message returned by this method.
-     * sent with this message.  This value is used to create a flat
-     * message with necessary space at the end to send the data.  Use
-     * the getData() method to update the raw reference.
-     *
-     * \param[in] tag The message type for the created message
-     *
-     * \return A message object which is essentially jsut a type-cast
-     * of the supplied buffer.
-     */
-    static MessagePtr create(char* buffer);
+  /**
+   * Convenience method to create a message to send data to another
+   * process.
+   *
+   * \param[in] dataSize The size of the data that will be sent with
+   * this message.  This value is used to create a flat message with
+   * necessary space at the end to send the data.  Use the getData()
+   * method to update the raw reference.
+   *
+   * \param[in] tag The tag to be set for this message.  The tag can
+   * always be changed at anytime.
+   *
+   * \param[in] srcRank The rank of the source process (if any) from
+   * where the message was received.  Note that this value can be
+   * changed at any time.
+   *
+   * \return A newly created message object whose payload can be
+   * populated.
+   */
+  static MessagePtr create (const int dataSize, const MsgTag tag,
+                            const int srcRank, size_t dsTag, size_t blockTag);
 
-    /**
-     * Create a clone aka deep-copy of a given message.  This is the
-     * only way to create a copy of a method, in case copies are
-     * needed.  This method is a convenience method that internally
-     * creates a new message and copies the payload information from
-     * src.
-     *
-     * \param[in] src The source message to be cloned.
-     *
-     * \return The cloned message object.
-     */
-    static MessagePtr create(const Message& src);
-    
-    /**
-     * Obtain the size of the data associated with this message.
-     *
-     * \return The size of the data contained in this message.
-     */
-    int getPayloadSize() const noexcept { return size - sizeof(Message); }
+  /**
+   * Convenience constructor which constructs a message without specifying
+   * dsTag/blockTag
+   *
+   * \param[in] dataSize The size of the data that will be sent with
+   * this message.  This value is used to create a flat message with
+   * necessary space at the end to send the data.  Use the getData()
+   * method to update the raw reference.
+   *
+   * \param[in] tag The tag to be set for this message.  The tag can
+   * always be changed at anytime.
+   *
+   * \param[in] srcRank The rank of the source process (if any) from
+   * where the message was received.  Note that this value can be
+   * changed at any time.
+   *
+   * \return A newly created message object whose payload can be
+   * populated.
+   */
+  static MessagePtr
+  create (const int dataSize, const MsgTag tag,
+          const int srcRank = MPI_ANY_SOURCE)
+  {
+    return create (dataSize, tag, srcRank, -1U, -1U);
+  }
+  /**
+   * Convenience method to create a message from a buffer containing
+   * data received from another process.  This method essentially
+   * just type-casts the supplied buffer and sets the data pointer
+   * to point back into the buffer.
+   *
+   * \note The lifetime of the supplied buffer should exceed the
+   * lifetime of the Message object returned by this method.  If you
+   * want to make a true-copy then use the create(const Message&)
+   * method.
+   *
+   * \param[in] buffer The buffer to be used as the backing store to
+   * the message returned by this method.
+   * sent with this message.  This value is used to create a flat
+   * message with necessary space at the end to send the data.  Use
+   * the getData() method to update the raw reference.
+   *
+   * \param[in] tag The message type for the created message
+   *
+   * \return A message object which is essentially jsut a type-cast
+   * of the supplied buffer.
+   */
+  static MessagePtr create (char *buffer);
 
-    /**
-     * Obtain an immutable reference to the raw data associated with
-     * this message.
-     *
-     * \note Never delete the pointer returned by this method!
-     *
-     * \return The raw binary data associated with this message.
-     */
-    const char* getPayload() const noexcept { return payload; }
+  /**
+   * Create a clone aka deep-copy of a given message.  This is the
+   * only way to create a copy of a method, in case copies are
+   * needed.  This method is a convenience method that internally
+   * creates a new message and copies the payload information from
+   * src.
+   *
+   * \param[in] src The source message to be cloned.
+   *
+   * \return The cloned message object.
+   */
+  static MessagePtr create (const Message &src);
 
-    /**
-     * Obtain an mutable reference to the raw data associated with
-     * this message.
-     *
-     * \note Never delete the pointer returned by this method!
-     *
-     * \return The raw binary data associated with this message.
-     */
-    char* getPayload() { return payload; }
+  /**
+   * Obtain the size of the data associated with this message.
+   *
+   * \return The size of the data contained in this message.
+   */
+  int
+  getPayloadSize () const noexcept
+  {
+    return size - sizeof (Message);
+  }
 
-    /**
-     * Obtain the full size of this message.
-     *
-     * \return The size of this message.  The size includes size of
-     * payload and this class.
-     */
-    int getSize() const noexcept { return size; }
+  /**
+   * Obtain an immutable reference to the raw data associated with
+   * this message.
+   *
+   * \note Never delete the pointer returned by this method!
+   *
+   * \return The raw binary data associated with this message.
+   */
+  const char *
+  getPayload () const noexcept
+  {
+    return payload;
+  }
 
-    /** The tag associated with this message. This tag is useful to
-     * distinguish between different types of messages.
-     */
-    MsgTag tag = INVALID_MSG;
-    
-    /**
-     * The source rank from where the message was recived, if any.
-     */
-    int srcRank = MPI_ANY_SOURCE;
+  /**
+   * Obtain an mutable reference to the raw data associated with
+   * this message.
+   *
+   * \note Never delete the pointer returned by this method!
+   *
+   * \return The raw binary data associated with this message.
+   */
+  char *
+  getPayload ()
+  {
+    return payload;
+  }
 
-    /**
-     * A unique identifier for each data structure that PC2L is
-     * working with. This value is used to associate messages with
-     * specific data structures.  Furthermore,  the pair of values
-     * {dsTag, blockTag} is used to uniquely identify a cache block
-     * in a given data structure.
-     */
-    unsigned int dsTag = -1U;
+  /**
+   * Obtain the full size of this message.
+   *
+   * \return The size of this message.  The size includes size of
+   * payload and this class.
+   */
+  int
+  getSize () const noexcept
+  {
+    return size;
+  }
 
-    /**
-     * A unique identifier for a block of data associated with a given
-     * data structure.  The pair of values {dsTag, blockTag} is used
-     * to uniquely identify a cache block in a given data structure.
-     * This limits the number of blocks associatable with a data
-     * structure to a maximum of 4GiB blocks, but each block can be
-     * arbitrarly large.
-     */
-    unsigned int blockTag = -1U;
+  /** The tag associated with this message. This tag is useful to
+   * distinguish between different types of messages.
+   */
+  MsgTag tag = INVALID_MSG;
 
-    /**
-     * Key calculated through hashing of dsTag and blockTag. Stored with
-     * Message object to avoid repeated computation. Uniquely identifies a
-     * Message globally within a given PC2L instance.
-     */
-    size_t key;
+  /**
+   * The source rank from where the message was recived, if any.
+   */
+  int srcRank = MPI_ANY_SOURCE;
 
-    /**
-     * A buffer that contains the binary-data blob associated with
-     * this message.  This object either points to the buffer in this
-     * class or points to: <ul>
-     *
-     * <li>The above buffer if the message was constructed via the
-     * \c create(int) method in this class.</li>
-     *
-     * <li>Or, it points to an external buffer using which this
-     * message was created via the create(std::vector<char>) class.
-     *
-     * </ul>
-     */
-    char* payload = nullptr;
+  /**
+   * A unique identifier for each data structure that PC2L is
+   * working with. This value is used to associate messages with
+   * specific data structures.  Furthermore,  the pair of values
+   * {dsTag, blockTag} is used to uniquely identify a cache block
+   * in a given data structure.
+   */
+  unsigned int dsTag = -1U;
 
-    /**
-     * Flag to indicate if this message was created from an external
-     * buffer or from a buffer that must be deleted when this object
-     * goes out of scope.
-     *
-     *
-     * This value is is set to <ul>
-     *
-     * <li>\c true: The above buffer if the message was constructed
-     * via the \c create(int) method in this class and it should be
-     * deleted in the destructor.</li>
-     *
-     * <li>Or, it points to an external buffer using which this
-     * message was created via the create(std::vector<char>) class.
-     * So the buffer should not be deleted.</li>
-     *
-     * </ul>
-     */
-    bool ownBuf = true;
+  /**
+   * A unique identifier for a block of data associated with a given
+   * data structure.  The pair of values {dsTag, blockTag} is used
+   * to uniquely identify a cache block in a given data structure.
+   * This limits the number of blocks associatable with a data
+   * structure to a maximum of 4GiB blocks, but each block can be
+   * arbitrarly large.
+   */
+  unsigned int blockTag = -1U;
+
+  /**
+   * Key calculated through hashing of dsTag and blockTag. Stored with
+   * Message object to avoid repeated computation. Uniquely identifies a
+   * Message globally within a given PC2L instance.
+   */
+  size_t key;
+
+  /**
+   * A buffer that contains the binary-data blob associated with
+   * this message.  This object either points to the buffer in this
+   * class or points to: <ul>
+   *
+   * <li>The above buffer if the message was constructed via the
+   * \c create(int) method in this class.</li>
+   *
+   * <li>Or, it points to an external buffer using which this
+   * message was created via the create(std::vector<char>) class.
+   *
+   * </ul>
+   */
+  char *payload = nullptr;
+
+  /**
+   * Flag to indicate if this message was created from an external
+   * buffer or from a buffer that must be deleted when this object
+   * goes out of scope.
+   *
+   *
+   * This value is is set to <ul>
+   *
+   * <li>\c true: The above buffer if the message was constructed
+   * via the \c create(int) method in this class and it should be
+   * deleted in the destructor.</li>
+   *
+   * <li>Or, it points to an external buffer using which this
+   * message was created via the create(std::vector<char>) class.
+   * So the buffer should not be deleted.</li>
+   *
+   * </ul>
+   */
+  bool ownBuf = true;
 
 protected:
-    /**
-     * The constructor is made protected to ensure that this class is
-     * not directly instantiated.  Instead use one of the static
-     * create methods to create a message class.
-     *
-     * The constructor is used by the overloaded create method(s) in
-     * this class to suitably initialize a message object.
-     *
-     * \param[in] tag The tag to be set for this message.
-     *
-     * \param[in] rank The source rank for this message.
-     *
-     * \param[in] size The total size for this message, including the
-     * payload size.
-     *
-     * \param[in] ownBuf Flag to indicate if this message owns this
-     * buffer.
-     *
-     * \param[in] payload A pointer to the payload associated with
-     * this message.
-     */
-    Message(MsgTag tag, int rank, int size, bool ownBuf, char* payload) :
-        tag(tag), srcRank(rank), size(size), ownBuf(ownBuf), payload(payload) {}
+  /**
+   * The constructor is made protected to ensure that this class is
+   * not directly instantiated.  Instead use one of the static
+   * create methods to create a message class.
+   *
+   * The constructor is used by the overloaded create method(s) in
+   * this class to suitably initialize a message object.
+   *
+   * \param[in] tag The tag to be set for this message.
+   *
+   * \param[in] rank The source rank for this message.
+   *
+   * \param[in] size The total size for this message, including the
+   * payload size.
+   *
+   * \param[in] ownBuf Flag to indicate if this message owns this
+   * buffer.
+   *
+   * \param[in] payload A pointer to the payload associated with
+   * this message.
+   */
+  Message (MsgTag tag, int rank, int size, bool ownBuf, char *payload)
+      : tag (tag), srcRank (rank), size (size), ownBuf (ownBuf),
+        payload (payload)
+  {
+  }
 
-    /**
-     * The overall size of this message including the memory
-     * associated with the payload.  This value is set when a message
-     * is created.
-     */
-    int size;
+  /**
+   * The overall size of this message including the memory
+   * associated with the payload.  This value is set when a message
+   * is created.
+   */
+  int size;
 
 private:
-
-
-    /** A custom deleter class to correctly delete Message objects.
-     * This class is used inconjunction with the shared_ptr to
-     * correctly delete a message created via one of the \c create
-     * methods in this class.
+  /** A custom deleter class to correctly delete Message objects.
+   * This class is used inconjunction with the shared_ptr to
+   * correctly delete a message created via one of the \c create
+   * methods in this class.
+   */
+  class MessageDeleter
+  {
+  public:
+    /**
+     * @brief  Deletes message object if message owns this buffer
+     *
+     * @param msg Message object to be deleted
      */
-    class MessageDeleter {
-    public:
-        /**
-         * @brief  Deletes message object if message owns this buffer 
-         * 
-         * @param msg Message object to be deleted 
-         */
-        void operator()(Message* msg) {
-            if (msg->ownBuf) {
-                delete[] reinterpret_cast<char*>(msg);
-            }
+    void
+    operator() (Message *msg)
+    {
+      if (msg->ownBuf)
+        {
+          delete[] reinterpret_cast<char *> (msg);
         }
-    };
+    }
+  };
 };
 
-END_NAMESPACE(pc2l);
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
-
 
 #endif

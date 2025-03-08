@@ -2,19 +2,19 @@
 #define CACHE_MANAGER_H
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -36,12 +36,12 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao          raodm@miamioh.edu
 //---------------------------------------------------------------------
-#include <thread>
 #include "CacheWorker.h"
+#include "LeastFrequentlyUsedCacheWorker.h"
 #include "LeastRecentlyUsedCacheWorker.h"
 #include "MostRecentlyUsedCacheWorker.h"
 #include "PseudoLRUCacheWorker.h"
-#include "LeastFrequentlyUsedCacheWorker.h"
+#include <thread>
 
 /**
  * @file CacheManager.h
@@ -55,7 +55,7 @@
  */
 // namespace pc2l {
 #include <queue>
-BEGIN_NAMESPACE(pc2l);
+BEGIN_NAMESPACE (pc2l);
 
 /**
  * A centralized manager that manages cache entries in coordination
@@ -65,88 +65,104 @@ BEGIN_NAMESPACE(pc2l);
  * for maintaining a local cache and updating caches on distributed
  * worker processes.
  */
-class CacheManager : public virtual CacheWorker {
+class CacheManager : public virtual CacheWorker
+{
 public:
-    /**
-     * The default constructor.  Currently, the constructor does not
-     * have much to do but is present for future extensions.
-     */
-    CacheManager() {}
+  /**
+   * The default constructor.  Currently, the constructor does not
+   * have much to do but is present for future extensions.
+   */
+  CacheManager () {}
 
-    /**
-     * The polymorphic destructor.  The destructor does not have much
-     * to do but is present for future extensions (if any).
-     */
-    virtual ~CacheManager() {}
+  /**
+   * The polymorphic destructor.  The destructor does not have much
+   * to do but is present for future extensions (if any).
+   */
+  virtual ~CacheManager () {}
 
-    /**
-     * The manager does not have a specific task in the run method.
-     * The operations of a manager are triggered by data structures to
-     * access information in the manager. However, in order to utilize the
-     * memory of the manager as well, we run a typical 
-     * CacheWorker thread in the background on the manager node.
-     * 
-     */
-    void run() override;
+  /**
+   * The manager does not have a specific task in the run method.
+   * The operations of a manager are triggered by data structures to
+   * access information in the manager. However, in order to utilize the
+   * memory of the manager as well, we run a typical
+   * CacheWorker thread in the background on the manager node.
+   *
+   */
+  void run () override;
 
-    /**
-     * The finalize method sends finish messages to all of the workers
-     * to let them know they need to wind-up their operation.
-     */
-    void finalize() override;
+  /**
+   * The finalize method sends finish messages to all of the workers
+   * to let them know they need to wind-up their operation.
+   */
+  void finalize () override;
 
-    /**
-     * Retrieve a block from the manager cache. If it's not there, return nullptr
-     * \param[in] dsTag the data structure tag associated with this message
-     * \param[in] blockTag the block tag associated with this message
-     * \param[in] debug whether this is a debug check - if true, this check does
-     * not change the order of the cache - useful for testing
-     * \return message associated with the key formed by combining these tags
-     */
-    MessagePtr getBlock(size_t dsTag, size_t blockTag, bool debug = false);
+  /**
+   * Retrieve a block from the manager cache. If it's not there, return nullptr
+   * \param[in] dsTag the data structure tag associated with this message
+   * \param[in] blockTag the block tag associated with this message
+   * \param[in] debug whether this is a debug check - if true, this check does
+   * not change the order of the cache - useful for testing
+   * \return message associated with the key formed by combining these tags
+   */
+  MessagePtr getBlock (size_t dsTag, size_t blockTag, bool debug = false);
 
-    /**
-     * Retrieve a block from the manager cache. If it's not there, fallback to remote CacheWorker
-     * \param[in] dsTag the data structure tag associated with this block
-     * \param[in] blockTag the block tag associated with this block
-     * \return message containing block requested
-     */
-    MessagePtr getBlockFallbackRemote(size_t dsTag, size_t blockTag);
+  /**
+   * Retrieve a block from the manager cache. If it's not there, fallback to
+   * remote CacheWorker
+   * \param[in] dsTag the data structure tag associated with this block
+   * \param[in] blockTag the block tag associated with this block
+   * \return message containing block requested
+   */
+  MessagePtr getBlockFallbackRemote (size_t dsTag, size_t blockTag);
 
-    /**
-     *  Retrieve a block from a remote CacheWorker in a non-blocking fashion
-     * \param[in] dsTag the data structure tag associated with this block
-     * \param[in] blockTag the block tag associated with this block
-     *
-     */
-    void getRemoteBlockNonblocking(size_t dsTag, size_t blockTag);
+  /**
+   *  Retrieve a block from a remote CacheWorker in a non-blocking fashion
+   * \param[in] dsTag the data structure tag associated with this block
+   * \param[in] blockTag the block tag associated with this block
+   *
+   */
+  void getRemoteBlockNonblocking (size_t dsTag, size_t blockTag);
 
 private:
-    MPI_Request prefetchReq;
-    MessagePtr prefetchMsg;
+  MPI_Request prefetchReq;
+  MessagePtr prefetchMsg;
 };
 
 /**
- * CacheManager which implements the Least Recently Used (LRU) cache eviction algorithm
+ * CacheManager which implements the Least Recently Used (LRU) cache eviction
+ * algorithm
  */
-class LeastRecentlyUsedCacheManager : public LeastRecentlyUsedCacheWorker, public CacheManager{};
+class LeastRecentlyUsedCacheManager : public LeastRecentlyUsedCacheWorker,
+                                      public CacheManager
+{
+};
 
 /**
- * CacheManager which implements the Most Recently Used (MRU) cache eviction algorithm
+ * CacheManager which implements the Most Recently Used (MRU) cache eviction
+ * algorithm
  */
-class MostRecentlyUsedCacheManager : public MostRecentlyUsedCacheWorker, public CacheManager{};
+class MostRecentlyUsedCacheManager : public MostRecentlyUsedCacheWorker,
+                                     public CacheManager
+{
+};
 
 /**
- * CacheManager which implements the Least Frequently Used (LFU) cache eviction algorithm
+ * CacheManager which implements the Least Frequently Used (LFU) cache eviction
+ * algorithm
  */
-class LeastFrequentlyUsedCacheManager : public LeastFrequentlyUsedCacheWorker, public CacheManager{};
+class LeastFrequentlyUsedCacheManager : public LeastFrequentlyUsedCacheWorker,
+                                        public CacheManager
+{
+};
 
 /**
  * CacheManager which implements the Pseudo-LRU cache eviction algorithm
  */
-class PseudoLRUCacheManager : public PseudoLRUCacheWorker, public CacheManager{};
+class PseudoLRUCacheManager : public PseudoLRUCacheWorker, public CacheManager
+{
+};
 
-END_NAMESPACE(pc2l);
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
 
 #endif

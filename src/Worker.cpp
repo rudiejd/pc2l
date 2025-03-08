@@ -2,19 +2,19 @@
 #define WORKER_CPP
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -36,76 +36,93 @@
 // --------------------------------------------------------------------
 // Authors:   Dhananjai M. Rao, JD Rudie          {raodm, rudiejd}@miamioh.edu
 //---------------------------------------------------------------------
-#include "Utilities.h"
-#include "Exception.h"
 #include "Worker.h"
+#include "Exception.h"
 #include "MPIHelper.h"
+#include "Utilities.h"
 
 // namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
+BEGIN_NAMESPACE (pc2l);
 
 // Sending a message is relatively simple
 void
-Worker::send(MessagePtr msgPtr, const int destRank) {
-    // Send message only if the pointer is set
-    if (msgPtr) {
-        MPI_SEND(msgPtr.get(), msgPtr->getSize(), MPI_TYPE_CHAR, destRank,
-                 msgPtr->tag);
+Worker::send (MessagePtr msgPtr, const int destRank)
+{
+  // Send message only if the pointer is set
+  if (msgPtr)
+    {
+      MPI_SEND (msgPtr.get (), msgPtr->getSize (), MPI_TYPE_CHAR, destRank,
+                msgPtr->tag);
     }
 }
 // Recieve a message using our recv buffer
-MessagePtr Worker::recv(const int srcRank, const int tag) {
-    // First poll and find out the size of the message to read
-    MPI_STATUS status;
-    try {
-        MPI_PROBE(srcRank, tag, status);
-    } catch (CONST_EXP MPI_EXCEPTION& e) {
-        // Rethrow MPI exception as a pc2l::Exception
-        throw PC2L_EXP(e.Get_error_string(), "MPI_PROBE error (can't do much)");
+MessagePtr
+Worker::recv (const int srcRank, const int tag)
+{
+  // First poll and find out the size of the message to read
+  MPI_STATUS status;
+  try
+    {
+      MPI_PROBE (srcRank, tag, status);
+    }
+  catch (CONST_EXP MPI_EXCEPTION &e)
+    {
+      // Rethrow MPI exception as a pc2l::Exception
+      throw PC2L_EXP (e.Get_error_string (),
+                      "MPI_PROBE error (can't do much)");
     }
 
-    // Figure out the size of the size we need.
-    const int msgSize = MPI_GET_COUNT(status, MPI_TYPE_CHAR);
-    recvBuf.resize(msgSize);
-    // Read the actual string data.
-    try {
-        MPI_RECV(recvBuf.data(), msgSize, MPI_CHAR, status.MPI_SOURCE,
-                 status.MPI_TAG, status);
-    } catch (CONST_EXP MPI_EXCEPTION& e) {
-        // Rethrow MPI exception as a pc2l::Exception
-        throw PC2L_EXP(e.Get_error_string(), "MPI_RECV error (can't do much)");
+  // Figure out the size of the size we need.
+  const int msgSize = MPI_GET_COUNT (status, MPI_TYPE_CHAR);
+  recvBuf.resize (msgSize);
+  // Read the actual string data.
+  try
+    {
+      MPI_RECV (recvBuf.data (), msgSize, MPI_CHAR, status.MPI_SOURCE,
+                status.MPI_TAG, status);
+    }
+  catch (CONST_EXP MPI_EXCEPTION &e)
+    {
+      // Rethrow MPI exception as a pc2l::Exception
+      throw PC2L_EXP (e.Get_error_string (), "MPI_RECV error (can't do much)");
     }
 
-    // Return our buffer as if it is a message
-    return Message::create(recvBuf.data());
+  // Return our buffer as if it is a message
+  return Message::create (recvBuf.data ());
 }
 
 // Recieve a message using our recv buffer
-MPI_Request Worker::startReceiveNonblocking(const int srcRank, const int tag) {
-    // First poll and find out the size of the message to read
-    MPI_STATUS status;
-    // Figure out the size of the size we need.
-    const int msgSize = MPI_GET_COUNT(status, MPI_TYPE_CHAR);
-    MPI_Request req;
-    MPI_Irecv(recvBuf.data(), msgSize, MPI_CHAR, srcRank, status.MPI_TAG, MPI_COMM_WORLD, &req);
-    // Return the request asssociated with this
-    return req;
+MPI_Request
+Worker::startReceiveNonblocking (const int srcRank, const int tag)
+{
+  // First poll and find out the size of the message to read
+  MPI_STATUS status;
+  // Figure out the size of the size we need.
+  const int msgSize = MPI_GET_COUNT (status, MPI_TYPE_CHAR);
+  MPI_Request req;
+  MPI_Irecv (recvBuf.data (), msgSize, MPI_CHAR, srcRank, status.MPI_TAG,
+             MPI_COMM_WORLD, &req);
+  // Return the request asssociated with this
+  return req;
 }
 
 // Waits on a request
-MessagePtr Worker::wait(MPI_Request req) {
-    MPI_Status status;
-    MPI_Wait(&req, &status);
-    return Message::create(recvBuf.data());
+MessagePtr
+Worker::wait (MPI_Request req)
+{
+  MPI_Status status;
+  MPI_Wait (&req, &status);
+  return Message::create (recvBuf.data ());
 }
 
 void
-Worker::run() {
-    throw PC2L_EXP("Not implemented",
-                   "Need to override run() method in derived class.");
+Worker::run ()
+{
+  throw PC2L_EXP ("Not implemented",
+                  "Need to override run() method in derived class.");
 }
 
-END_NAMESPACE(pc2l);
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
 
 #endif

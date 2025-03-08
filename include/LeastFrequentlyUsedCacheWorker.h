@@ -2,19 +2,19 @@
 #define LFU_CACHE_WORKER_H
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -50,46 +50,52 @@
 #include <map>
 
 // namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
-class LeastFrequentlyUsedCacheWorker: public virtual CacheWorker {
+BEGIN_NAMESPACE (pc2l);
+class LeastFrequentlyUsedCacheWorker : public virtual CacheWorker
+{
 public:
-    /**
-     * Refer the key for a block to our eviction scheme. If the cache is full,
-     * this removes the least frequently used block in the cache. If there is a tie
-     * for the least frequency, it removes the least recently used item with the least
-     * frequency.
-     * @param key the key to place into eviction scheme
-     */
-    void refer(const MessagePtr& msg) override;
+  /**
+   * Refer the key for a block to our eviction scheme. If the cache is full,
+   * this removes the least frequently used block in the cache. If there is a
+   * tie for the least frequency, it removes the least recently used item with
+   * the least frequency.
+   * @param key the key to place into eviction scheme
+   */
+  void refer (const MessagePtr &msg) override;
+
 protected:
-    void addToCache(pc2l::MessagePtr &msg) override;
+  void addToCache (pc2l::MessagePtr &msg) override;
 
-    void eraseFromCache(size_t key) override;
+  void eraseFromCache (size_t key) override;
 
-    MessagePtr & getFromCache(size_t key) override;
+  MessagePtr &getFromCache (size_t key) override;
+
 private:
-    struct CacheItem {
-        MessagePtr msg;
-        size_t key;
-        size_t frequency = 1;
-    };
+  struct CacheItem
+  {
+    MessagePtr msg;
+    size_t key;
+    size_t frequency = 1;
+  };
 
-    /**
-     * Unordered map for finding position of the block in one of the frequency queues
-     */
-     std::unordered_map<size_t, std::list<CacheItem>::iterator> placeInQueue;
-    /**
-     * Ordered map with a separate queue for every frequency in the range of access
-     * frequencies for each block currently stored in the cache. Note that we use
-     * a std::list here for both complexity (O(1) insertion and erasure since it's a doubly linked list)
-     * but also because of its unique properties for iterator invalidation;
-     * insertion leaves all iterators unaffected AND erasing only affects the erased
-     * iterator See: http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
-     */
-    std::map<int, std::list<CacheItem>> queues;
+  /**
+   * Unordered map for finding position of the block in one of the frequency
+   * queues
+   */
+  std::unordered_map<size_t, std::list<CacheItem>::iterator> placeInQueue;
+  /**
+   * Ordered map with a separate queue for every frequency in the range of
+   * access frequencies for each block currently stored in the cache. Note that
+   * we use a std::list here for both complexity (O(1) insertion and erasure
+   * since it's a doubly linked list) but also because of its unique properties
+   * for iterator invalidation; insertion leaves all iterators unaffected AND
+   * erasing only affects the erased iterator See:
+   * http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
+   */
+  std::map<int, std::list<CacheItem> > queues;
 };
 
-END_NAMESPACE(pc2l);
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
 
 #endif

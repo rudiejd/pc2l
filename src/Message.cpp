@@ -2,19 +2,19 @@
 #define MESSAGE_CPP
 
 //---------------------------------------------------------------------
-//  ____ 
-// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing 
-// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is 
+//  ____
+// |  _ \    This file is part of  PC2L:  A Parallel & Cloud Computing
+// | |_) |   Library <http://www.pc2lab.cec.miamioh.edu/pc2l>. PC2L is
 // |  __/    free software: you can  redistribute it and/or  modify it
 // |_|       under the terms of the GNU  General Public License  (GPL)
 //           as published  by  the   Free  Software Foundation, either
 //           version 3 (GPL v3), or  (at your option) a later version.
-//    
+//
 //   ____    PC2L  is distributed in the hope that it will  be useful,
 //  / ___|   but   WITHOUT  ANY  WARRANTY;  without  even  the IMPLIED
 // | |       WARRANTY of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
 // | |___    PURPOSE.
-//  \____| 
+//  \____|
 //            Miami University and  the PC2Lab development team make no
 //            representations  or  warranties  about the suitability of
 //  ____      the software,  either  express  or implied, including but
@@ -39,74 +39,80 @@
 
 // make a workhorse
 
-#include <algorithm>
 #include "Message.h"
+#include <algorithm>
 
 // namespace pc2l {
-BEGIN_NAMESPACE(pc2l);
-size_t Message::getKey(const MessagePtr& msg) noexcept {
-    return getKey(msg->dsTag, msg->blockTag);
+BEGIN_NAMESPACE (pc2l);
+size_t
+Message::getKey (const MessagePtr &msg) noexcept
+{
+  return getKey (msg->dsTag, msg->blockTag);
 }
 
-size_t Message::getKey(unsigned int dsTag, unsigned int blockTag) noexcept {
-    // This method assumes that the dsTag and blockTag are exactly 32-bits
-    // in size to pack them into a 64-bit data type.
-    ASSERT(sizeof(dsTag)    == 4);
-    ASSERT(sizeof(blockTag) == 4);
-    ASSERT(sizeof(size_t)   >= 8);
-    
-    size_t key = dsTag;
-    key <<= 32;  // Shift left by 32-bits
-    key |= blockTag;
-    return key;
+size_t
+Message::getKey (unsigned int dsTag, unsigned int blockTag) noexcept
+{
+  // This method assumes that the dsTag and blockTag are exactly 32-bits
+  // in size to pack them into a 64-bit data type.
+  ASSERT (sizeof (dsTag) == 4);
+  ASSERT (sizeof (blockTag) == 4);
+  ASSERT (sizeof (size_t) >= 8);
+
+  size_t key = dsTag;
+  key <<= 32; // Shift left by 32-bits
+  key |= blockTag;
+  return key;
 }
 
 // Create a message from scratch using dynamic memory
 MessagePtr
-Message::create(const int dataSize, const MsgTag tag,
-                const int srcRank, size_t dsTag, size_t blockTag) {
-    // First create a dynamic memory block for this message, even
-    // though we are going to return it as if it were an object.
-    char* rawBuf = new char[dataSize + sizeof(Message)];
-    // Now use placement new to initialize the message
-    Message *msg = new(rawBuf) Message(tag, srcRank,
-                                       dataSize + sizeof(Message), true,
-                                       rawBuf   + sizeof(Message));
-    msg->dsTag = dsTag;
-    msg->blockTag = blockTag;
-    msg->key = getKey(dsTag, blockTag);
-    // Return the newly created object
-    return MessagePtr(msg, MessageDeleter());
+Message::create (const int dataSize, const MsgTag tag, const int srcRank,
+                 size_t dsTag, size_t blockTag)
+{
+  // First create a dynamic memory block for this message, even
+  // though we are going to return it as if it were an object.
+  char *rawBuf = new char[dataSize + sizeof (Message)];
+  // Now use placement new to initialize the message
+  Message *msg
+      = new (rawBuf) Message (tag, srcRank, dataSize + sizeof (Message), true,
+                              rawBuf + sizeof (Message));
+  msg->dsTag = dsTag;
+  msg->blockTag = blockTag;
+  msg->key = getKey (dsTag, blockTag);
+  // Return the newly created object
+  return MessagePtr (msg, MessageDeleter ());
 }
 
 // Make a message from a given buffer
 MessagePtr
-Message::create(char *buffer) {
-    // First simply reinterpret cast the buffer into a message.
-    Message* msg = reinterpret_cast<Message*>(buffer);
-    // Next setup the payload and ownBuf correctly
-    msg->ownBuf  = false;
-    msg->payload = buffer + sizeof(Message);
-    // Return the newly created object
-    return MessagePtr(msg, MessageDeleter());
+Message::create (char *buffer)
+{
+  // First simply reinterpret cast the buffer into a message.
+  Message *msg = reinterpret_cast<Message *> (buffer);
+  // Next setup the payload and ownBuf correctly
+  msg->ownBuf = false;
+  msg->payload = buffer + sizeof (Message);
+  // Return the newly created object
+  return MessagePtr (msg, MessageDeleter ());
 }
 
 MessagePtr
-Message::create(const Message& src) {
-    // First create a message from the source.
-    MessagePtr msg = Message::create(src.getPayloadSize(),
-                                     src.tag, src.srcRank);
-    msg->blockTag = src.blockTag;
-    msg->dsTag = src.dsTag;
-    msg->key = src.key;
-    // Copy the data from source to the newly created message
-    std::copy_n(src.getPayload(), src.getPayloadSize(), msg->getPayload());
-    // Return the newly created msg
-    return msg;
+Message::create (const Message &src)
+{
+  // First create a message from the source.
+  MessagePtr msg
+      = Message::create (src.getPayloadSize (), src.tag, src.srcRank);
+  msg->blockTag = src.blockTag;
+  msg->dsTag = src.dsTag;
+  msg->key = src.key;
+  // Copy the data from source to the newly created message
+  std::copy_n (src.getPayload (), src.getPayloadSize (), msg->getPayload ());
+  // Return the newly created msg
+  return msg;
 }
 
-END_NAMESPACE(pc2l);
+END_NAMESPACE (pc2l);
 // }   // end namespace pc2l
-
 
 #endif
