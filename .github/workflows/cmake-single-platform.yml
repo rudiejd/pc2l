@@ -23,7 +23,11 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install dependencies
-      run: sudo apt-get -y install libopenmpi-dev libgtest-dev libbenchmark-dev
+      run: sudo apt-get -y install libopenmpi-dev libgtest-dev libbenchmark-dev clang-format
+
+    - name: Check formatting
+      # Check that all of the source code is properly formatted with clang-format
+      run: find ${{github.workspace}} -iname '*.h' -o -iname '*.cpp' | xargs clang-format -i -style=GNU --dry-run -Werror
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
