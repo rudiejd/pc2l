@@ -28,7 +28,7 @@ jobs:
     - name: Check formatting
       # Check that all of the source code is properly formatted with clang-format
       # uses the .clang-format file from the root of the repo
-      run: cd ${{github.workspace} && find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format -i --dry-run -Werror
+      run: cd ${{github.workspace}} && find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format -i --dry-run -Werror
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
