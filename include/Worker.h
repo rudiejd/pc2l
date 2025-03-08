@@ -49,7 +49,7 @@
 #include <vector>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 /**
  * A simple base class for all of the distributed workers in PC2L. The
@@ -57,13 +57,12 @@ BEGIN_NAMESPACE (pc2l);
  * zero. The workers collaborate with the manager (process with
  * rank-zero) to handle various distributed operations.
  */
-class Worker
-{
+class Worker {
 public:
   /**
    * The required polymorphic destructor for the worker class.
    */
-  virtual ~Worker () {}
+  virtual ~Worker() {}
 
   /**
    * Perform any initialization operations that are needed for the
@@ -75,10 +74,7 @@ public:
    * multiple sequential runs) then this method is called once for
    * each of the runs.
    */
-  virtual void
-  initialize ()
-  {
-  }
+  virtual void initialize() {}
 
   /**
    * This is the primary method of a worker.  This method is
@@ -91,7 +87,7 @@ public:
    * multiple sequential runs) then this method is called once for
    * each of the runs.
    */
-  virtual void run ();
+  virtual void run();
 
   /**
    * Perform any finalization operations that are needed for the
@@ -103,10 +99,7 @@ public:
    * multiple sequential runs) then this method is called once for
    * each of the runs.
    */
-  virtual void
-  finalize ()
-  {
-  }
+  virtual void finalize() {}
 
   /**
    * Helper method to send a message (binary blob) to a given
@@ -119,14 +112,14 @@ public:
    * \param[in] destRank The destination rank to where the message
    * is to be sent.
    */
-  void send (MessagePtr msgPtr, const int destRank = 0);
+  void send(MessagePtr msgPtr, const int destRank = 0);
 
   /**
    * Waits on a request to come back then returns pointer to data with result
    * @param req MPI_Request to wait on
    * @return resulting message
    */
-  MessagePtr wait (MPI_Request req);
+  MessagePtr wait(MPI_Request req);
 
   /**
    * Helper method to receive a message (binary blob), optionaly
@@ -142,8 +135,8 @@ public:
    *
    * \return The message received, if any.
    */
-  MessagePtr recv (const int srcRank = MPI_ANY_SOURCE,
-                   const int tag = MPI_ANY_TAG);
+  MessagePtr recv(const int srcRank = MPI_ANY_SOURCE,
+                  const int tag = MPI_ANY_TAG);
 
   /**
    * Helper method to receive a message (binary blob),
@@ -162,8 +155,8 @@ public:
    *
    * \return Request resulting from recv
    */
-  MPI_Request startReceiveNonblocking (const int srcRank = MPI_ANY_SOURCE,
-                                       const int tag = MPI_ANY_TAG);
+  MPI_Request startReceiveNonblocking(const int srcRank = MPI_ANY_SOURCE,
+                                      const int tag = MPI_ANY_TAG);
 
 protected:
   /**
@@ -172,7 +165,7 @@ protected:
    * work with one of the derived classes.
    *
    */
-  Worker () {}
+  Worker() {}
 
 private:
   /**
@@ -184,7 +177,7 @@ private:
   std::vector<char> recvBuf;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

@@ -42,35 +42,32 @@
 #include <pc2l.h>
 using ull = unsigned long long;
 
-int
-main (int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   // Boilerplate code to get MPI up and running
-  auto &pc2l = pc2l::System::get ();
-  pc2l.initialize (argc, argv);
-  pc2l.start ();
-  ull num = strtoull (argv[1], NULL, 0);
+  auto &pc2l = pc2l::System::get();
+  pc2l.initialize(argc, argv);
+  pc2l.start();
+  ull num = strtoull(argv[1], NULL, 0);
 
   // initialize a vector of type unsigned long long filled with the number
   // specified by 2nd command line argument
-  pc2l::Vector<ull> vec (num);
+  pc2l::Vector<ull> vec(num);
 
   // fill vector with values from 1 to n
-  std::iota (vec.begin (), vec.end (), 1);
+  std::iota(vec.begin(), vec.end(), 1);
 
   // every number that does not have a 3 or 5 as a factor is set to 0
-  std::replace_if (
-      vec.begin (), vec.end (), [] (auto i) { return !((i % 3) || (i % 5)); },
-      0);
+  std::replace_if(
+      vec.begin(), vec.end(), [](auto i) { return !((i % 3) || (i % 5)); }, 0);
 
   // sum all elements in the vector
-  auto total = std::accumulate (vec.begin (), vec.end (), 0ULL);
+  auto total = std::accumulate(vec.begin(), vec.end(), 0ULL);
 
   std::cout << "The total is " << total << std::endl;
 
   // Boilerplate to shut down MPI (could be included in other file
-  pc2l.stop ();
-  pc2l.finalize ();
+  pc2l.stop();
+  pc2l.finalize();
 }
 
 #endif

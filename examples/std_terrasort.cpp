@@ -44,83 +44,67 @@
 #include <vector>
 
 // Merges the sorted and unsorted portions of the Vector
-void
-merge (int low, int mid, int high, std::vector<int> &v)
-{
+void merge(int low, int mid, int high, std::vector<int> &v) {
   auto secondLow = mid + 1;
 
   // if merge already sorted
-  if (v[mid] <= v[secondLow])
-    {
-      return;
+  if (v[mid] <= v[secondLow]) {
+    return;
+  }
+
+  while (low <= mid && secondLow <= high) {
+    // first element is in right place
+    if (v[low] <= v[secondLow]) {
+      low++;
+    } else {
+      auto val = v[secondLow];
+      auto idx = secondLow;
+
+      // Shift all shit between low and 2nd low right by one
+      while (idx != low) {
+        v[idx] = v[idx - 1];
+        idx--;
+      }
+      v[low] = val;
+
+      // update indices
+      low++;
+      mid++;
+      secondLow++;
     }
-
-  while (low <= mid && secondLow <= high)
-    {
-      // first element is in right place
-      if (v[low] <= v[secondLow])
-        {
-          low++;
-        }
-      else
-        {
-          auto val = v[secondLow];
-          auto idx = secondLow;
-
-          // Shift all shit between low and 2nd low right by one
-          while (idx != low)
-            {
-              v[idx] = v[idx - 1];
-              idx--;
-            }
-          v[low] = val;
-
-          // update indices
-          low++;
-          mid++;
-          secondLow++;
-        }
-    }
+  }
 }
 
 // Iteratively sort subarray `A[low…high]` using a temporary array
-void
-mergesort (unsigned long long low, unsigned long long high,
-           std::vector<int> &v)
-{
-  if (low < high)
-    {
+void mergesort(unsigned long long low, unsigned long long high,
+               std::vector<int> &v) {
+  if (low < high) {
 
-      // avoid overflow for large low/high indices
-      auto mid = low + (high - low) / 2;
+    // avoid overflow for large low/high indices
+    auto mid = low + (high - low) / 2;
 
-      mergesort (low, mid, v);
-      mergesort (mid + 1, high, v);
+    mergesort(low, mid, v);
+    mergesort(mid + 1, high, v);
 
-      merge (low, mid, high, v);
-    }
+    merge(low, mid, high, v);
+  }
 }
 
-int
-main (int argc, char *argv[])
-{
-  if (argc != 2)
-    {
-      std::cout << "Usage: ./std_terrasort <bytes>";
-      return 1;
-    }
+int main(int argc, char *argv[]) {
+  if (argc != 2) {
+    std::cout << "Usage: ./std_terrasort <bytes>";
+    return 1;
+  }
   std::vector<int> terraVec;
-  auto start = clock ();
-  while (terraVec.size () * sizeof (int) < atoi (argv[1]))
-    {
-      // create one terrabyte of pseudo random ints
-      terraVec.push_back (rand () % INT_MAX);
-    }
+  auto start = clock();
+  while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
+    // create one terrabyte of pseudo random ints
+    terraVec.push_back(rand() % INT_MAX);
+  }
   std::cout << "Creation of vector took "
-            << ((clock () - start) * 1000) / CLOCKS_PER_SEC << "ms"
-            << std::endl;
-  auto sortStart = clock ();
-  std::sort (terraVec.begin (), terraVec.end ());
+            << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms" << std::endl;
+  auto sortStart = clock();
+  std::sort(terraVec.begin(), terraVec.end());
   std::cout << "Sorting of vector took "
             << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms"
             << std::endl;

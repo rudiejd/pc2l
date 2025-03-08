@@ -42,7 +42,7 @@
 #include <stdexcept>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 /** \file Exception.h
 
@@ -109,9 +109,8 @@ BEGIN_NAMESPACE (pc2l);
     throw PC2L_EXP("Invalid file: %s", "Check command-line arguments", path);
     \endcode
 */
-class Exception : public std::exception
-{
-  friend std::ostream &operator<< (std::ostream &, const pc2l::Exception &);
+class Exception : public std::exception {
+  friend std::ostream &operator<<(std::ostream &, const pc2l::Exception &);
 
 public:
   /** The default and only constructor.
@@ -144,9 +143,8 @@ public:
 
       \param lineNumber An \em optional source code line number.
   */
-  Exception (const std::string &errorMessage,
-             const std::string &suggestion = "",
-             const std::string &fileName = "", const int lineNumber = 0, ...);
+  Exception(const std::string &errorMessage, const std::string &suggestion = "",
+            const std::string &fileName = "", const int lineNumber = 0, ...);
 
   /** Obtain the error message for this exception.
 
@@ -158,11 +156,7 @@ public:
       \return The error message associated with the exception, if
       any
   */
-  const std::string &
-  getErrorMessage () const noexcept
-  {
-    return message;
-  }
+  const std::string &getErrorMessage() const noexcept { return message; }
 
   /** Obtain the help or suggestion text for this exception.
 
@@ -176,11 +170,7 @@ public:
 
       \return The suggestion associated with the exception (never NULL).
   */
-  const std::string &
-  getSuggestion () const noexcept
-  {
-    return suggestion;
-  }
+  const std::string &getSuggestion() const noexcept { return suggestion; }
 
   /** Source file name for the exception (only Debug version).
 
@@ -192,11 +182,7 @@ public:
 
       \return An optional source file name for the exception.
   */
-  const std::string &
-  getFileName () const noexcept
-  {
-    return fileName;
-  }
+  const std::string &getFileName() const noexcept { return fileName; }
 
   /** Obtain the source code line number (only Debug version).
 
@@ -207,11 +193,7 @@ public:
 
       \return The optional source file line number.
   */
-  int
-  getLineNumber () const noexcept
-  {
-    return lineNumber;
-  }
+  int getLineNumber() const noexcept { return lineNumber; }
 
   /** The destructor.
 
@@ -222,7 +204,7 @@ public:
       convention of having a constructor-destructor pair for every
       class.
   */
-  ~Exception () {}
+  ~Exception() {}
 
   /**
      Overrides the default base class method to return the error
@@ -231,10 +213,8 @@ public:
      \return The error message associated with this exception.  This
      method never returns nullptr.
   */
-  virtual const char *
-  what () const noexcept override
-  {
-    return fullInfo.c_str ();
+  virtual const char *what() const noexcept override {
+    return fullInfo.c_str();
   }
 
 protected:
@@ -288,9 +268,9 @@ private:
 * @param exp @c Exception to be inserted into stream
 * @return Returns os stream with exception contents
 */
-extern std::ostream &operator<< (std::ostream &os, const pc2l::Exception &exp);
+extern std::ostream &operator<<(std::ostream &os, const pc2l::Exception &exp);
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 /** \def PC2L_EXP(errorMessage, suggestion, ...)
@@ -307,14 +287,14 @@ END_NAMESPACE (pc2l);
 
 #ifdef DEVELOPER_ASSERTIONS
 
-#define PC2L_EXP(errorMessage, suggestion, ...)                               \
-  pc2l::Exception ((errorMessage), (suggestion), __FILE__, __LINE__,          \
-                   ##__VA_ARGS__)
+#define PC2L_EXP(errorMessage, suggestion, ...)                                \
+  pc2l::Exception((errorMessage), (suggestion), __FILE__, __LINE__,            \
+                  ##__VA_ARGS__)
 
 #else
 // Use dummy values for file and line number (in non-debug mode)
-#define PC2L_EXP(errorMessage, suggestion, ...)                               \
-  pc2l::Exception ((errorMessage), (suggestion), "", 0, ##__VA_ARGS__)
+#define PC2L_EXP(errorMessage, suggestion, ...)                                \
+  pc2l::Exception((errorMessage), (suggestion), "", 0, ##__VA_ARGS__)
 
 #endif // DEVELOPER_ASSERTIONS
 

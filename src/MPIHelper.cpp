@@ -40,18 +40,16 @@
 #include "MPIHelper.h"
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 #ifndef MPI_FOUND
 
 #ifndef _WINDOWS
 // A simple implementation for MPI_WTIME on linux
 #include <sys/time.h>
-double
-MPI_WTIME ()
-{
+double MPI_WTIME() {
   struct timeval tv;
-  gettimeofday (&tv, NULL);
+  gettimeofday(&tv, NULL);
   return tv.tv_sec + (tv.tv_usec / 1e6);
 }
 
@@ -59,11 +57,9 @@ MPI_WTIME ()
 // A simple implementation for MPI_WTIME on Windows
 #include <windows.h>
 
-double
-MPI_WTIME ()
-{
+double MPI_WTIME() {
   FILETIME st;
-  GetSystemTimeAsFileTime (&st);
+  GetSystemTimeAsFileTime(&st);
   long long time = st.dwHighDateTime;
   time <<= 32;
   time |= st.dwLowDateTime;
@@ -73,36 +69,30 @@ MPI_WTIME ()
 #endif // _Windows
 
 // Dummy MPI_INIT when we don't have MPI to keep code base streamlined
-void
-MPI_INIT (int argc, char *argv[])
-{
-  UNUSED_PARAM (argc);
-  UNUSED_PARAM (argv);
+void MPI_INIT(int argc, char *argv[]) {
+  UNUSED_PARAM(argc);
+  UNUSED_PARAM(argv);
 }
 
-bool
-MPI_IPROBE (int src, int tag, MPI_STATUS status)
-{
-  UNUSED_PARAM (src);
-  UNUSED_PARAM (tag);
-  UNUSED_PARAM (status);
+bool MPI_IPROBE(int src, int tag, MPI_STATUS status) {
+  UNUSED_PARAM(src);
+  UNUSED_PARAM(tag);
+  UNUSED_PARAM(status);
   return false;
 }
 
-int
-MPI_SEND (const void *data, int count, int type, int rank, int tag)
-{
-  UNUSED_PARAM (data);
-  UNUSED_PARAM (count);
-  UNUSED_PARAM (type);
-  UNUSED_PARAM (rank);
-  UNUSED_PARAM (tag);
+int MPI_SEND(const void *data, int count, int type, int rank, int tag) {
+  UNUSED_PARAM(data);
+  UNUSED_PARAM(count);
+  UNUSED_PARAM(type);
+  UNUSED_PARAM(rank);
+  UNUSED_PARAM(tag);
   return -1;
 }
 
 #endif // Don't have MPI
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif // MPI_HELPER_CPP

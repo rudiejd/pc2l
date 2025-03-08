@@ -50,19 +50,15 @@
 
 // for debugging purposes we need some way to print std arrays
 // just print every element
-namespace std
-{
+namespace std {
 template <typename T, size_t N>
-std::ostream &
-operator<< (std::ostream &os, const std::array<T, N> &arr)
-{
-  for (auto i = 0; i < arr.size () - 1; i++)
-    {
-      os << arr.at (i) << " ";
-    }
-  return os << arr.at (arr.size () - 1);
+std::ostream &operator<<(std::ostream &os, const std::array<T, N> &arr) {
+  for (auto i = 0; i < arr.size() - 1; i++) {
+    os << arr.at(i) << " ";
+  }
+  return os << arr.at(arr.size() - 1);
 }
-}
+} // namespace std
 /** \def ASSERT(x)
 
     \brief Define a convenient macro for using c asserts.
@@ -80,7 +76,7 @@ operator<< (std::ostream &os, const std::array<T, N> &arr)
 #ifdef DEVELOPER_ASSERTIONS
 #include <assert.h>
 
-#define ASSERT(x) assert (x)
+#define ASSERT(x) assert(x)
 
 #else // !DEVELOPER_ASSERTIONS
 
@@ -139,8 +135,8 @@ operator<< (std::ostream &os, const std::array<T, N> &arr)
  */
 #ifndef PC2L_DEBUG_START_TIMER
 
-#define PC2L_DEBUG_START_TIMER()                                              \
-  PC2L_DEBUG (auto start = std::chrono::high_resolution_clock::now ();)
+#define PC2L_DEBUG_START_TIMER()                                               \
+  PC2L_DEBUG(auto start = std::chrono::high_resolution_clock::now();)
 
 #endif
 
@@ -149,12 +145,12 @@ operator<< (std::ostream &os, const std::array<T, N> &arr)
  */
 #ifndef PC2L_DEBUG_STOP_TIMER
 
-#define PC2L_DEBUG_STOP_TIMER(X)                                              \
-  PC2L_DEBUG (                                                                \
-      std::cout << X << " took "                                              \
-                << std::chrono::duration_cast<std::chrono::nanoseconds> (     \
-                       std::chrono::high_resolution_clock::now () - start)    \
-                       .count ()                                              \
+#define PC2L_DEBUG_STOP_TIMER(X)                                               \
+  PC2L_DEBUG(                                                                  \
+      std::cout << X << " took "                                               \
+                << std::chrono::duration_cast<std::chrono::nanoseconds>(       \
+                       std::chrono::high_resolution_clock::now() - start)      \
+                       .count()                                                \
                 << "ns" << std::endl;)
 
 #endif
@@ -164,7 +160,7 @@ operator<< (std::ostream &os, const std::array<T, N> &arr)
  */
 #ifndef PC2L_DEBUG_PRINT
 
-#define PC2L_DEBUG_PRINT(x) PC2L_DEBUG (std::cout << x << std::endl;)
+#define PC2L_DEBUG_PRINT(x) PC2L_DEBUG(std::cout << x << std::endl;)
 
 #endif
 
@@ -208,9 +204,7 @@ operator<< (std::ostream &os, const std::array<T, N> &arr)
     \see END_NAMESPACE
 */
 #ifndef BEGIN_NAMESPACE
-#define BEGIN_NAMESPACE(x)                                                    \
-  namespace x                                                                 \
-  {
+#define BEGIN_NAMESPACE(x) namespace x {
 #endif
 
 /**
@@ -226,7 +220,7 @@ operator<< (std::ostream &os, const std::array<T, N> &arr)
     stamp is format is the one returned by the
     Utilities::getSystemTime method.
 */
-char *getTimeStamp (const char *fileName, char *buffer);
+char *getTimeStamp(const char *fileName, char *buffer);
 
 /** \def getSystemTime
 
@@ -259,7 +253,7 @@ char *getTimeStamp (const char *fileName, char *buffer);
  * @return The pointer to the buffer passed in.  This method returns
     the buffer filled with the date in the form "Wed Jun 30 21:49:08 1993"
 */
-char *getSystemTime (char *buffer, const time_t *codedTime = NULL);
+char *getSystemTime(char *buffer, const time_t *codedTime = NULL);
 
 /** \brief ctime_s Macro to define ctime_s if not defined.
 
@@ -268,7 +262,7 @@ char *getSystemTime (char *buffer, const time_t *codedTime = NULL);
     simply defines \c ctime_s as \c ctime_r in Unix and Linux.
 */
 #if (!defined(_WINDOWS) && !defined(ctime_s))
-#define ctime_s(buffer, size, time) ctime_r (time, buffer)
+#define ctime_s(buffer, size, time) ctime_r(time, buffer)
 #endif
 
 /**\def UNUSED_PARAM(x)

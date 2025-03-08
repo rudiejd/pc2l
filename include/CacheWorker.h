@@ -53,7 +53,7 @@
 #include <unordered_map>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 /**
  * A convenience synonym for caching data associated with different
  * data structures.  The key in the map is computed as:
@@ -74,8 +74,7 @@ using DataCache = std::unordered_map<size_t, MessagePtr>;
  * to effectively utlize the main-memory/RAM.
  */
 
-class CacheWorker : public Worker
-{
+class CacheWorker : public Worker {
 public:
   // Maximum cache size in bytes of this cacheworker
   unsigned long long cacheSize = 16000000000;
@@ -83,12 +82,12 @@ public:
    * The default constructor.  Currently, the consructor initializes
    * some of the instance variables in this class.
    */
-  CacheWorker ();
+  CacheWorker();
 
   /**
    * The destructor.
    */
-  virtual ~CacheWorker () {}
+  virtual ~CacheWorker() {}
 
   /**
    * This is the primary method of a worker.  This method overrides
@@ -96,7 +95,7 @@ public:
    * running (processing messages) until the manager process sends a
    * message to stop the worker.
    */
-  virtual void run () override;
+  virtual void run() override;
 
   /**
    * Method that computes hash and stores a block of cache data from
@@ -105,7 +104,7 @@ public:
    * \param[in] msg The message that contains a block of cache data
    * to be stored.
    */
-  void storeCacheBlock (const MessagePtr &msgIn);
+  void storeCacheBlock(const MessagePtr &msgIn);
 
   /**
    * Method that computes hash and erases a block of cache data from
@@ -114,7 +113,7 @@ public:
    * \param[in] msg The message that contains information about a block that
    * needs to be erased.
    */
-  void eraseCacheBlock (const MessagePtr &msg);
+  void eraseCacheBlock(const MessagePtr &msg);
 
   /**
    * Method that computes hash and sends the requested block of
@@ -123,13 +122,13 @@ public:
    * \param[in] msg The message that contains information about the
    * block of cache requested by the sender of the message.
    */
-  void sendCacheBlock (const MessagePtr &msg);
+  void sendCacheBlock(const MessagePtr &msg);
 
   /**
    * Refer the key for a block to our eviction scheme
    * @param key the key to place into eviction scheme
    */
-  virtual void refer (const MessagePtr &msg) = 0;
+  virtual void refer(const MessagePtr &msg) = 0;
 
 protected:
   /**
@@ -139,7 +138,7 @@ protected:
    * strategies
    * \param[in] msg reference to a message
    */
-  virtual void addToCache (MessagePtr &msg) = 0;
+  virtual void addToCache(MessagePtr &msg) = 0;
 
   /**
    * Get an item from the cache. Pure virtual method needed
@@ -149,24 +148,24 @@ protected:
    * \return blockNotFoundMsg if not in cache, otherwise reference
    * to the MessagePtr associated with the block
    */
-  virtual MessagePtr &getFromCache (size_t key) = 0;
+  virtual MessagePtr &getFromCache(size_t key) = 0;
 
   /**
    * Erase a given key from the cache, then decrement the current number
    * of bytes that the cache is holding
    * @param key key of message to erase
    */
-  virtual void eraseFromCache (size_t key) = 0;
+  virtual void eraseFromCache(size_t key) = 0;
 
   /**
    * If in profiling mode: keep a counter for cache hits
    */
-  PC2L_PROFILE (size_t cacheHits = 0;)
+  PC2L_PROFILE(size_t cacheHits = 0;)
 
   /**
    * Profiling mode: keep a counter of total attempted accesses
    */
-  PC2L_PROFILE (size_t accesses = 0;)
+  PC2L_PROFILE(size_t accesses = 0;)
   /**
    * The amount of bytes currently stored in the cache manager (incremented
    * each time a message is added
@@ -181,7 +180,7 @@ protected:
   MessagePtr blockNotFoundMsg;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

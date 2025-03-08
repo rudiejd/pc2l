@@ -51,7 +51,7 @@
 #include <iostream>
 #include <vector>
 
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 /** \brief A utility class to ease the parsing of command-line
     arguments
@@ -91,8 +91,7 @@ BEGIN_NAMESPACE (pc2l);
     \endcode
 
 */
-class ArgParser
-{
+class ArgParser {
   /** Prints a nicely formatted list of parameters.  This method is
       used when printing help information.
 
@@ -104,7 +103,7 @@ class ArgParser
 
       \return The output stream passed in as the parameter.
   */
-  friend std::ostream &operator<< (std::ostream &os, ArgParser &ap);
+  friend std::ostream &operator<<(std::ostream &os, ArgParser &ap);
 
 public:
   /** \brief Specify the argument type
@@ -118,8 +117,7 @@ public:
       into the argument list.  The help entry of this arg type is
       written to the screen.
   */
-  enum ArgType
-  {
+  enum ArgType {
     BOOLEAN,
     INTEGER,
     UNSIGNED_INT,
@@ -164,8 +162,7 @@ public:
       program to use.
 
   */
-  struct ArgRecord
-  {
+  struct ArgRecord {
     /**
        Store the command's name, usually prefixed by two hyphens
        ("--") in the GNU Long Option style.
@@ -203,7 +200,7 @@ public:
       displayed to the user (before list of arguments) when help is
       requested.
   */
-  ArgParser (const std::string &info = "");
+  ArgParser(const std::string &info = "");
 
   /** \brief Recommended constructor for creating a usable
       ArgParser.
@@ -222,7 +219,7 @@ public:
       displayed to the user (before list of arguments) when help is
       requested.
   */
-  ArgParser (const ArgRecord validArguments[], const std::string &info = "");
+  ArgParser(const ArgRecord validArguments[], const std::string &info = "");
 
   /** \brief Default destructor.
 
@@ -231,7 +228,7 @@ public:
       allocate any memory and therefore the destructor does nothing.
 
   */
-  ~ArgParser () {};
+  ~ArgParser() {};
 
   /** \brief Adds additional set of parsable arguments to this
       argument parser.
@@ -251,7 +248,7 @@ public:
       a {"", "", NULL, ArgType::INVALID} entry to indicate the end
       of the array.
   */
-  void addValidArguments (const ArgRecord validArguments[]);
+  void addValidArguments(const ArgRecord validArguments[]);
 
   /** \brief Parse the supplied arguments for the valid arguments
       and set the appropriate values
@@ -276,7 +273,7 @@ public:
       \param[in] caxoe Compain And eXit On Error. Defaults to \c
       true, set to \c false to suppress calls to exit().
   */
-  void parseArguments (int &argc, char *argv[], bool caxoe = true);
+  void parseArguments(int &argc, char *argv[], bool caxoe = true);
 
   /** \brief Check the argument vector for any leftover, unparsed
       entries.
@@ -304,8 +301,8 @@ public:
       are valid. Otherwise it returns false to indicate that further
       processing should logically terminate.
   */
-  bool checkRemainingArguments (int argc, char *argv[], bool caxoe = true,
-                                bool caxoa = false);
+  bool checkRemainingArguments(int argc, char *argv[], bool caxoe = true,
+                               bool caxoa = false);
 
   /** Helper method to locate and change an argument record in
       argRecords.
@@ -330,21 +327,17 @@ public:
 
   */
   template <typename ValueType>
-  bool
-  setArgument (const std::string &arg, const ArgParser::ArgType argType,
-               const ValueType &value)
-  {
+  bool setArgument(const std::string &arg, const ArgParser::ArgType argType,
+                   const ValueType &value) {
     // First locate the appropriate entry in the argRecord
-    for (size_t idx = 0; (idx < argRecords.size ()); idx++)
-      {
-        ArgRecord &rec = argRecords[idx];
-        if ((rec.command == arg) && (rec.type == argType))
-          {
-            // Found a match
-            *(reinterpret_cast<ValueType *> (rec.data)) = value;
-            return true;
-          }
+    for (size_t idx = 0; (idx < argRecords.size()); idx++) {
+      ArgRecord &rec = argRecords[idx];
+      if ((rec.command == arg) && (rec.type == argType)) {
+        // Found a match
+        *(reinterpret_cast<ValueType *>(rec.data)) = value;
+        return true;
       }
+    }
     // No matches found
     return false;
   }
@@ -373,9 +366,9 @@ protected:
       line can occupy.  The description of the command is suitably
       wrapped not to exceed this size.
   */
-  static void printArg (std::ostream &os, const std::string &indentStr,
-                        const int numSpaces, const ArgRecord &argRec,
-                        const int maxWidth = 80);
+  static void printArg(std::ostream &os, const std::string &indentStr,
+                       const int numSpaces, const ArgRecord &argRec,
+                       const int maxWidth = 80);
 
   /** Helper method to get string representation of current value in
       a given arg record for printing.
@@ -392,7 +385,7 @@ protected:
       \return The string representation of the data value stored in
       this argument record.
   */
-  static std::string getValue (const ArgRecord &argRec);
+  static std::string getValue(const ArgRecord &argRec);
 
 private:
   /** \brief Remove the specified argument from the argument vector,
@@ -412,7 +405,7 @@ private:
       \param[in,out] argv The argument vector.
 
   */
-  void removeArgument (int removeIdx, int &argc, char *argv[]);
+  void removeArgument(int removeIdx, int &argc, char *argv[]);
 
   /** \brief A pointer to the valid argument records.
 
@@ -432,6 +425,6 @@ private:
   std::string info;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 
 #endif

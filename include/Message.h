@@ -52,7 +52,7 @@
 #include <memory>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 class Message;
 using MessagePtr = std::shared_ptr<Message>;
@@ -96,8 +96,7 @@ using MessagePtr = std::shared_ptr<Message>;
  *
  * </ol>
  */
-class Message
-{
+class Message {
   friend class MessageDeleter;
 
 public:
@@ -105,8 +104,7 @@ public:
    * Enumeration to define the different types of messages that can
    * be sent/received by various classes in PC2L
    */
-  enum MsgTag : int
-  {
+  enum MsgTag : int {
     STORE_BLOCK = 1, /**< Binary blob with cache data */
     GET_BLOCK,       /**< Send requested cache block back */
     ERASE_BLOCK,     /**< Send requested cache block back */
@@ -123,7 +121,7 @@ public:
    * copied using a standard copy-constructor.  Use an appropriate
    * call to the \c create method to clone/copy a message.
    */
-  Message (const Message &) = delete;
+  Message(const Message &) = delete;
 
   /**
    * Messages constructed via the overloaded \c create method (in
@@ -133,12 +131,12 @@ public:
    * MessagePtr (a std::shared_ptr) to pass messages to other
    * methods.
    */
-  Message (Message &&) = delete;
+  Message(Message &&) = delete;
 
   /**
    * The destructor to free the memory owned by this message, if any
    */
-  ~Message () {}
+  ~Message() {}
 
   /**
    * Convenience helper method to get an aggregate key for a given
@@ -150,7 +148,7 @@ public:
    *
    * \return The a 64-bit key associated with this message.
    */
-  static size_t getKey (unsigned int dsTag, unsigned int blockTag) noexcept;
+  static size_t getKey(unsigned int dsTag, unsigned int blockTag) noexcept;
 
   /**
    * Convenience helper method to get an aggregate key for a given
@@ -162,7 +160,7 @@ public:
    *
    * \return The a 64-bit key associated with this message.
    */
-  static size_t getKey (const MessagePtr &msg) noexcept;
+  static size_t getKey(const MessagePtr &msg) noexcept;
 
   /**
    * Convenience method to create a message to send data to another
@@ -183,8 +181,8 @@ public:
    * \return A newly created message object whose payload can be
    * populated.
    */
-  static MessagePtr create (const int dataSize, const MsgTag tag,
-                            const int srcRank, size_t dsTag, size_t blockTag);
+  static MessagePtr create(const int dataSize, const MsgTag tag,
+                           const int srcRank, size_t dsTag, size_t blockTag);
 
   /**
    * Convenience constructor which constructs a message without specifying
@@ -205,11 +203,9 @@ public:
    * \return A newly created message object whose payload can be
    * populated.
    */
-  static MessagePtr
-  create (const int dataSize, const MsgTag tag,
-          const int srcRank = MPI_ANY_SOURCE)
-  {
-    return create (dataSize, tag, srcRank, -1U, -1U);
+  static MessagePtr create(const int dataSize, const MsgTag tag,
+                           const int srcRank = MPI_ANY_SOURCE) {
+    return create(dataSize, tag, srcRank, -1U, -1U);
   }
   /**
    * Convenience method to create a message from a buffer containing
@@ -233,7 +229,7 @@ public:
    * \return A message object which is essentially jsut a type-cast
    * of the supplied buffer.
    */
-  static MessagePtr create (char *buffer);
+  static MessagePtr create(char *buffer);
 
   /**
    * Create a clone aka deep-copy of a given message.  This is the
@@ -246,18 +242,14 @@ public:
    *
    * \return The cloned message object.
    */
-  static MessagePtr create (const Message &src);
+  static MessagePtr create(const Message &src);
 
   /**
    * Obtain the size of the data associated with this message.
    *
    * \return The size of the data contained in this message.
    */
-  int
-  getPayloadSize () const noexcept
-  {
-    return size - sizeof (Message);
-  }
+  int getPayloadSize() const noexcept { return size - sizeof(Message); }
 
   /**
    * Obtain an immutable reference to the raw data associated with
@@ -267,11 +259,7 @@ public:
    *
    * \return The raw binary data associated with this message.
    */
-  const char *
-  getPayload () const noexcept
-  {
-    return payload;
-  }
+  const char *getPayload() const noexcept { return payload; }
 
   /**
    * Obtain an mutable reference to the raw data associated with
@@ -281,11 +269,7 @@ public:
    *
    * \return The raw binary data associated with this message.
    */
-  char *
-  getPayload ()
-  {
-    return payload;
-  }
+  char *getPayload() { return payload; }
 
   /**
    * Obtain the full size of this message.
@@ -293,11 +277,7 @@ public:
    * \return The size of this message.  The size includes size of
    * payload and this class.
    */
-  int
-  getSize () const noexcept
-  {
-    return size;
-  }
+  int getSize() const noexcept { return size; }
 
   /** The tag associated with this message. This tag is useful to
    * distinguish between different types of messages.
@@ -392,11 +372,8 @@ protected:
    * \param[in] payload A pointer to the payload associated with
    * this message.
    */
-  Message (MsgTag tag, int rank, int size, bool ownBuf, char *payload)
-      : tag (tag), srcRank (rank), size (size), ownBuf (ownBuf),
-        payload (payload)
-  {
-  }
+  Message(MsgTag tag, int rank, int size, bool ownBuf, char *payload)
+      : tag(tag), srcRank(rank), size(size), ownBuf(ownBuf), payload(payload) {}
 
   /**
    * The overall size of this message including the memory
@@ -411,26 +388,22 @@ private:
    * correctly delete a message created via one of the \c create
    * methods in this class.
    */
-  class MessageDeleter
-  {
+  class MessageDeleter {
   public:
     /**
      * @brief  Deletes message object if message owns this buffer
      *
      * @param msg Message object to be deleted
      */
-    void
-    operator() (Message *msg)
-    {
-      if (msg->ownBuf)
-        {
-          delete[] reinterpret_cast<char *> (msg);
-        }
+    void operator()(Message *msg) {
+      if (msg->ownBuf) {
+        delete[] reinterpret_cast<char *>(msg);
+      }
     }
   };
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

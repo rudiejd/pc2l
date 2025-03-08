@@ -51,19 +51,19 @@
 #include <list>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
-class MostRecentlyUsedCacheWorker : public virtual CacheWorker,
-                                    public virtual LeastRecentlyUsedCacheWorker
-{
+BEGIN_NAMESPACE(pc2l);
+class MostRecentlyUsedCacheWorker
+    : public virtual CacheWorker,
+      public virtual LeastRecentlyUsedCacheWorker {
 public:
   /**
    * Refer the key for a block to our eviction scheme
    * @param key the key to place into eviction scheme
    */
-  void refer (const MessagePtr &msg) override;
+  void refer(const MessagePtr &msg) override;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

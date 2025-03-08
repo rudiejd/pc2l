@@ -48,7 +48,7 @@
 // namespace pc2l {
 #include "CacheManager.h"
 
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 /**
  * A top-level class to encapsulate system-wide data and
@@ -66,8 +66,7 @@ BEGIN_NAMESPACE (pc2l);
  * auto& pc2l = pc2l::System::get();
  * \endcode
  */
-class System
-{
+class System {
 public:
   // Count of data structures in the system for tagging purposes
   int dsCount = 0;
@@ -82,8 +81,7 @@ public:
    * run of PC2L.  Currently, the library only supports a single
    * node that reads/write data from a distributed cache.
    */
-  enum OpMode : int
-  {
+  enum OpMode : int {
     OneWriter_DistributedCache = 1, /**< single node that
                                        reads/writes with rest of
                                        the nodes serving as
@@ -96,8 +94,7 @@ public:
    * This is the algorithm that determines how blocks will be
    * removed from the cache manager (rank 0) node
    */
-  enum EvictionStrategy
-  {
+  enum EvictionStrategy {
     LeastRecentlyUsed = 1,
     MostRecentlyUsed,
     LeastFrequentlyUsed,
@@ -108,11 +105,7 @@ public:
    * Obtain a reference to the process-wide unique (singleton)
    * instance of the PC2L system object for further use.
    */
-  static System &
-  get () noexcept
-  {
-    return system;
-  }
+  static System &get() noexcept { return system; }
 
   /**
    * This method must be invoked prior to performing any operations
@@ -151,7 +144,7 @@ public:
    * \exception std::exception If any errors occur during
    * initialization then this method throws an exception.
    */
-  void initialize (int &argc, char *argv[], bool initMPI = true);
+  void initialize(int &argc, char *argv[], bool initMPI = true);
 
   /**
    * This is a method to actually start the operations of PC2L
@@ -163,14 +156,14 @@ public:
    * for this run.  The default value is OneWriter_DistributedCache;
    * \param[in] enable
    */
-  void start (const EvictionStrategy es = LeastRecentlyUsed,
-              const OpMode mode = pc2l::System::OneWriter_DistributedCache);
+  void start(const EvictionStrategy es = LeastRecentlyUsed,
+             const OpMode mode = pc2l::System::OneWriter_DistributedCache);
 
   /**
    * This method can be be used to shutdown the PC2L cache and
    * algorithm operations.
    */
-  void stop ();
+  void stop();
 
   /**
    * This method must be invoked to wind-down the distributed
@@ -194,20 +187,20 @@ public:
    * control on finalization if they need (i.e., maybe users want
    * to separately use MPI for some other operations)
    */
-  void finalize (bool finMPI = true) noexcept;
+  void finalize(bool finMPI = true) noexcept;
 
   /**
    * The MPI world size of the current instance of PC2L
    */
-  int worldSize () noexcept;
+  int worldSize() noexcept;
 
   /**
    * Set the cache size of the System's cache manager
    * @param cSize maximum size in bytes of CM's cache
    */
-  void setCacheSize (unsigned long long cSize) noexcept;
+  void setCacheSize(unsigned long long cSize) noexcept;
 
-  pc2l::CacheManager &cacheManager ();
+  pc2l::CacheManager &cacheManager();
 
 protected:
   /**
@@ -217,7 +210,7 @@ protected:
    * runs it.  On the manager-process (i.e., MPI-rank == 0), this
    * method just initializes the CacheManager object in this class.
    */
-  void oneWriterDistribCache (EvictionStrategy es);
+  void oneWriterDistribCache(EvictionStrategy es);
 
 protected:
   /**
@@ -253,23 +246,23 @@ private:
    * pc2l::System::initialize();
    * \endcode
    */
-  System () {}
+  System() {}
 
   /**
    * Remove a copy constructor to ensure that the process-wide
    * unique system object is never copied.
    */
-  System (const System &) = delete;
+  System(const System &) = delete;
 
   /**
    * Remove the default assignment operator as well, just to play it
    * safe to ensure that the process-wide unique object is never
    * copied.
    */
-  System &operator= (const System &other) = delete;
+  System &operator=(const System &other) = delete;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

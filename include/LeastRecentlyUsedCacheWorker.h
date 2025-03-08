@@ -51,22 +51,21 @@
 #include <map>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
-class LeastRecentlyUsedCacheWorker : public virtual CacheWorker
-{
+BEGIN_NAMESPACE(pc2l);
+class LeastRecentlyUsedCacheWorker : public virtual CacheWorker {
 public:
   /**
    * Refer the key for a block to our eviction scheme
    * @param key the key to place into eviction scheme
    */
-  void refer (const MessagePtr &msg) override;
+  void refer(const MessagePtr &msg) override;
 
 protected:
-  void addToCache (MessagePtr &msg) override;
+  void addToCache(MessagePtr &msg) override;
 
-  MessagePtr &getFromCache (size_t key) override;
+  MessagePtr &getFromCache(size_t key) override;
 
-  void eraseFromCache (size_t key) override;
+  void eraseFromCache(size_t key) override;
 
   /**
    * Keys of blocks in queue in their removal order under LRU
@@ -82,8 +81,7 @@ protected:
    * of a MessagePtr and an iterator for this MessagePtr's current place in
    * the LRU queue, and can be bracket initialized
    */
-  struct CacheItem
-  {
+  struct CacheItem {
     MessagePtr msg;
     std::list<size_t>::iterator placeInQueue;
   };
@@ -93,7 +91,7 @@ protected:
 private:
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

@@ -42,42 +42,37 @@
 #include <ctime>
 #include <iostream>
 #include <pc2l.h>
-int
-main (int argc, char *argv[])
-{
-  if (argc != 4)
-    {
-      std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
-      return 1;
-    }
-  auto &pc2l = pc2l::System::get ();
-  pc2l.setCacheSize (atoi (argv[3]));
-  pc2l.initialize (argc, argv);
-  pc2l.start ();
-  std::cout << "Block size " << atoi (argv[2]) << " bytes" << std::endl;
-  std::cout << "Cache size " << atoi (argv[3]) << " bytes" << std::endl;
+int main(int argc, char *argv[]) {
+  if (argc != 4) {
+    std::cout << "Usage: ./terrasort <bytes> <block size> <cache size>";
+    return 1;
+  }
+  auto &pc2l = pc2l::System::get();
+  pc2l.setCacheSize(atoi(argv[3]));
+  pc2l.initialize(argc, argv);
+  pc2l.start();
+  std::cout << "Block size " << atoi(argv[2]) << " bytes" << std::endl;
+  std::cout << "Cache size " << atoi(argv[3]) << " bytes" << std::endl;
   pc2l::Vector<int, 100000> terraVec;
-  auto start = clock ();
-  while (terraVec.size () * sizeof (int) < atoi (argv[1]))
-    {
-      // create one terrabyte of pseudo random ints
-      terraVec.push_back (rand () % INT_MAX);
-    }
-  if (pc2l::MPI_GET_RANK () == 0)
-    {
-      std::cout << "Creation of vector took "
-                << ((clock () - start) * 1000) / CLOCKS_PER_SEC << "ms"
-                << std::endl;
-      auto sortStart = clock ();
-      std::sort (terraVec.begin (), terraVec.end ());
-      std::cout << "Sorting of vector took "
-                << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms"
-                << std::endl;
-    }
+  auto start = clock();
+  while (terraVec.size() * sizeof(int) < atoi(argv[1])) {
+    // create one terrabyte of pseudo random ints
+    terraVec.push_back(rand() % INT_MAX);
+  }
+  if (pc2l::MPI_GET_RANK() == 0) {
+    std::cout << "Creation of vector took "
+              << ((clock() - start) * 1000) / CLOCKS_PER_SEC << "ms"
+              << std::endl;
+    auto sortStart = clock();
+    std::sort(terraVec.begin(), terraVec.end());
+    std::cout << "Sorting of vector took "
+              << ((sortStart - start) * 1000) / CLOCKS_PER_SEC << "ms"
+              << std::endl;
+  }
 
   // Wind-up
-  pc2l.stop ();
-  pc2l.finalize ();
+  pc2l.stop();
+  pc2l.finalize();
 }
 
 #endif

@@ -41,33 +41,30 @@
 #include <iostream>
 #include <pc2l.h>
 
-int
-main (int argc, char *argv[])
-{
-  auto start = clock ();
-  auto &pc2l = pc2l::System::get ();
-  unsigned long long size = strtoull (argv[1], NULL, 0);
-  pc2l.initialize (argc, argv);
+int main(int argc, char *argv[]) {
+  auto start = clock();
+  auto &pc2l = pc2l::System::get();
+  unsigned long long size = strtoull(argv[1], NULL, 0);
+  pc2l.initialize(argc, argv);
   // 50 block cache
-  pc2l.setCacheSize (50 * 100 * sizeof (double));
-  pc2l.start ();
-  Matrix m1 (size, size, 1);
-  Matrix m2 (size, size, 1);
+  pc2l.setCacheSize(50 * 100 * sizeof(double));
+  pc2l.start();
+  Matrix m1(size, size, 1);
+  Matrix m2(size, size, 1);
   std::cout << "setup took "
-            << ((clock () - start) * 1000000000) / CLOCKS_PER_SEC << "ns"
+            << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC << "ns"
             << std::endl;
 
-  start = clock ();
+  start = clock();
 
-  Matrix res = m1.dot (m2);
+  Matrix res = m1.dot(m2);
 
-  std::cout << "dot took "
-            << ((clock () - start) * 1000000000) / CLOCKS_PER_SEC << "ns"
-            << std::endl;
+  std::cout << "dot took " << ((clock() - start) * 1000000000) / CLOCKS_PER_SEC
+            << "ns" << std::endl;
 
   // Wind-up
-  pc2l.stop ();
-  pc2l.finalize ();
+  pc2l.stop();
+  pc2l.finalize();
 }
 
 #endif

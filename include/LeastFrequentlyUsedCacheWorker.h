@@ -50,9 +50,8 @@
 #include <map>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
-class LeastFrequentlyUsedCacheWorker : public virtual CacheWorker
-{
+BEGIN_NAMESPACE(pc2l);
+class LeastFrequentlyUsedCacheWorker : public virtual CacheWorker {
 public:
   /**
    * Refer the key for a block to our eviction scheme. If the cache is full,
@@ -61,18 +60,17 @@ public:
    * the least frequency.
    * @param key the key to place into eviction scheme
    */
-  void refer (const MessagePtr &msg) override;
+  void refer(const MessagePtr &msg) override;
 
 protected:
-  void addToCache (pc2l::MessagePtr &msg) override;
+  void addToCache(pc2l::MessagePtr &msg) override;
 
-  void eraseFromCache (size_t key) override;
+  void eraseFromCache(size_t key) override;
 
-  MessagePtr &getFromCache (size_t key) override;
+  MessagePtr &getFromCache(size_t key) override;
 
 private:
-  struct CacheItem
-  {
+  struct CacheItem {
     MessagePtr msg;
     size_t key;
     size_t frequency = 1;
@@ -92,10 +90,10 @@ private:
    * erasing only affects the erased iterator See:
    * http://kera.name/articles/2011/06/iterator-invalidation-rules-c0x/
    */
-  std::map<int, std::list<CacheItem> > queues;
+  std::map<int, std::list<CacheItem>> queues;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

@@ -15,7 +15,7 @@
 using Val = double;
 
 /** Short cut to a 2-d vector double values to streamline the code */
-using TwoDVec = std::vector<std::vector<Val> >;
+using TwoDVec = std::vector<std::vector<Val>>;
 
 /** A matrix class to perform basic matrix operations.
 
@@ -32,8 +32,7 @@ using TwoDVec = std::vector<std::vector<Val> >;
 
     </ul>
 */
-class STDMatrix : public TwoDVec
-{
+class STDMatrix : public TwoDVec {
   /** Stream insertion operator to ease printing matrices
    *
    * This method prints the dimension of the matrix and then prints
@@ -49,7 +48,7 @@ class STDMatrix : public TwoDVec
    * \return As per convention, this method returns the supplied
    * output stream.
    */
-  friend std::ostream &operator<< (std::ostream &os, const STDMatrix &matrix);
+  friend std::ostream &operator<<(std::ostream &os, const STDMatrix &matrix);
 
   /** Stream extraction operator to ease reading matrices
    *
@@ -66,7 +65,7 @@ class STDMatrix : public TwoDVec
    * \return As per convention, this method returns the supplied
    * input stream.
    */
-  friend std::istream &operator>> (std::istream &is, STDMatrix &matrix);
+  friend std::istream &operator>>(std::istream &is, STDMatrix &matrix);
 
 public:
   /**
@@ -80,30 +79,22 @@ public:
    * \param[in] initVal The inital value to be set for each entry in
    * the matrix.
    */
-  explicit STDMatrix (const size_t rows = 0, const size_t cols = 0,
-                      const Val initVal = 0);
+  explicit STDMatrix(const size_t rows = 0, const size_t cols = 0,
+                     const Val initVal = 0);
 
   /**
    * Returns the height or number of rows in this matrix.
    *
    * \return Returns the height or number of rows in this matrix.
    */
-  size_t
-  height () const
-  {
-    return size ();
-  }
+  size_t height() const { return size(); }
 
   /**
    * Returns the width or number of columns in this matrix.
    *
    * \return Returns the width or number of columns in this matrix.
    */
-  size_t
-  width () const
-  {
-    return (height () > 0) ? front ().size () : 0;
-  }
+  size_t width() const { return (height() > 0) ? front().size() : 0; }
 
   /**
    * Creates a new matrix in which each value is obtained by
@@ -112,18 +103,13 @@ public:
    * \param[in] operation The unary operation to be used to create
    * the given matrix.
    */
-  template <typename UnaryOp>
-  STDMatrix
-  apply (const UnaryOp &operation) const
-  {
-    STDMatrix ret (this->height (), this->width ());
-    for (size_t row = 0; row < ret.height (); row++)
-      {
-        for (size_t col = 0; col < ret.width (); col++)
-          {
-            ret[row][col] = operation (this->at (row)[col]);
-          }
+  template <typename UnaryOp> STDMatrix apply(const UnaryOp &operation) const {
+    STDMatrix ret(this->height(), this->width());
+    for (size_t row = 0; row < ret.height(); row++) {
+      for (size_t col = 0; col < ret.width(); col++) {
+        ret[row][col] = operation(this->at(row)[col]);
       }
+    }
     return ret;
   }
 
@@ -138,7 +124,7 @@ public:
    * computed by adding the corresponding values from \c this and
    * rhs.
    */
-  STDMatrix operator+ (const STDMatrix &rhs) const;
+  STDMatrix operator+(const STDMatrix &rhs) const;
 
   /**
    * Operator for computing the Hadamard product of two matrices
@@ -152,7 +138,7 @@ public:
    * computed by multiplying the corresponding values from \c this
    * and rhs.
    */
-  STDMatrix operator* (const STDMatrix &rhs) const;
+  STDMatrix operator*(const STDMatrix &rhs) const;
 
   /**
    * Operator for computing the Hadamard product of two matrices
@@ -166,7 +152,7 @@ public:
    * computed by multiplying the corresponding values from \c this
    * and rhs.
    */
-  STDMatrix operator* (const Val val) const;
+  STDMatrix operator*(const Val val) const;
 
   /**
    * Operator to subtract two matrices with the same dimensions.
@@ -179,7 +165,7 @@ public:
    * computed by subtracting the corresponding values from \c this
    * and rhs.
    */
-  STDMatrix operator- (const STDMatrix &rhs) const;
+  STDMatrix operator-(const STDMatrix &rhs) const;
 
   /**
    * Performs the dot product of two matrices. This method has a
@@ -193,12 +179,12 @@ public:
    * computed by multiplying the corresponding values from \c this
    * and rhs.
    */
-  STDMatrix dot (const STDMatrix &rhs) const;
+  STDMatrix dot(const STDMatrix &rhs) const;
 
   /**
    * Returns the transpose of this matrix.
    */
-  STDMatrix transpose () const;
+  STDMatrix transpose() const;
 };
 
 #endif

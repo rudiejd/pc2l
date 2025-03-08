@@ -54,7 +54,7 @@
 #include <string>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 #ifdef MPI_FOUND
 
@@ -102,11 +102,9 @@ BEGIN_NAMESPACE (pc2l);
 */
 #ifdef MPI_FOUND
 // We have MPI enabled
-inline int
-MPI_GET_RANK ()
-{
+inline int MPI_GET_RANK() {
   int rank;
-  MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   return rank;
 }
 #else
@@ -142,11 +140,9 @@ MPI_GET_RANK ()
 */
 #ifdef MPI_FOUND
 // We have MPI enabled
-inline int
-MPI_GET_SIZE ()
-{
+inline int MPI_GET_SIZE() {
   int size = 0;
-  MPI_Comm_size (MPI_COMM_WORLD, &size);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
   return size;
 }
 #else
@@ -206,8 +202,7 @@ MPI_GET_SIZE ()
 // We don't have MPI. So provide a suitable definition for MPI_Status
 /** A custom class to mimic the operation of MPI_Status when MPI
     library is not available. */
-class MPI_STATUS
-{
+class MPI_STATUS {
 public:
   /// The source rank.  This value is always zero whem MPI is unavailable.
   int MPI_SOURCE = 0;
@@ -271,19 +266,14 @@ public:
 
     \endcode
 */
-class MPI_EXCEPTION
-{
+class MPI_EXCEPTION {
 public:
   /**
    * @brief Returns string stating that some MPI error occurred
    *
    * @return String with error message
    */
-  std::string
-  Get_error_string () const
-  {
-    return "MPI error occurred";
-  }
+  std::string Get_error_string() const { return "MPI error occurred"; }
 };
 
 // Ensure that MPI_CONST is also defined
@@ -545,10 +535,10 @@ public:
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_INIT(argc, argv) MPI_Init (&argc, &argv);
+#define MPI_INIT(argc, argv) MPI_Init(&argc, &argv);
 #else
 // MPI is not available
-void MPI_INIT (int argc, char *argv[]);
+void MPI_INIT(int argc, char *argv[]);
 #endif
 
 /** \def MPI_FINALIZE
@@ -576,7 +566,7 @@ void MPI_INIT (int argc, char *argv[]);
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_FINALIZE() MPI_Finalize ()
+#define MPI_FINALIZE() MPI_Finalize()
 #else
 // MPI is not available
 #define MPI_FINALIZE()
@@ -606,8 +596,7 @@ void MPI_INIT (int argc, char *argv[]);
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_PROBE(src, tag, status)                                           \
-  MPI_Probe (src, tag, MPI_COMM_WORLD, &status)
+#define MPI_PROBE(src, tag, status) MPI_Probe(src, tag, MPI_COMM_WORLD, &status)
 #else
 // MPI is not available
 #define MPI_PROBE(src, tag, status)
@@ -636,16 +625,14 @@ void MPI_INIT (int argc, char *argv[]);
     \endcode
 */
 #ifdef MPI_FOUND
-inline bool
-MPI_IPROBE (int src, int tag, MPI_STATUS &status)
-{
+inline bool MPI_IPROBE(int src, int tag, MPI_STATUS &status) {
   int flag = 0;
-  MPI_Iprobe (src, tag, MPI_COMM_WORLD, &flag, &status);
+  MPI_Iprobe(src, tag, MPI_COMM_WORLD, &flag, &status);
   return (flag == 1);
 }
 #else
 // MPI is not available
-bool MPI_IPROBE (int src, int tag, MPI_STATUS status);
+bool MPI_IPROBE(int src, int tag, MPI_STATUS status);
 #endif
 
 /** \def MPI_BCAST
@@ -673,8 +660,8 @@ bool MPI_IPROBE (int src, int tag, MPI_STATUS status);
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_BCAST(data, size, type, src)                                      \
-  MPI_Bcast (data, size, type, src, MPI_COMM_WORLD)
+#define MPI_BCAST(data, size, type, src)                                       \
+  MPI_Bcast(data, size, type, src, MPI_COMM_WORLD)
 #else
 // MPI is not available
 #define MPI_BCAST(data, size, type, src)
@@ -706,8 +693,8 @@ bool MPI_IPROBE (int src, int tag, MPI_STATUS status);
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_RECV(data, count, type, rank, tag, status)                        \
-  MPI_Recv (data, count, type, rank, tag, MPI_COMM_WORLD, &status)
+#define MPI_RECV(data, count, type, rank, tag, status)                         \
+  MPI_Recv(data, count, type, rank, tag, MPI_COMM_WORLD, &status)
 #else
 // MPI is not available
 #define MPI_RECV(data, count, type, rank, tag, status)
@@ -739,11 +726,11 @@ bool MPI_IPROBE (int src, int tag, MPI_STATUS status);
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_SEND(data, count, type, rank, tag)                                \
-  MPI_Send (data, count, type, rank, tag, MPI_COMM_WORLD)
+#define MPI_SEND(data, count, type, rank, tag)                                 \
+  MPI_Send(data, count, type, rank, tag, MPI_COMM_WORLD)
 #else
 // MPI is not available
-int MPI_SEND (const void *data, int count, int type, int rank, int tag);
+int MPI_SEND(const void *data, int count, int type, int rank, int tag);
 #endif
 
 /** \def MPI_WTIME
@@ -775,7 +762,7 @@ int MPI_SEND (const void *data, int count, int type, int rank, int tag);
 #define MPI_WTIME MPI_Wtime
 #else
 // MPI is not available
-extern double MPI_WTIME ();
+extern double MPI_WTIME();
 #endif
 
 /** \def MPI_CODE
@@ -836,7 +823,7 @@ extern double MPI_WTIME ();
         \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_BARRIER() MPI_Barrier (MPI_COMM_WORLD)
+#define MPI_BARRIER() MPI_Barrier(MPI_COMM_WORLD)
 #else
 // MPI is not available
 #define MPI_BARRIER()
@@ -869,11 +856,9 @@ extern double MPI_WTIME ();
         \endcode
 */
 #ifdef MPI_FOUND
-inline int
-MPI_GET_COUNT (const MPI_STATUS &status, MPI_Datatype datatype)
-{
+inline int MPI_GET_COUNT(const MPI_STATUS &status, MPI_Datatype datatype) {
   int count = 0;
-  MPI_Get_count (&status, datatype, &count);
+  MPI_Get_count(&status, datatype, &count);
   return count;
 }
 #else
@@ -905,13 +890,13 @@ MPI_GET_COUNT (const MPI_STATUS &status, MPI_Datatype datatype)
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_ALL_GATHER(sendbuf, sendcount, sendtype, recvbuf, recvcount,      \
-                       recvtype)                                              \
-  MPI_Allgather (sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,  \
-                 MPI_COMM_WORLD)
+#define MPI_ALL_GATHER(sendbuf, sendcount, sendtype, recvbuf, recvcount,       \
+                       recvtype)                                               \
+  MPI_Allgather(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,    \
+                MPI_COMM_WORLD)
 #else
 // MPI is not available
-#define MPI_ALL_GATHER(sendbuf, sendcount, sendtype, recvbuf, recvcount,      \
+#define MPI_ALL_GATHER(sendbuf, sendcount, sendtype, recvbuf, recvcount,       \
                        recvtype)
 #endif
 
@@ -941,17 +926,17 @@ MPI_GET_COUNT (const MPI_STATUS &status, MPI_Datatype datatype)
     \endcode
 */
 #ifdef MPI_FOUND
-#define MPI_ALL_GATHERV(sendbuf, sendcount, sendtype, recvbuf, recvcounts,    \
-                        displs, recvtype)                                     \
-  MPI_Allgatherv (sendbuf, sendcount, sendtype, recvbuf, recvcounts, displs,  \
-                  recvtype, MPI_COMM_WORLD)
+#define MPI_ALL_GATHERV(sendbuf, sendcount, sendtype, recvbuf, recvcounts,     \
+                        displs, recvtype)                                      \
+  MPI_Allgatherv(sendbuf, sendcount, sendtype, recvbuf, recvcounts, displs,    \
+                 recvtype, MPI_COMM_WORLD)
 #else
 // MPI is not available
-#define MPI_ALL_GATHERV(sendbuf, sendcount, sendtype, recvbuf, recvcounts,    \
+#define MPI_ALL_GATHERV(sendbuf, sendcount, sendtype, recvbuf, recvcounts,     \
                         displs, recvtype)
 #endif
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

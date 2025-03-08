@@ -38,34 +38,29 @@
 #include <iostream>
 #include <random>
 
-class PLRUTest : public ::testing::Test
-{
-};
+class PLRUTest : public ::testing::Test {};
 
-int
-main (int argc, char *argv[])
-{
-  ::testing::InitGoogleTest (&argc, argv);
-  auto &pc2l = pc2l::System::get ();
-  pc2l.setCacheSize (3 * (sizeof (pc2l::Message) + 8 * sizeof (int)));
-  pc2l.initialize (argc, argv);
-  pc2l.start (pc2l::System::PseudoLRU);
-  auto env = new PC2LEnvironment ();
+int main(int argc, char *argv[]) {
+  ::testing::InitGoogleTest(&argc, argv);
+  auto &pc2l = pc2l::System::get();
+  pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+  pc2l.initialize(argc, argv);
+  pc2l.start(pc2l::System::PseudoLRU);
+  auto env = new PC2LEnvironment();
   env->argc = argc;
   env->argv = argv;
-  ::testing::AddGlobalTestEnvironment (env);
-  return RUN_ALL_TESTS ();
+  ::testing::AddGlobalTestEnvironment(env);
+  return RUN_ALL_TESTS();
 }
 
-TEST_F (PLRUTest, test_plru_caching)
-{
-  auto &pc2l = pc2l::System::get ();
+TEST_F(PLRUTest, test_plru_caching) {
+  auto &pc2l = pc2l::System::get();
   const int listSize = 100;
-  pc2l::Vector<int, 8 * sizeof (int)> intVec = createRangeIntVec (listSize);
+  pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
   // cache should now be the last 3 blocks inserted
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 12), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 11), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 10), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
 
   // now put the zero block back in cache
   intVec[0] = 1;

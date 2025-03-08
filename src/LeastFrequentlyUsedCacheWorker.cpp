@@ -41,91 +41,73 @@
 #include "Exception.h"
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
-void
-LeastFrequentlyUsedCacheWorker::addToCache (pc2l::MessagePtr &msg)
-{
+void LeastFrequentlyUsedCacheWorker::addToCache(pc2l::MessagePtr &msg) {
   // this only is needed if it's a new insert. If it's not, refer already
   // updated the cache stuff
-  if (placeInQueue.find (msg->key) == placeInQueue.end ())
-    {
-      CacheItem ci{ msg, msg->key };
-      queues[1].push_front (ci);
-      placeInQueue[msg->key] = queues[1].begin ();
-    }
+  if (placeInQueue.find(msg->key) == placeInQueue.end()) {
+    CacheItem ci{msg, msg->key};
+    queues[1].push_front(ci);
+    placeInQueue[msg->key] = queues[1].begin();
+  }
 }
 
-void
-LeastFrequentlyUsedCacheWorker::eraseFromCache (size_t key)
-{
+void LeastFrequentlyUsedCacheWorker::eraseFromCache(size_t key) {
   // by the time this is called, refer has already fixed cache details
-  placeInQueue.erase (key);
+  placeInQueue.erase(key);
 }
 
-MessagePtr &
-LeastFrequentlyUsedCacheWorker::getFromCache (size_t key)
-{
-  if (placeInQueue.find (key) != placeInQueue.end ())
-    {
-      return placeInQueue[key]->msg;
-    }
-  else
-    {
-      return blockNotFoundMsg;
-    }
+MessagePtr &LeastFrequentlyUsedCacheWorker::getFromCache(size_t key) {
+  if (placeInQueue.find(key) != placeInQueue.end()) {
+    return placeInQueue[key]->msg;
+  } else {
+    return blockNotFoundMsg;
+  }
 }
 
-void
-LeastFrequentlyUsedCacheWorker::refer (const MessagePtr &msg)
-{
-  if (MPI_GET_RANK () != 0)
+void LeastFrequentlyUsedCacheWorker::refer(const MessagePtr &msg) {
+  if (MPI_GET_RANK() != 0)
     return;
   const auto key = msg->key;
-  if (auto msgPlace = placeInQueue.find (key); msgPlace == placeInQueue.end ())
-    {
-      // Use eviction strategy if cache is at capacity
-      if (currentBytes + msg->getSize () > cacheSize)
-        {
-          // Get the queue for the smallest frequency (always at the beginning
-          // of the map of queues)
-          auto &smallestFreqQueue = queues.begin ()->second;
-          // Item at the end of this queue is the LRU
-          auto evictedItem = smallestFreqQueue.back ();
-          smallestFreqQueue.pop_back ();
-          // if this frequency queue is now empty, erase the frequency from the
-          // map of all freq. queues
-          if (smallestFreqQueue.empty ())
-            {
-              queues.erase (evictedItem.frequency);
-            }
-          // send evicted block to remote cacheworker
-          MessagePtr evicted = evictedItem.msg;
-          eraseCacheBlock (evicted);
-          const int destRank
-              = (evicted->blockTag % (System::get ().worldSize () - 1)) + 1;
-          send (evicted, destRank);
-        }
+  if (auto msgPlace = placeInQueue.find(key); msgPlace == placeInQueue.end()) {
+    // Use eviction strategy if cache is at capacity
+    if (currentBytes + msg->getSize() > cacheSize) {
+      // Get the queue for the smallest frequency (always at the beginning
+      // of the map of queues)
+      auto &smallestFreqQueue = queues.begin()->second;
+      // Item at the end of this queue is the LRU
+      auto evictedItem = smallestFreqQueue.back();
+      smallestFreqQueue.pop_back();
+      // if this frequency queue is now empty, erase the frequency from the
+      // map of all freq. queues
+      if (smallestFreqQueue.empty()) {
+        queues.erase(evictedItem.frequency);
+      }
+      // send evicted block to remote cacheworker
+      MessagePtr evicted = evictedItem.msg;
+      eraseCacheBlock(evicted);
+      const int destRank =
+          (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+      send(evicted, destRank);
     }
-  else
-    {
-      // If the block is present in the cache, we need to update which
-      // frequency queue it is in
-      auto item = *placeInQueue[key];
-      auto &itemQueue = queues[item.frequency];
-      itemQueue.erase (placeInQueue[key]);
-      // if this frequency queue is now empty, erase the frequency from the map
-      // of all freq. queues
-      if (itemQueue.empty ())
-        {
-          queues.erase (item.frequency);
-        }
-      item.frequency++;
-      queues[item.frequency].push_front (item);
-      placeInQueue[key] = queues[item.frequency].begin ();
+  } else {
+    // If the block is present in the cache, we need to update which
+    // frequency queue it is in
+    auto item = *placeInQueue[key];
+    auto &itemQueue = queues[item.frequency];
+    itemQueue.erase(placeInQueue[key]);
+    // if this frequency queue is now empty, erase the frequency from the map
+    // of all freq. queues
+    if (itemQueue.empty()) {
+      queues.erase(item.frequency);
     }
+    item.frequency++;
+    queues[item.frequency].push_front(item);
+    placeInQueue[key] = queues[item.frequency].begin();
+  }
 }
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

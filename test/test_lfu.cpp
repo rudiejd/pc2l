@@ -38,42 +38,37 @@
 #include <iostream>
 #include <random>
 
-class LFUTest : public ::testing::Test
-{
-};
+class LFUTest : public ::testing::Test {};
 
-int
-main (int argc, char *argv[])
-{
-  ::testing::InitGoogleTest (&argc, argv);
-  auto &pc2l = pc2l::System::get ();
-  pc2l.setCacheSize (3 * (sizeof (pc2l::Message) + 8 * sizeof (int)));
-  pc2l.initialize (argc, argv);
-  pc2l.start (pc2l::System::LeastFrequentlyUsed);
-  auto env = new PC2LEnvironment ();
+int main(int argc, char *argv[]) {
+  ::testing::InitGoogleTest(&argc, argv);
+  auto &pc2l = pc2l::System::get();
+  pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+  pc2l.initialize(argc, argv);
+  pc2l.start(pc2l::System::LeastFrequentlyUsed);
+  auto env = new PC2LEnvironment();
   env->argc = argc;
   env->argv = argv;
-  ::testing::AddGlobalTestEnvironment (env);
-  return RUN_ALL_TESTS ();
+  ::testing::AddGlobalTestEnvironment(env);
+  return RUN_ALL_TESTS();
 }
 
-TEST_F (LFUTest, test_lfu_caching)
-{
-  auto &pc2l = pc2l::System::get ();
+TEST_F(LFUTest, test_lfu_caching) {
+  auto &pc2l = pc2l::System::get();
   const int listSize = 100;
-  pc2l::Vector<int, 8 * sizeof (int)> intVec = createRangeIntVec (listSize);
+  pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
   // cache should now be the last 3 blocks inserted (defaults to LRU)
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 12), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 11), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 10), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
 
   // now put the zero block back in cache
   intVec[0] = 1;
   // LRU order: 10 11 12
   // freq(10) = 9, freq(11) = 9, freq(12) = 5 (this block only contains 4
   // elements) 12 should be removed
-  ASSERT_EQ (pc2l.cacheManager ().getBlock (intVec.dsTag, 12), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 10), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 11), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 0), nullptr);
+  ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 10), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0), nullptr);
 }

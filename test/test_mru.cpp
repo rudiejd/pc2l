@@ -38,45 +38,40 @@
 #include <iostream>
 #include <random>
 
-class MRUTest : public ::testing::Test
-{
-};
+class MRUTest : public ::testing::Test {};
 
-int
-main (int argc, char *argv[])
-{
-  ::testing::InitGoogleTest (&argc, argv);
-  auto &pc2l = pc2l::System::get ();
-  pc2l.setCacheSize (3 * (sizeof (pc2l::Message) + 8 * sizeof (int)));
-  pc2l.initialize (argc, argv);
-  pc2l.start (pc2l::System::MostRecentlyUsed);
-  auto env = new PC2LEnvironment ();
+int main(int argc, char *argv[]) {
+  ::testing::InitGoogleTest(&argc, argv);
+  auto &pc2l = pc2l::System::get();
+  pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+  pc2l.initialize(argc, argv);
+  pc2l.start(pc2l::System::MostRecentlyUsed);
+  auto env = new PC2LEnvironment();
   env->argc = argc;
   env->argv = argv;
-  ::testing::AddGlobalTestEnvironment (env);
-  return RUN_ALL_TESTS ();
+  ::testing::AddGlobalTestEnvironment(env);
+  return RUN_ALL_TESTS();
 }
 
-TEST_F (MRUTest, test_mru_caching)
-{
-  auto &pc2l = pc2l::System::get ();
+TEST_F(MRUTest, test_mru_caching) {
+  auto &pc2l = pc2l::System::get();
   const int listSize = 100;
-  pc2l::Vector<int, 8 * sizeof (int)> intVec = createRangeIntVec (listSize);
+  pc2l::Vector<int, 8 * sizeof(int)> intVec = createRangeIntVec(listSize);
   // cache should now be the MRU block, the 2nd LRU block, and the LRU block
   // MRU order 12 1 0
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 12, true), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 0, true), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 1, true), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1, true), nullptr);
 
   // now put the eleven block back in cache
   // MRU order: 12 11 10
   intVec[90] = 1;
   // MRU order: 0 11 10
   // 12 should be removed
-  ASSERT_EQ (pc2l.cacheManager ().getBlock (intVec.dsTag, 12, true), nullptr);
+  ASSERT_EQ(pc2l.cacheManager().getBlock(intVec.dsTag, 12, true), nullptr);
   intVec[9] = 1;
   // New MRU order: 11 1 0
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 0, true), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 1, true), nullptr);
-  ASSERT_NE (pc2l.cacheManager ().getBlock (intVec.dsTag, 11, true), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 0, true), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 1, true), nullptr);
+  ASSERT_NE(pc2l.cacheManager().getBlock(intVec.dsTag, 11, true), nullptr);
 }

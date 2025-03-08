@@ -45,7 +45,7 @@
  */
 #include "Vector.h"
 
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
-END_NAMESPACE (pc2l)
+END_NAMESPACE(pc2l)
 #endif

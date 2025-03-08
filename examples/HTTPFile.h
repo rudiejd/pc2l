@@ -13,8 +13,7 @@
 /** A HTTP namespace to disambiguate the file class encapsulated by
     it.
 */
-namespace http
-{
+namespace http {
 /**
  * The defaut HTTP headers used when sending file contents to a
  * web-client.  NOTE: The content-type header must always be the
@@ -38,12 +37,11 @@ const std::string Http404Headers = "HTTP/1.1 404 Not Found\r\n"
 /** Convenience wrapper class to stream path to a given file as a
     HTTP response.
 */
-class file
-{
+class file {
 public:
   // Stream insertion operator to ease streaming contents of a
   // file to a given output stream.
-  friend std::ostream &operator<< (std::ostream &os, const http::file &file);
+  friend std::ostream &operator<<(std::ostream &os, const http::file &file);
 
   /** The constructor that merely saves the parameters to
       instance variables. The actual streaming
@@ -56,11 +54,9 @@ public:
 
       \param[in] headers An optional set to
   */
-  file (const std::string &path = "index.html",
-        const std::string &headers = DefaultHttpHeaders)
-      : path (path), headers (headers)
-  {
-  }
+  file(const std::string &path = "index.html",
+       const std::string &headers = DefaultHttpHeaders)
+      : path(path), headers(headers) {}
 
 private:
   /**
@@ -89,10 +85,10 @@ private:
  * \return The content type associated with the file. By default
  * this method returns "text/plain" as the content type.
  */
-std::string getContentType (const std::string &path);
+std::string getContentType(const std::string &path);
 
 /** Prototype for operator<< used for HTTP-streaming file contents */
-std::ostream &operator<< (std::ostream &os, const file &file);
+std::ostream &operator<<(std::ostream &os, const file &file);
 
 }; // namespace http
 

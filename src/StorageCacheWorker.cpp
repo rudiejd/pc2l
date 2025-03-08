@@ -41,38 +41,24 @@
 #include "Exception.h"
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
-void
-StorageCacheWorker::addToCache (pc2l::MessagePtr &msg)
-{
+void StorageCacheWorker::addToCache(pc2l::MessagePtr &msg) {
   cache[msg->key] = msg;
 }
 
-MessagePtr &
-StorageCacheWorker::getFromCache (size_t key)
-{
-  if (cache.find (key) != cache.end ())
-    {
-      return cache[key];
-    }
-  else
-    {
-      return blockNotFoundMsg;
-    }
+MessagePtr &StorageCacheWorker::getFromCache(size_t key) {
+  if (cache.find(key) != cache.end()) {
+    return cache[key];
+  } else {
+    return blockNotFoundMsg;
+  }
 }
 
-void
-StorageCacheWorker::eraseFromCache (size_t key)
-{
-  cache.erase (key);
-}
+void StorageCacheWorker::eraseFromCache(size_t key) { cache.erase(key); }
 
-void
-StorageCacheWorker::refer (const MessagePtr &msg)
-{
-}
-END_NAMESPACE (pc2l);
+void StorageCacheWorker::refer(const MessagePtr &msg) {}
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

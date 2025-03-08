@@ -41,23 +41,12 @@
  * This NullReporter class does nothing. We use it to suppress
  * output on non-zero mpi processes
  */
-class NullReporter : public ::benchmark::BenchmarkReporter
-{
+class NullReporter : public ::benchmark::BenchmarkReporter {
 public:
-  NullReporter () {}
-  virtual bool
-  ReportContext (const Context &)
-  {
-    return true;
-  }
-  virtual void
-  ReportRuns (const std::vector<Run> &)
-  {
-  }
-  virtual void
-  Finalize ()
-  {
-  }
+  NullReporter() {}
+  virtual bool ReportContext(const Context &) { return true; }
+  virtual void ReportRuns(const std::vector<Run> &) {}
+  virtual void Finalize() {}
 };
 
 #define PC2L_BENCHMARK_H

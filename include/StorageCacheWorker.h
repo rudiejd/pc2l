@@ -51,28 +51,27 @@
 #include <list>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
-class StorageCacheWorker : public virtual CacheWorker
-{
+BEGIN_NAMESPACE(pc2l);
+class StorageCacheWorker : public virtual CacheWorker {
 public:
   /**
    * Refer the key for a block to our eviction scheme
    * @param key the key to place into eviction scheme
    */
-  void refer (const MessagePtr &msg) override;
+  void refer(const MessagePtr &msg) override;
 
 protected:
-  void addToCache (MessagePtr &msg) override;
+  void addToCache(MessagePtr &msg) override;
 
-  MessagePtr &getFromCache (size_t key) override;
+  MessagePtr &getFromCache(size_t key) override;
 
-  void eraseFromCache (size_t key) override;
+  void eraseFromCache(size_t key) override;
 
 private:
   std::unordered_map<size_t, MessagePtr> cache;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

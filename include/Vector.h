@@ -55,10 +55,9 @@
 #include <unordered_map>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
-enum PrefetchStrategy
-{
+enum PrefetchStrategy {
   NONE = 0,
   FORWARD_SEQUENTIAL,
   BACKWARD_SEQUENTIAL,
@@ -72,16 +71,14 @@ enum PrefetchStrategy
  */
 template <typename T, unsigned int UserBlockSize = 4096,
           unsigned int PrefetchCount = 5, PrefetchStrategy PFStrategy = NONE>
-class Vector
-{
+class Vector {
 public:
   /**
    * Customer iterator for a PC2L vector. As of right now,
    * only an input iterator is implemented.
    * TODO: need a custom reference to replace reference
    */
-  class Iterator
-  {
+  class Iterator {
   public:
     using iterator_category = std::random_access_iterator_tag;
     using value_type = T;
@@ -90,171 +87,103 @@ public:
     using pointer = T *;
     using reference = T &;
 
-    Iterator ();
+    Iterator();
 
     // declare friend class so only pc2l::Vector can access Iterator's private
     // constructor
     friend class Vector<T, UserBlockSize>;
 
     // Maybe implement bounds check here? Or bounds check in pc2l::Vector
-    inline Iterator &
-    operator++ ()
-    {
+    inline Iterator &operator++() {
       i++;
       return *this;
     }
-    inline Iterator &
-    operator-- ()
-    {
+    inline Iterator &operator--() {
       i--;
       return *this;
     }
-    inline Iterator &
-    operator= (const Iterator &rhs)
-    {
+    inline Iterator &operator=(const Iterator &rhs) {
       i = rhs.i;
       return *this;
     }
-    inline Iterator &
-    operator+= (const difference_type &rhs)
-    {
+    inline Iterator &operator+=(const difference_type &rhs) {
       i += rhs;
       return *this;
     }
-    inline Iterator &
-    operator+= (const Iterator &rhs)
-    {
+    inline Iterator &operator+=(const Iterator &rhs) {
       i += rhs.i;
       return *this;
     }
-    inline Iterator &
-    operator-= (const difference_type &rhs)
-    {
+    inline Iterator &operator-=(const difference_type &rhs) {
       i -= rhs;
       return *this;
     }
-    inline Iterator &
-    operator-= (const Iterator &rhs)
-    {
+    inline Iterator &operator-=(const Iterator &rhs) {
       i -= rhs.i;
       return *this;
     }
 
-    pointer
-    operator->() const
-    {
-      return vec.ptr (i);
-    }
+    pointer operator->() const { return vec.ptr(i); }
     // TODO: Redefine reference type with custom reference
-    reference
-    operator[] (const difference_type &rhs) const
-    {
-      return vec[rhs];
-    }
-    reference
-    operator* () const
-    {
-      return vec[i];
-    };
+    reference operator[](const difference_type &rhs) const { return vec[rhs]; }
+    reference operator*() const { return vec[i]; };
 
-    difference_type
-    operator- (const Iterator &rhs)
-    {
-      return i - rhs.i;
+    difference_type operator-(const Iterator &rhs) { return i - rhs.i; }
+    Iterator operator+(const difference_type &rhs) const {
+      return Iterator(vec, i + rhs);
     }
-    Iterator
-    operator+ (const difference_type &rhs) const
-    {
-      return Iterator (vec, i + rhs);
+    Iterator operator-(const difference_type &rhs) const {
+      return Iterator(vec, i - rhs);
     }
-    Iterator
-    operator- (const difference_type &rhs) const
-    {
-      return Iterator (vec, i - rhs);
+    friend Iterator operator+(const difference_type &lhs, const Iterator &rhs) {
+      return Iterator(rhs.vec, lhs + rhs.i);
     }
-    friend Iterator
-    operator+ (const difference_type &lhs, const Iterator &rhs)
-    {
-      return Iterator (rhs.vec, lhs + rhs.i);
-    }
-    friend Iterator
-    operator- (const difference_type &lhs, const Iterator &rhs)
-    {
-      return Iterator (rhs.vec, lhs - rhs.i);
+    friend Iterator operator-(const difference_type &lhs, const Iterator &rhs) {
+      return Iterator(rhs.vec, lhs - rhs.i);
     }
 
-    bool
-    operator== (const Iterator &rhs) const
-    {
+    bool operator==(const Iterator &rhs) const {
       return &rhs.vec == &vec && rhs.i == i;
     }
-    bool
-    operator!= (const Iterator &rhs) const
-    {
-      return !(*this == rhs);
-    }
-    bool
-    operator< (const Iterator &rhs) const
-    {
-      return i < rhs.i;
-    }
-    bool
-    operator> (const Iterator &rhs) const
-    {
-      return i > rhs.i;
-    }
-    bool
-    operator<= (const Iterator &rhs) const
-    {
-      return i >= rhs.i;
-    }
-    bool
-    operator>= (const Iterator &rhs) const
-    {
-      return i >= rhs.i;
-    }
+    bool operator!=(const Iterator &rhs) const { return !(*this == rhs); }
+    bool operator<(const Iterator &rhs) const { return i < rhs.i; }
+    bool operator>(const Iterator &rhs) const { return i > rhs.i; }
+    bool operator<=(const Iterator &rhs) const { return i >= rhs.i; }
+    bool operator>=(const Iterator &rhs) const { return i >= rhs.i; }
 
-    Iterator (const Iterator &other) : vec (other.vec), i (other.i) {}
+    Iterator(const Iterator &other) : vec(other.vec), i(other.i) {}
     size_t i = 0;
 
   private:
-    Iterator (Vector<T, UserBlockSize> &vec, const size_t end = 0)
-        : vec (vec), i (end)
-    {
-    }
+    Iterator(Vector<T, UserBlockSize> &vec, const size_t end = 0)
+        : vec(vec), i(end) {}
     Vector<T, UserBlockSize> &vec;
   };
 
   // Iterator methods
-  Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator
-  begin ()
-  {
-    return Iterator (*this);
+  Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator begin() {
+    return Iterator(*this);
   }
-  Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator
-  end ()
-  {
-    return Iterator (*this, size ());
+  Vector<T, UserBlockSize, PrefetchCount, PFStrategy>::Iterator end() {
+    return Iterator(*this, size());
   }
 
   /**
    * The default constructor. Increments system-wide data structure
    * count
    */
-  Vector () : siz (0), dsTag (System::get ().dsCount++) {}
+  Vector() : siz(0), dsTag(System::get().dsCount++) {}
 
-  Vector (unsigned long long fillCount)
-      : siz (0), dsTag (System::get ().dsCount++)
-  {
-    for (auto i = 0; i < fillCount; i++)
-      {
-        insert (0, T{});
-      }
+  Vector(unsigned long long fillCount)
+      : siz(0), dsTag(System::get().dsCount++) {
+    for (auto i = 0; i < fillCount; i++) {
+      insert(0, T{});
+    }
   }
   /**
    * The destructor.
    */
-  virtual ~Vector () = default;
+  virtual ~Vector() = default;
 
   // unique identifier for this data structure
   size_t dsTag;
@@ -268,25 +197,19 @@ public:
   // reference to message containing last retrieved block
   mutable MessagePtr prevMsg;
   // calculate log2(n) at compile time
-  static constexpr unsigned int
-  log2 (unsigned int n)
-  {
-    return std::log2 (n);
-  }
+  static constexpr unsigned int log2(unsigned int n) { return std::log2(n); }
   // Calculate a^n at compile time
-  static constexpr unsigned int
-  pow (unsigned int a, unsigned int n)
-  {
-    return std::pow (a, n);
+  static constexpr unsigned int pow(unsigned int a, unsigned int n) {
+    return std::pow(a, n);
   }
   // If user provides a block size that isn't a power of 2, round it up to
   // nearest power of 2 the bit shift hack UserBlockSize & (UserBlockSize - 1)
   // is a fast way to check this (from stanford bitshift hacks)
-  static constexpr unsigned int BlockShiftBits
-      = !(UserBlockSize & (UserBlockSize - 1)) ? log2 (UserBlockSize)
-                                               : log2 (UserBlockSize) + 1;
-  static constexpr unsigned int BlockSize = pow (2, BlockShiftBits);
-  static constexpr unsigned int TypeSize = sizeof (T);
+  static constexpr unsigned int BlockShiftBits =
+      !(UserBlockSize & (UserBlockSize - 1)) ? log2(UserBlockSize)
+                                             : log2(UserBlockSize) + 1;
+  static constexpr unsigned int BlockSize = pow(2, BlockShiftBits);
+  static constexpr unsigned int TypeSize = sizeof(T);
   static constexpr unsigned int IndexMask = BlockSize - 1;
   // Count the number of elements of type T in a single block for prefetching
   // purposes
@@ -296,68 +219,52 @@ public:
    * ifdefs depending on some prefetching strategy specified as a template
    * argument
    */
-  void
-  prefetch (size_t inBlockIdx, size_t blockTag) const
-  {
-    if constexpr (PFStrategy == PrefetchStrategy::FORWARD_SEQUENTIAL)
-      {
-        if (BlockSize - inBlockIdx + 1 >= PrefetchCount
-            && (siz / BlockSize) > blockTag + 1)
-          {
-            auto &pc2l = pc2l::System::get ();
-            pc2l.cacheManager ().getBlockFallbackRemote (dsTag, blockTag + 1);
-          }
+  void prefetch(size_t inBlockIdx, size_t blockTag) const {
+    if constexpr (PFStrategy == PrefetchStrategy::FORWARD_SEQUENTIAL) {
+      if (BlockSize - inBlockIdx + 1 >= PrefetchCount &&
+          (siz / BlockSize) > blockTag + 1) {
+        auto &pc2l = pc2l::System::get();
+        pc2l.cacheManager().getBlockFallbackRemote(dsTag, blockTag + 1);
       }
-    else if constexpr (PFStrategy == PrefetchStrategy::BACKWARD_SEQUENTIAL)
-      {
-      }
+    } else if constexpr (PFStrategy == PrefetchStrategy::BACKWARD_SEQUENTIAL) {
+    }
   }
 
   /**
    * Returns size (in values, not blocks) of vector
    * @return size (in values) of vector
    */
-  unsigned long long
-  size () const
-  {
-    return siz;
-  }
+  unsigned long long size() const { return siz; }
 
-  T &
-  operator[] (size_t index)
-  {
-    auto [offset, blockTag, inBlockIdx] = indexCalculation (index);
+  T &operator[](size_t index) {
+    auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
     // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
     //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
-    prefetch (inBlockIdx, blockTag);
-    if (blockTag == prevBlockTag)
-      {
-        // if the CacheManager's cache contains this block, just get it
-        // get array of concatenated T-serializations
-        char *payload = prevMsg->getPayload ();
-        return *reinterpret_cast<T *> (payload + inBlockIdx);
-      }
-    CacheManager &cm = System::get ().cacheManager ();
-    MessagePtr msg = cm.getBlockFallbackRemote (dsTag, blockTag);
+    prefetch(inBlockIdx, blockTag);
+    if (blockTag == prevBlockTag) {
+      // if the CacheManager's cache contains this block, just get it
+      // get array of concatenated T-serializations
+      char *payload = prevMsg->getPayload();
+      return *reinterpret_cast<T *>(payload + inBlockIdx);
+    }
+    CacheManager &cm = System::get().cacheManager();
+    MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
     prevBlockTag = blockTag;
     prevMsg = msg;
     // if the CacheManager's cache contains this block, just get it
     // get array of concatenated T-serializations
-    char *payload = msg->getPayload ();
-    return *reinterpret_cast<T *> (payload + inBlockIdx);
+    char *payload = msg->getPayload();
+    return *reinterpret_cast<T *>(payload + inBlockIdx);
   }
 
   /**
    * Erase all values from vector
    */
-  void
-  clear ()
-  {
-    for (unsigned long long i = 0; i < siz; i++)
-      {
-        erase (i);
-      }
+  void clear() {
+    for (unsigned long long i = 0; i < siz; i++) {
+      erase(i);
+    }
   }
 
   /**
@@ -365,29 +272,24 @@ public:
    * @param i first index of swap
    * @param j second index of swap
    */
-  void
-  swap (size_t i, size_t j)
-  {
-    auto oldI = at (i);
-    replace (i, at (j));
-    replace (j, oldI);
+  void swap(size_t i, size_t j) {
+    auto oldI = at(i);
+    replace(i, at(j));
+    replace(j, oldI);
   }
 
   /**
    * Erase the value at \p index
    * @param index the index of the value to be erased
    */
-  void
-  erase (unsigned long long index)
-  {
-    PC2L_DEBUG_START_TIMER ()
+  void erase(unsigned long long index) {
+    PC2L_DEBUG_START_TIMER()
     // move all of the blocks to the right of the index left by one
-    for (unsigned long long i = index; i < size () - 1; i++)
-      {
-        swap (i, i + 1);
-      }
+    for (unsigned long long i = index; i < size() - 1; i++) {
+      swap(i, i + 1);
+    }
     siz--;
-    PC2L_DEBUG_STOP_TIMER ("erase(" << index << ")")
+    PC2L_DEBUG_STOP_TIMER("erase(" << index << ")")
     // TODO: maybe some check to see if it is successfully deleted?
   }
 
@@ -397,10 +299,8 @@ public:
    * @param index
    * @return The value at \p index
    */
-  T
-  at (unsigned long long index) const
-  {
-    PC2L_DEBUG_START_TIMER ()
+  T at(unsigned long long index) const {
+    PC2L_DEBUG_START_TIMER()
     // instead of div, prefer bitwise operations eventually
     // but this will require moving to powers of 2 only
 
@@ -414,33 +314,30 @@ public:
 
     // @insert: index = 99, blockTag = 12, inBlockIdx = 12
     // @at: index = 99, blockTag = 49, inBlockIdx = 4
-    auto [offset, blockTag, inBlockIdx] = indexCalculation (index);
+    auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
     // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
     //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
-    prefetch (inBlockIdx, blockTag);
-    if (blockTag == prevBlockTag)
-      {
-        // if the CacheManager's cache contains this block, just get it
-        // get array of concatenated T-serializations
-        char *payload = prevMsg->getPayload ();
-        return *reinterpret_cast<T *> (payload + inBlockIdx);
-      }
-    CacheManager &cm = System::get ().cacheManager ();
-    MessagePtr msg = cm.getBlockFallbackRemote (dsTag, blockTag);
+    prefetch(inBlockIdx, blockTag);
+    if (blockTag == prevBlockTag) {
+      // if the CacheManager's cache contains this block, just get it
+      // get array of concatenated T-serializations
+      char *payload = prevMsg->getPayload();
+      return *reinterpret_cast<T *>(payload + inBlockIdx);
+    }
+    CacheManager &cm = System::get().cacheManager();
+    MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
     prevBlockTag = blockTag;
     prevMsg = msg;
     // if the CacheManager's cache contains this block, just get it
     // get array of concatenated T-serializations
-    char *payload = msg->getPayload ();
-    PC2L_DEBUG_STOP_TIMER ("at(" << index << ")")
-    return *reinterpret_cast<T *> (payload + inBlockIdx);
+    char *payload = msg->getPayload();
+    PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
+    return *reinterpret_cast<T *>(payload + inBlockIdx);
   }
 
-  T *
-  ptr (unsigned long long index)
-  {
-    PC2L_DEBUG_START_TIMER ()
+  T *ptr(unsigned long long index) {
+    PC2L_DEBUG_START_TIMER()
     // instead of div, prefer bitwise operations eventually
     // but this will require moving to powers of 2 only
 
@@ -454,27 +351,26 @@ public:
 
     // @insert: index = 99, blockTag = 12, inBlockIdx = 12
     // @at: index = 99, blockTag = 49, inBlockIdx = 4
-    auto [offset, blockTag, inBlockIdx] = indexCalculation (index);
+    auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
     // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
     //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
-    prefetch (inBlockIdx, blockTag);
-    if (blockTag == prevBlockTag)
-      {
-        // if the CacheManager's cache contains this block, just get it
-        // get array of concatenated T-serializations
-        char *payload = prevMsg->getPayload ();
-        return reinterpret_cast<T *> (payload + inBlockIdx);
-      }
-    CacheManager &cm = System::get ().cacheManager ();
-    MessagePtr msg = cm.getBlockFallbackRemote (dsTag, blockTag);
+    prefetch(inBlockIdx, blockTag);
+    if (blockTag == prevBlockTag) {
+      // if the CacheManager's cache contains this block, just get it
+      // get array of concatenated T-serializations
+      char *payload = prevMsg->getPayload();
+      return reinterpret_cast<T *>(payload + inBlockIdx);
+    }
+    CacheManager &cm = System::get().cacheManager();
+    MessagePtr msg = cm.getBlockFallbackRemote(dsTag, blockTag);
     prevBlockTag = blockTag;
     prevMsg = msg;
     // if the CacheManager's cache contains this block, just get it
     // get array of concatenated T-serializations
-    char *payload = msg->getPayload ();
-    PC2L_DEBUG_STOP_TIMER ("at(" << index << ")")
-    return reinterpret_cast<T *> (payload + inBlockIdx);
+    char *payload = msg->getPayload();
+    PC2L_DEBUG_STOP_TIMER("at(" << index << ")")
+    return reinterpret_cast<T *>(payload + inBlockIdx);
   }
 
   /**
@@ -482,115 +378,91 @@ public:
    * @param index index where insert should occur
    * @param value value to be inserted
    */
-  void
-  insert (unsigned long long index, T value)
-  {
-    PC2L_DEBUG_START_TIMER ()
-    auto [offset, blockTag, inBlockIdx] = indexCalculation (index);
-    CacheManager &cm = System::get ().cacheManager ();
-    if (index < size ())
-      {
-        // all other values shifted right one index (size incremented here)
-        // we have to do this BEFORE the (potentially evicted) message with
-        // this value in it is retrieved
-        insert (size (), at (size () - 1));
-        for (auto i = size () - 2; i > index; i--)
-          {
-            replace (i, at (i - 1));
-            //                for(size_t j = 0; j < size(); j++) {
-            //                    if (MPI_GET_RANK() == 0)
-            //                        std::cout << at(j) << std::endl;
-            //                }
-          }
+  void insert(unsigned long long index, T value) {
+    PC2L_DEBUG_START_TIMER()
+    auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+    CacheManager &cm = System::get().cacheManager();
+    if (index < size()) {
+      // all other values shifted right one index (size incremented here)
+      // we have to do this BEFORE the (potentially evicted) message with
+      // this value in it is retrieved
+      insert(size(), at(size() - 1));
+      for (auto i = size() - 2; i > index; i--) {
+        replace(i, at(i - 1));
+        //                for(size_t j = 0; j < size(); j++) {
+        //                    if (MPI_GET_RANK() == 0)
+        //                        std::cout << at(j) << std::endl;
+        //                }
       }
+    }
     MessagePtr msg;
-    if (prevBlockTag == blockTag && size () > 0)
-      {
-        msg = prevMsg;
-      }
-    else if (index < size ())
-      {
-        // fetch from cache manager or remote CW
-        msg = cm.getBlockFallbackRemote (dsTag, blockTag);
-      }
-    else
-      {
-        // if insert at end, make new block+
-        msg = Message::create (BlockSize, Message::STORE_BLOCK, 0, dsTag,
-                               blockTag);
-      }
-    char *block = msg->getPayload ();
+    if (prevBlockTag == blockTag && size() > 0) {
+      msg = prevMsg;
+    } else if (index < size()) {
+      // fetch from cache manager or remote CW
+      msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+    } else {
+      // if insert at end, make new block+
+      msg =
+          Message::create(BlockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
+    }
+    char *block = msg->getPayload();
     // std::cout << "@insert: index = " << index << ", blockTag = "
     //         << blockTag << ", inBlockIdx = " << inBlockIdx << std::endl;
-    char *serialized = reinterpret_cast<char *> (&value);
-    std::move (&serialized[0], &serialized[sizeof (T)], &block[inBlockIdx]);
+    char *serialized = reinterpret_cast<char *>(&value);
+    std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
     // then put the object at retrieved index into cache
     prevMsg = msg;
     prevBlockTag = blockTag;
-    cm.storeCacheBlock (msg);
+    cm.storeCacheBlock(msg);
     // if it's an insert at the end, we haven't yet incremented size. otherwise
     // we have
-    if (index == size ())
+    if (index == size())
       siz++;
-    PC2L_DEBUG_STOP_TIMER ("insert(" << index << ", " << value << ")")
+    PC2L_DEBUG_STOP_TIMER("insert(" << index << ", " << value << ")")
   }
 
-  Iterator
-  insert (const Iterator &index, T value)
-  {
-    insert (index.i, value);
-    return Iterator (*this, index.i);
+  Iterator insert(const Iterator &index, T value) {
+    insert(index.i, value);
+    return Iterator(*this, index.i);
   }
 
   /**
    * Alias for inserting at "back" (largest index) of vector
    * @param value value to be inserted
    */
-  Iterator
-  push_back (T value)
-  {
-    return insert (Iterator (*this, size ()), value);
-  }
+  Iterator push_back(T value) { return insert(Iterator(*this, size()), value); }
 
   /**
    * Replace value at \p index with \p value
    * @param index index in vector which should be replaced
    * @param value object to put in the index
    */
-  void
-  replace (unsigned long long index, T value)
-  {
-    PC2L_DEBUG_START_TIMER ()
-    const auto [offset, blockTag, inBlockIdx] = indexCalculation (index);
-    prefetch (inBlockIdx, blockTag);
+  void replace(unsigned long long index, T value) {
+    PC2L_DEBUG_START_TIMER()
+    const auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
+    prefetch(inBlockIdx, blockTag);
     MessagePtr msg;
-    CacheManager &cm = System::get ().cacheManager ();
-    if (blockTag == prevBlockTag)
-      {
-        msg = prevMsg;
-      }
-    else
-      {
-        msg = cm.getBlockFallbackRemote (dsTag, blockTag);
-      }
-    char *block = msg->getPayload ();
+    CacheManager &cm = System::get().cacheManager();
+    if (blockTag == prevBlockTag) {
+      msg = prevMsg;
+    } else {
+      msg = cm.getBlockFallbackRemote(dsTag, blockTag);
+    }
+    char *block = msg->getPayload();
     // fill the buffer with new datum at correct in-blok offset
-    char *serialized = reinterpret_cast<char *> (&value);
-    std::move (&serialized[0], &serialized[sizeof (T)], &block[inBlockIdx]);
+    char *serialized = reinterpret_cast<char *>(&value);
+    std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
     prevMsg = msg;
     prevBlockTag = blockTag;
-    cm.storeCacheBlock (msg);
-    PC2L_DEBUG_STOP_TIMER ("replace(" << index << ", " << value << ")")
+    cm.storeCacheBlock(msg);
+    PC2L_DEBUG_STOP_TIMER("replace(" << index << ", " << value << ")")
   }
 
   /**
    * Sort vector in ascending order using mergesort
    */
-  void
-  sort ()
-  {
-    mergesort (0, size () - 1);
-  }
+  void sort() { mergesort(0, size() - 1); }
 
 private:
   /**
@@ -600,73 +472,61 @@ private:
    * @return tuple of (offset, blockTag, inBlockIdx)
    */
   const static std::tuple<size_t, size_t, size_t>
-  indexCalculation (unsigned long long index)
-  {
+  indexCalculation(unsigned long long index) {
     const size_t offset = index * TypeSize;
     const size_t blockTag = (offset >> BlockShiftBits),
                  inBlockIdx = (offset & IndexMask);
-    return std::tie (offset, blockTag, inBlockIdx);
+    return std::tie(offset, blockTag, inBlockIdx);
   }
 
   // Merges the sorted and unsorted portions of the Vector
-  void
-  merge (int low, int mid, int high)
-  {
+  void merge(int low, int mid, int high) {
     auto secondLow = mid + 1;
 
     // if merge already sorted
-    if (at (mid) <= at (secondLow))
-      {
-        return;
+    if (at(mid) <= at(secondLow)) {
+      return;
+    }
+
+    while (low <= mid && secondLow <= high) {
+      // first element is in right place
+      if (at(low) <= at(secondLow)) {
+        low++;
+      } else {
+        auto val = at(secondLow);
+        auto idx = secondLow;
+
+        // Shift all shit between low and 2nd low right by one
+        while (idx != low) {
+          replace(idx, at(idx - 1));
+          idx--;
+        }
+        replace(low, val);
+
+        // update indices
+        low++;
+        mid++;
+        secondLow++;
       }
-
-    while (low <= mid && secondLow <= high)
-      {
-        // first element is in right place
-        if (at (low) <= at (secondLow))
-          {
-            low++;
-          }
-        else
-          {
-            auto val = at (secondLow);
-            auto idx = secondLow;
-
-            // Shift all shit between low and 2nd low right by one
-            while (idx != low)
-              {
-                replace (idx, at (idx - 1));
-                idx--;
-              }
-            replace (low, val);
-
-            // update indices
-            low++;
-            mid++;
-            secondLow++;
-          }
-      }
+    }
   }
 
   // Iteratively sort subarray `A[low…high]` using a temporary array
-  void
-  mergesort (unsigned long long low, unsigned long long high)
-  {
-    if (low < high)
-      {
+  void mergesort(unsigned long long low, unsigned long long high) {
+    if (low < high) {
 
-        // avoid overflow for large low/high indices
-        auto mid = low + (high - low) / 2;
+      // avoid overflow for large low/high indices
+      auto mid = low + (high - low) / 2;
 
-        mergesort (low, mid);
-        mergesort (mid + 1, high);
+      mergesort(low, mid);
+      mergesort(mid + 1, high);
 
-        merge (low, mid, high);
-      }
+      merge(low, mid, high);
+    }
   }
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

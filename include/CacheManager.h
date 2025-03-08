@@ -55,7 +55,7 @@
  */
 // namespace pc2l {
 #include <queue>
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 /**
  * A centralized manager that manages cache entries in coordination
@@ -65,20 +65,19 @@ BEGIN_NAMESPACE (pc2l);
  * for maintaining a local cache and updating caches on distributed
  * worker processes.
  */
-class CacheManager : public virtual CacheWorker
-{
+class CacheManager : public virtual CacheWorker {
 public:
   /**
    * The default constructor.  Currently, the constructor does not
    * have much to do but is present for future extensions.
    */
-  CacheManager () {}
+  CacheManager() {}
 
   /**
    * The polymorphic destructor.  The destructor does not have much
    * to do but is present for future extensions (if any).
    */
-  virtual ~CacheManager () {}
+  virtual ~CacheManager() {}
 
   /**
    * The manager does not have a specific task in the run method.
@@ -88,13 +87,13 @@ public:
    * CacheWorker thread in the background on the manager node.
    *
    */
-  void run () override;
+  void run() override;
 
   /**
    * The finalize method sends finish messages to all of the workers
    * to let them know they need to wind-up their operation.
    */
-  void finalize () override;
+  void finalize() override;
 
   /**
    * Retrieve a block from the manager cache. If it's not there, return nullptr
@@ -104,7 +103,7 @@ public:
    * not change the order of the cache - useful for testing
    * \return message associated with the key formed by combining these tags
    */
-  MessagePtr getBlock (size_t dsTag, size_t blockTag, bool debug = false);
+  MessagePtr getBlock(size_t dsTag, size_t blockTag, bool debug = false);
 
   /**
    * Retrieve a block from the manager cache. If it's not there, fallback to
@@ -113,7 +112,7 @@ public:
    * \param[in] blockTag the block tag associated with this block
    * \return message containing block requested
    */
-  MessagePtr getBlockFallbackRemote (size_t dsTag, size_t blockTag);
+  MessagePtr getBlockFallbackRemote(size_t dsTag, size_t blockTag);
 
   /**
    *  Retrieve a block from a remote CacheWorker in a non-blocking fashion
@@ -121,7 +120,7 @@ public:
    * \param[in] blockTag the block tag associated with this block
    *
    */
-  void getRemoteBlockNonblocking (size_t dsTag, size_t blockTag);
+  void getRemoteBlockNonblocking(size_t dsTag, size_t blockTag);
 
 private:
   MPI_Request prefetchReq;
@@ -133,36 +132,29 @@ private:
  * algorithm
  */
 class LeastRecentlyUsedCacheManager : public LeastRecentlyUsedCacheWorker,
-                                      public CacheManager
-{
-};
+                                      public CacheManager {};
 
 /**
  * CacheManager which implements the Most Recently Used (MRU) cache eviction
  * algorithm
  */
 class MostRecentlyUsedCacheManager : public MostRecentlyUsedCacheWorker,
-                                     public CacheManager
-{
-};
+                                     public CacheManager {};
 
 /**
  * CacheManager which implements the Least Frequently Used (LFU) cache eviction
  * algorithm
  */
 class LeastFrequentlyUsedCacheManager : public LeastFrequentlyUsedCacheWorker,
-                                        public CacheManager
-{
-};
+                                        public CacheManager {};
 
 /**
  * CacheManager which implements the Pseudo-LRU cache eviction algorithm
  */
-class PseudoLRUCacheManager : public PseudoLRUCacheWorker, public CacheManager
-{
-};
+class PseudoLRUCacheManager : public PseudoLRUCacheWorker,
+                              public CacheManager {};
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

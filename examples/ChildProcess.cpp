@@ -30,32 +30,27 @@ const int READ = 0, WRITE = 1;
 
 // This method is just a copy-paste from lecture notes. This is done
 // to illustrate an example.
-void
-ChildProcess::myExec (StrVec argList)
-{
+void ChildProcess::myExec(StrVec argList) {
   std::vector<char *> args; // list of pointers to args
-  for (auto &s : argList)
-    {
-      args.push_back (&s[0]); // address of 1st character
-    }
+  for (auto &s : argList) {
+    args.push_back(&s[0]); // address of 1st character
+  }
   // nullptr is very important
-  args.push_back (nullptr);
+  args.push_back(nullptr);
   // Make execvp system call to run desired process
-  execvp (args[0], &args[0]);
+  execvp(args[0], &args[0]);
   // In case execvp ever fails, we throw a runtime execption
-  throw std::runtime_error ("Call to execvp failed for: " + argList[0]);
+  throw std::runtime_error("Call to execvp failed for: " + argList[0]);
 }
 
 // Implement the constructor
-ChildProcess::ChildProcess () : childPid (-1), childOutput (&pipeBuf)
-{
+ChildProcess::ChildProcess() : childPid(-1), childOutput(&pipeBuf) {
   // childPid is initialized and not assigned!  Hence body is empty.
 }
 
 // Implement the destructor.  The destructor is an empty method
 // because this class does not have any resources to release.
-ChildProcess::~ChildProcess ()
-{
+ChildProcess::~ChildProcess() {
   // Maybe it is a good idea to call wait() method here to ensure
   // that the child process does not get killed? On the other hand,
   // if we call wait() here and the child process misbehaves, then
@@ -64,34 +59,28 @@ ChildProcess::~ChildProcess ()
   // the user to decide what is the best course of action.
 }
 
-StrVec
-ChildProcess::split (const std::string &words)
-{
-  StrVec retVal;                 // The list of words to be returned.
-  std::istringstream is (words); // Stream to split words
+StrVec ChildProcess::split(const std::string &words) {
+  StrVec retVal;                // The list of words to be returned.
+  std::istringstream is(words); // Stream to split words
 
   // Extract words while honoring quotes
-  for (std::string word; is >> std::quoted (word);)
-    {
-      retVal.push_back (word); // add words to the vector.
-    }
+  for (std::string word; is >> std::quoted(word);) {
+    retVal.push_back(word); // add words to the vector.
+  }
   return retVal; // return the list of words
 }
 
 // Use the comments in the header to implement the forkNexec method.
 // This is a relatively simple method with an if-statement to call
 // myExec in the child process and just return the childPid in parent.
-int
-ChildProcess::forkNexec (const StrVec &argList)
-{
+int ChildProcess::forkNexec(const StrVec &argList) {
   // Fork and save the pid of the child process
-  childPid = fork ();
+  childPid = fork();
   // Call the myExec helper method in the child
-  if (childPid == 0)
-    {
-      // We are in the child process
-      myExec (argList);
-    }
+  if (childPid == 0) {
+    // We are in the child process
+    myExec(argList);
+  }
   // Control drops here only in the parent process!
   return childPid;
 }
@@ -99,11 +88,9 @@ ChildProcess::forkNexec (const StrVec &argList)
 // Use the comments in the header to implement the wait method.  This
 // is a relatively simple method which uses waitpid call to get
 // exitCode as shown in Slide #6 of ForkAndExec.pdf
-int
-ChildProcess::wait () const
-{
-  int exitCode = 0;                 // Child process's exit code
-  waitpid (childPid, &exitCode, 0); // wait for child to finish
+int ChildProcess::wait() const {
+  int exitCode = 0;                // Child process's exit code
+  waitpid(childPid, &exitCode, 0); // wait for child to finish
   return exitCode;
 }
 
@@ -111,33 +98,30 @@ ChildProcess::wait () const
 // this method runs the specified program in the child process. The
 // output of the cild process can be read in the parent process via
 // the childProcess stream.
-int
-ChildProcess::forkNexecIO (const StrVec &argList)
-{
+int ChildProcess::forkNexecIO(const StrVec &argList) {
   int pipefd[2]; // The pipe file descriptors
-  pipe (pipefd); // Make system call to get pipe file descriptors
+  pipe(pipefd);  // Make system call to get pipe file descriptors
 
   // Fork and save the pid of the child process.
-  childPid = fork ();
+  childPid = fork();
 
   // Appropriately tie the I/O streams of the parent and child processes.
-  if (childPid == 0)
-    {
-      // In the child process
-      close (pipefd[READ]);    // Close unused end (in child)
-      dup2 (pipefd[WRITE], 1); // Tie/redirect std::cout of command
-      myExec (argList);        // Run a different program
-    }
+  if (childPid == 0) {
+    // In the child process
+    close(pipefd[READ]);    // Close unused end (in child)
+    dup2(pipefd[WRITE], 1); // Tie/redirect std::cout of command
+    myExec(argList);        // Run a different program
+  }
 
   // When control drops here we are in the parent process.  In the
   // parent process. Wrap the pipe's end into a buffer so we can
   // read the output of our child process.
-  pipeBuf = { pipefd[READ], std::ios::in, sizeof (char) };
+  pipeBuf = {pipefd[READ], std::ios::in, sizeof(char)};
   // Note the above pipeBuf is already set to be used by
   // childOutput stream in the constructor of ChildProcess
 
   // Close the unused end of the pipe in the parent process.
-  close (pipefd[WRITE]);
+  close(pipefd[WRITE]);
 
   // Return the child's pid in the parent.
   return childPid;

@@ -26,14 +26,13 @@ using StrVec = std::vector<std::string>;
  * process.  This class maintains the PID of the child process in an
  * instance variable.
  */
-class ChildProcess
-{
+class ChildProcess {
 public:
   /** A simple default (no-argument) constructor.  This constructor
       merely initializes (so the body of the method should be
       empty!) the childPid instance variable to -1.
   */
-  ChildProcess ();
+  ChildProcess();
 
   /** The destructor. This method cleans-up any resources (like open
       files etc.). However, this class is very simple and the
@@ -42,7 +41,7 @@ public:
       Note: Destructor for an object is called when the object goes
       out of scope.
   */
-  ~ChildProcess ();
+  ~ChildProcess();
 
   /**
    * Convenience method to split a given string into a vector of
@@ -54,7 +53,7 @@ public:
    * \return A list of words in the string returned as a
    * std::vector<std::string>.
    */
-  static StrVec split (const std::string &words);
+  static StrVec split(const std::string &words);
 
   /**
    * This method creates an process with output of child process
@@ -64,7 +63,7 @@ public:
    * \param[in] argList The list of command-line arguments.  The
    *   first entry is assumed to be the command to be executed.
    */
-  int forkNexecIO (const StrVec &argList);
+  int forkNexecIO(const StrVec &argList);
 
   /** The primary method in this class that:
 
@@ -79,7 +78,7 @@ public:
       \return This method returns the pid value of the child process
       forked by this method.
   */
-  int forkNexec (const StrVec &argList);
+  int forkNexec(const StrVec &argList);
 
   /** Helper method to wait for child process to finish.  This
       method calls the waitpid system call. It obtains the exit code
@@ -89,7 +88,7 @@ public:
       \return This method returns the exit code of the child
       process.
   */
-  int wait () const;
+  int wait() const;
 
   /**
    * Get the stream from where the child-process's outputs can be
@@ -103,11 +102,7 @@ public:
    * \return The stream from where the child-process's outputs can
    * be read.
    */
-  std::istream &
-  getChildOutput ()
-  {
-    return childOutput;
-  }
+  std::istream &getChildOutput() { return childOutput; }
 
 protected:
   /** A helper method to setup pointers and call execvp system call.
@@ -119,7 +114,7 @@ protected:
       \param[in] argList The list of command-line arguments.  The
       first entry is assumed to be the command to be executed.
   */
-  void myExec (StrVec argList);
+  void myExec(StrVec argList);
 
 private:
   /** The only instance variable in this class.  It is initialized

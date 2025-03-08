@@ -50,32 +50,30 @@
 #include <list>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
-class PseudoLRUCacheWorker : public virtual CacheWorker
-{
+BEGIN_NAMESPACE(pc2l);
+class PseudoLRUCacheWorker : public virtual CacheWorker {
 public:
   /**
    * Refer the key for a block to our eviction scheme
    * @param key the key to place into eviction scheme
    */
-  void refer (const MessagePtr &msg) override;
+  void refer(const MessagePtr &msg) override;
 
 private:
   /**
    * Cache items in the PLRU cache require only a flag
    * to say whether they were MRU (MRU bit)
    */
-  struct CacheItem
-  {
+  struct CacheItem {
     MessagePtr msg;
     bool wasUsed = false;
   };
 
-  void eraseFromCache (size_t key) override;
+  void eraseFromCache(size_t key) override;
 
-  void addToCache (pc2l::MessagePtr &msg) override;
+  void addToCache(pc2l::MessagePtr &msg) override;
 
-  MessagePtr &getFromCache (size_t key) override;
+  MessagePtr &getFromCache(size_t key) override;
 
   std::unordered_map<size_t, CacheItem> cache;
 
@@ -90,7 +88,7 @@ private:
   bool full = false;
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

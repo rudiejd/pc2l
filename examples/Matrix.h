@@ -15,7 +15,7 @@ using Val = double;
 
 /** Short cut to a 2-d vector double values to streamline the code */
 // block size is 100 doubles
-using Vec = pc2l::Vector<Val, 100 * sizeof (double)>;
+using Vec = pc2l::Vector<Val, 100 * sizeof(double)>;
 
 /** A matrix class to perform basic matrix operations.
 
@@ -32,8 +32,7 @@ using Vec = pc2l::Vector<Val, 100 * sizeof (double)>;
 
     </ul>
 */
-class Matrix : public Vec
-{
+class Matrix : public Vec {
   /** Stream insertion operator to ease printing matrices
    *
    * This method prints the dimension of the matrix and then prints
@@ -49,7 +48,7 @@ class Matrix : public Vec
    * \return As per convention, this method returns the supplied
    * output stream.
    */
-  friend std::ostream &operator<< (std::ostream &os, const Matrix &matrix);
+  friend std::ostream &operator<<(std::ostream &os, const Matrix &matrix);
 
   /** Stream extraction operator to ease reading matrices
    *
@@ -66,7 +65,7 @@ class Matrix : public Vec
    * \return As per convention, this method returns the supplied
    * input stream.
    */
-  friend std::istream &operator>> (std::istream &is, Matrix &matrix);
+  friend std::istream &operator>>(std::istream &is, Matrix &matrix);
 
   size_t rows;
 
@@ -84,30 +83,22 @@ public:
    * \param[in] initVal The inital value to be set for each entry in
    * the matrix.
    */
-  explicit Matrix (const size_t rows = 0, const size_t cols = 0,
-                   const Val initVal = 0);
+  explicit Matrix(const size_t rows = 0, const size_t cols = 0,
+                  const Val initVal = 0);
 
   /**
    * Returns the height or number of rows in this matrix.
    *
    * \return Returns the height or number of rows in this matrix.
    */
-  size_t
-  height () const
-  {
-    return rows;
-  };
+  size_t height() const { return rows; };
 
   /**
    * Returns the width or number of columns in this matrix.
    *
    * \return Returns the width or number of columns in this matrix.
    */
-  size_t
-  width () const
-  {
-    return cols;
-  };
+  size_t width() const { return cols; };
 
   /**
    * Creates a new matrix in which each value is obtained by
@@ -116,19 +107,14 @@ public:
    * \param[in] operation The unary operation to be used to create
    * the given matrix.
    */
-  template <typename UnaryOp>
-  Matrix
-  apply (const UnaryOp &operation) const
-  {
-    Matrix ret (this->height (), this->width ());
-    for (size_t row = 0; row < ret.height (); row++)
-      {
-        for (size_t col = 0; col < ret.width (); col++)
-          {
-            //                ret[row][col] = operation(this->at(row)[col])
-            ret.insert (row, col, operation (at (row, col)));
-          }
+  template <typename UnaryOp> Matrix apply(const UnaryOp &operation) const {
+    Matrix ret(this->height(), this->width());
+    for (size_t row = 0; row < ret.height(); row++) {
+      for (size_t col = 0; col < ret.width(); col++) {
+        //                ret[row][col] = operation(this->at(row)[col])
+        ret.insert(row, col, operation(at(row, col)));
       }
+    }
     return ret;
   }
 
@@ -139,10 +125,8 @@ public:
    * @param col column number of cell to insert into
    * @param val value to insert into cell
    */
-  void
-  insert (size_t row, size_t col, Val val)
-  {
-    Vec::insert (row * rows + col, val);
+  void insert(size_t row, size_t col, Val val) {
+    Vec::insert(row * rows + col, val);
   };
 
   /**
@@ -152,10 +136,8 @@ public:
    * @param col column number of cell to replace
    * @param val value to replace into cell
    */
-  void
-  replace (size_t row, size_t col, Val val)
-  {
-    Vec::replace (row * rows + col, val);
+  void replace(size_t row, size_t col, Val val) {
+    Vec::replace(row * rows + col, val);
   };
 
   /**
@@ -164,11 +146,7 @@ public:
    * @param col column number of cell to replace
    * @param val value to replace into cell
    */
-  void
-  erase (size_t row, size_t col)
-  {
-    Vec::erase (row * rows + col);
-  };
+  void erase(size_t row, size_t col) { Vec::erase(row * rows + col); };
 
   /**
    * Convenience method for getting the value in matrix cell (\p row, \p col).
@@ -176,11 +154,7 @@ public:
    * @param col column number of cell, 0 indexed
    * @return the data at (\p row, \p col)
    */
-  Val
-  at (size_t row, size_t col) const
-  {
-    return Vec::at (row * width () + col);
-  }
+  Val at(size_t row, size_t col) const { return Vec::at(row * width() + col); }
 
   /**
    * Operator to add two matrices with the same dimensions together.
@@ -193,7 +167,7 @@ public:
    * computed by adding the corresponding values from \c this and
    * rhs.
    */
-  Matrix operator+ (const Matrix &rhs) const;
+  Matrix operator+(const Matrix &rhs) const;
 
   /**
    * Operator for computing the Hadamard product of two matrices
@@ -207,7 +181,7 @@ public:
    * computed by multiplying the corresponding values from \c this
    * and rhs.
    */
-  Matrix operator* (const Matrix &rhs) const;
+  Matrix operator*(const Matrix &rhs) const;
 
   /**
    * Operator for computing the Hadamard product of two matrices
@@ -221,7 +195,7 @@ public:
    * computed by multiplying the corresponding values from \c this
    * and rhs.
    */
-  Matrix operator* (const Val val) const;
+  Matrix operator*(const Val val) const;
 
   /**
    * Operator to subtract two matrices with the same dimensions.
@@ -234,7 +208,7 @@ public:
    * computed by subtracting the corresponding values from \c this
    * and rhs.
    */
-  Matrix operator- (const Matrix &rhs) const;
+  Matrix operator-(const Matrix &rhs) const;
 
   /**
    * Performs the dot product of two matrices. This method has a
@@ -248,12 +222,12 @@ public:
    * computed by multiplying the corresponding values from \c this
    * and rhs.
    */
-  Matrix dot (const Matrix &rhs) const;
+  Matrix dot(const Matrix &rhs) const;
 
   /**
    * Returns the transpose of this matrix.
    */
-  Matrix transpose () const;
+  Matrix transpose() const;
 };
 
 #endif

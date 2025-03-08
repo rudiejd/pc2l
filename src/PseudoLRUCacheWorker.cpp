@@ -41,78 +41,57 @@
 #include "Exception.h"
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
-void
-PseudoLRUCacheWorker::eraseFromCache (size_t key)
-{
-  cache.erase (key);
+BEGIN_NAMESPACE(pc2l);
+void PseudoLRUCacheWorker::eraseFromCache(size_t key) { cache.erase(key); }
+
+void PseudoLRUCacheWorker::addToCache(pc2l::MessagePtr &msg) {
+  cache[msg->key] = {msg};
 }
 
-void
-PseudoLRUCacheWorker::addToCache (pc2l::MessagePtr &msg)
-{
-  cache[msg->key] = { msg };
+MessagePtr &PseudoLRUCacheWorker::getFromCache(size_t key) {
+  if (cache.find(key) != cache.end()) {
+    return cache[key].msg;
+  } else {
+    return blockNotFoundMsg;
+  }
 }
 
-MessagePtr &
-PseudoLRUCacheWorker::getFromCache (size_t key)
-{
-  if (cache.find (key) != cache.end ())
-    {
-      return cache[key].msg;
-    }
-  else
-    {
-      return blockNotFoundMsg;
-    }
-}
-
-void
-PseudoLRUCacheWorker::refer (const MessagePtr &msg)
-{
-  if (MPI_GET_RANK () != 0)
+void PseudoLRUCacheWorker::refer(const MessagePtr &msg) {
+  if (MPI_GET_RANK() != 0)
     return;
   const auto key = msg->key;
-  if (auto entry = cache.find (key); entry == cache.end ())
-    {
-      // Use eviction strategy if cache is overfull
-      if (currentBytes + msg->getSize () > cacheSize)
-        {
-          // the cache is full now and we can start resetting the mru bits
-          full = true;
-          // the first cache item without MRU bit set is removed
-          MessagePtr evicted;
-          for (auto e : cache)
-            {
-              if (!e.second.wasUsed)
-                {
-                  evicted = e.second.msg;
-                  break;
-                }
-            }
-          eraseCacheBlock (evicted);
-          const int destRank
-              = (evicted->blockTag % (System::get ().worldSize () - 1)) + 1;
-          send (evicted, destRank);
+  if (auto entry = cache.find(key); entry == cache.end()) {
+    // Use eviction strategy if cache is overfull
+    if (currentBytes + msg->getSize() > cacheSize) {
+      // the cache is full now and we can start resetting the mru bits
+      full = true;
+      // the first cache item without MRU bit set is removed
+      MessagePtr evicted;
+      for (auto e : cache) {
+        if (!e.second.wasUsed) {
+          evicted = e.second.msg;
+          break;
         }
+      }
+      eraseCacheBlock(evicted);
+      const int destRank =
+          (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
+      send(evicted, destRank);
     }
-  else
-    {
-      // If the block is present in the cache, we need to update its MRU bit
-      trueCount++;
-      if (trueCount >= cache.size () && full)
-        {
-          for (auto e : cache)
-            {
-              e.second.wasUsed = false;
-            }
-          // reset the count of MRU bools set
-          trueCount = 0;
-        }
-      entry->second.wasUsed = true;
+  } else {
+    // If the block is present in the cache, we need to update its MRU bit
+    trueCount++;
+    if (trueCount >= cache.size() && full) {
+      for (auto e : cache) {
+        e.second.wasUsed = false;
+      }
+      // reset the count of MRU bools set
+      trueCount = 0;
     }
+    entry->second.wasUsed = true;
+  }
 }
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif

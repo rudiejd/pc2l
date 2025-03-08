@@ -57,7 +57,7 @@
 #include <unordered_map>
 
 // namespace pc2l {
-BEGIN_NAMESPACE (pc2l);
+BEGIN_NAMESPACE(pc2l);
 
 /**
  * A distributed vector that runs across multiple machines
@@ -66,27 +66,17 @@ BEGIN_NAMESPACE (pc2l);
  */
 // T is first type, U is second type
 // associative map
-template <typename KeyType, typename ValueType> class Map
-{
+template <typename KeyType, typename ValueType> class Map {
 public:
-  struct MapPair
-  {
+  struct MapPair {
     KeyType first;
     ValueType second;
-    MapPair (const KeyType &key, const ValueType &value)
-        : first (key), second (value)
-    {
-    }
-    friend std::ostream &
-    operator<< (std::ostream &output, const MapPair &mp)
-    {
+    MapPair(const KeyType &key, const ValueType &value)
+        : first(key), second(value) {}
+    friend std::ostream &operator<<(std::ostream &output, const MapPair &mp) {
       return output << mp.first << ": " << mp.second;
     }
-    virtual ValueType &
-    val ()
-    {
-      return second;
-    }
+    virtual ValueType &val() { return second; }
   };
 
   typedef typename pc2l::Vector<MapPair>::Iterator iterator;
@@ -97,75 +87,56 @@ public:
    * The default constructor.  Currently, the consructor initializes
    * some of the instance variables in this class.
    */
-  Map () {}
+  Map() {}
 
   /**
    * The destructor.
    */
-  virtual ~Map () {}
+  virtual ~Map() {}
 
-  iterator
-  begin ()
-  {
-    return vec.begin ();
-  }
+  iterator begin() { return vec.begin(); }
 
-  iterator
-  end ()
-  {
-    return vec.end ();
-  }
+  iterator end() { return vec.end(); }
 
-  iterator
-  insert (KeyType key, ValueType value)
-  {
-    iterator i (std::lower_bound (vec.begin (), vec.end (), key,
-                                  [] (const MapPair &lhs, const KeyType &rhs) {
-                                    return lhs.first < rhs;
-                                  }));
+  iterator insert(KeyType key, ValueType value) {
+    iterator i(std::lower_bound(vec.begin(), vec.end(), key,
+                                [](const MapPair &lhs, const KeyType &rhs) {
+                                  return lhs.first < rhs;
+                                }));
 
-    if (i == vec.end () || std::less<KeyType>{}(key, (*i).first))
-      {
-        i = vec.insert (i, MapPair (key, value));
-      }
+    if (i == vec.end() || std::less<KeyType>{}(key, (*i).first)) {
+      i = vec.insert(i, MapPair(key, value));
+    }
     return i;
   }
 
-  iterator
-  find (const KeyType &k)
-  {
-    iterator i (
-        std::lower_bound (vec.begin (), vec.end (), k,
-                          [] (const MapPair &lhs, const KeyType &rhs) -> bool {
-                            return lhs.first < rhs;
-                          }));
-    if (i != vec.end () && std::less<KeyType>{}(k, (*i).first))
-      {
-        i = vec.end ();
-      }
+  iterator find(const KeyType &k) {
+    iterator i(
+        std::lower_bound(vec.begin(), vec.end(), k,
+                         [](const MapPair &lhs, const KeyType &rhs) -> bool {
+                           return lhs.first < rhs;
+                         }));
+    if (i != vec.end() && std::less<KeyType>{}(k, (*i).first)) {
+      i = vec.end();
+    }
     return i;
   }
 
-  ValueType &
-  operator[] (const KeyType &key)
-  {
-    auto it = find (key);
-    if (it == vec.end ())
-      {
-        ValueType val{ 1 };
-        it = insert (key, val);
-      }
-    return (*it).val ();
+  ValueType &operator[](const KeyType &key) {
+    auto it = find(key);
+    if (it == vec.end()) {
+      ValueType val{1};
+      it = insert(key, val);
+    }
+    return (*it).val();
   }
 
-  MapPair
-  make_map_pair (KeyType key, ValueType val)
-  {
-    return MapPair (key, val);
+  MapPair make_map_pair(KeyType key, ValueType val) {
+    return MapPair(key, val);
   }
 };
 
-END_NAMESPACE (pc2l);
+END_NAMESPACE(pc2l);
 // }   // end namespace pc2l
 
 #endif
