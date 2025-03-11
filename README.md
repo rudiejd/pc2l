@@ -23,9 +23,7 @@ PC2L as a library.
 ```sh
 git clone https://github.com/rudiejd/pc2l.git
 cd pc2l
-mkdir build
-cd build
-cmake .. -DPC2L_DOWNLOAD_EXTERNALS=true
+cmake -Bbuild -DPC2L_DOWNLOAD_EXTERNALS=true -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_BUILD_TYPE=Debug  
 ```
 
 ## Running the tests
