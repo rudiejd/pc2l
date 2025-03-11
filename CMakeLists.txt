@@ -54,7 +54,7 @@ if(PC2L_ENABLE_TESTS)
 	add_subdirectory(bench)
 endif()
 
-if (PC2L_BUILD_EXAMPLES)
-	add_subdirectory(examples)
-endif()
-
+# if (PC2L_BUILD_EXAMPLES)
+# 	add_subdirectory(examples)
+# endif()
+#

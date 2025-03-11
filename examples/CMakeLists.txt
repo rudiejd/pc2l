@@ -32,7 +32,7 @@ target_compile_features(web_cache PRIVATE cxx_std_11)
 
 target_link_libraries(web_cache pc2l_lib)
 
-find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(Boost COMPONENTS system thread)
 # link boost, curl, curlpp for web cache example
 target_link_libraries(web_cache ${BOOST_LIBRARIES})
 target_link_libraries(web_cache Boost::thread)
