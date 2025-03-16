@@ -13,7 +13,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_DEBUG 
+	"${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
 # Options
 option(pc2l_BUILD_EXAMPLES "Build examples in the examples/ folder" OFF)
@@ -54,7 +55,7 @@ if(PC2L_ENABLE_TESTS)
 	add_subdirectory(bench)
 endif()
 
-# if (PC2L_BUILD_EXAMPLES)
-# 	add_subdirectory(examples)
-# endif()
-#
+ if (PC2L_BUILD_EXAMPLES)
+ 	add_subdirectory(examples)
+ endif()
+
