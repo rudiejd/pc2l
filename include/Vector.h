@@ -192,7 +192,7 @@ public:
   unsigned long long siz;
 
   // block tag of last retrieved block
-  mutable size_t prevBlockTag;
+  mutable size_t prevBlockTag = 0;
 
   // reference to message containing last retrieved block
   mutable MessagePtr prevMsg;
