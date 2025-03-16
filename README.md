@@ -5,7 +5,7 @@ clustered computing environment with MPI. This was developed in Dr. DJ Rao's
 Lab at Miami University. You can read more about the lab [here](http://www.pc2lab.cec.miamioh.edu/pc2l>)
 
 
-# Compiling
+# Development
 - You must be running linux, and you must have an MPI compiler installed 
 and linked in your /usr/bin folder as `/usr/bin/mpicxx`. Many MPI 
 distributions have this as default behavior, but you should double check. 
@@ -13,7 +13,7 @@ distributions have this as default behavior, but you should double check.
 - Google's [Benchmark library](https://github.com/google/benchmark) for framework-level benchmarks 
 - [GoogleTest](https://github.com/google/googletest) for running tests
 
-To download all dependencies, you can set the build option `PC2L_DOWNLOAD_EXTERNALS=truu`
+To download all dependencies, you can set the build option `PC2L_DOWNLOAD_EXTERNALS=true`
 
 To disable tests, set `PC2L_ENABLE_TESTS=false`. If you aren't building tests,
 need either of the external dependencies. You should disable tests if you are using
@@ -23,7 +23,7 @@ PC2L as a library.
 ```sh
 git clone https://github.com/rudiejd/pc2l.git
 cd pc2l
-cmake -Bbuild -DPC2L_DOWNLOAD_EXTERNALS=true -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_BUILD_TYPE=Debug  
+cmake -Bbuild -DPC2L_DOWNLOAD_EXTERNALS=true -DPC2L_ENABLE_TESTS=true -DPC2L_BUILD_EXAMPLES=true -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_BUILD_TYPE=Debug  
 ```
 
 ## Running the tests
@@ -34,6 +34,17 @@ mpirun -n 10 ./bin/test_vector
 # load tests/benchmarks
 mpirun -n 10 /bin/bench_vector
 ```
+
+## Debugging
+You can find general approaches for debugging MPI applications in the [OpenMPI documentation](https://www.open-mpi.org/faq/?category=debugging).
+
+One of the simplest ways to debug PC2L is by running one GDB instance for each process in separate terminal windows. For example:
+```sh
+mpirun -n 2 alacritty -e gdb ./build/bin/test_vector
+```
+
+Replace `alacritty` with your terminal of choice.
+
 # Running programs that utilize PC2L
 
 Programs that utilize PC2L must be run using MPI via `mpirun` or a 
