@@ -373,7 +373,6 @@ public:
     auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
     CacheManager &cm = System::get().cacheManager();
     bool isTail = index == size();
-    std::cout << "isTail " << isTail << " index " << index << std::endl;
 
     if (!isTail) {
       // all other values shifted right one index (size incremented here)
