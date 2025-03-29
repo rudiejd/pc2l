@@ -238,8 +238,6 @@ public:
 
   T &operator[](size_t index) {
     auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
-    // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
-    //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
     prefetch(inBlockIdx, blockTag);
     if (blockTag == prevBlockTag) {
@@ -308,15 +306,7 @@ public:
     // what is the performance improvement that we may be able to
     // achieve with bitwise operations.
 
-    // const auto ret = std::lldiv(index*sizeof(T), BlockSize);
-    // const size_t blockTag = ret.quot;
-    // unsigned long long inBlockIdx = ret.rem;
-
-    // @insert: index = 99, blockTag = 12, inBlockIdx = 12
-    // @at: index = 99, blockTag = 49, inBlockIdx = 4
     auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
-    // std::cout << "@at: index = " << index << ", blockTag = " << blockTag
-    //           << ", inBlockIdx = " << inBlockIdx << std::endl;
 
     prefetch(inBlockIdx, blockTag);
     if (blockTag == prevBlockTag) {
@@ -382,43 +372,45 @@ public:
     PC2L_DEBUG_START_TIMER()
     auto [offset, blockTag, inBlockIdx] = indexCalculation(index);
     CacheManager &cm = System::get().cacheManager();
-    if (index < size()) {
+    bool isTail = index == size();
+    std::cout << "isTail " << isTail << " index " << index << std::endl;
+
+    if (!isTail) {
       // all other values shifted right one index (size incremented here)
       // we have to do this BEFORE the (potentially evicted) message with
       // this value in it is retrieved
       insert(size(), at(size() - 1));
       for (auto i = size() - 2; i > index; i--) {
         replace(i, at(i - 1));
-        //                for(size_t j = 0; j < size(); j++) {
-        //                    if (MPI_GET_RANK() == 0)
-        //                        std::cout << at(j) << std::endl;
-        //                }
       }
     }
+
     MessagePtr msg;
     if (prevBlockTag == blockTag && size() > 0) {
+      // we already have this block in memory
       msg = prevMsg;
-    } else if (index < size()) {
-      // fetch from cache manager or remote CW
-      msg = cm.getBlockFallbackRemote(dsTag, blockTag);
-    } else {
-      // if insert at end, make new block+
+    } else if (isTail) {
+      // we're inserting at the tail, create a new block
       msg =
           Message::create(BlockSize, Message::STORE_BLOCK, 0, dsTag, blockTag);
+    } else {
+      // we don't have the block in memory, but it must be on a remote worker
+      msg = cm.getBlockFallbackRemote(dsTag, blockTag);
     }
+
     char *block = msg->getPayload();
-    // std::cout << "@insert: index = " << index << ", blockTag = "
-    //         << blockTag << ", inBlockIdx = " << inBlockIdx << std::endl;
     char *serialized = reinterpret_cast<char *>(&value);
     std::move(&serialized[0], &serialized[sizeof(T)], &block[inBlockIdx]);
+
     // then put the object at retrieved index into cache
     prevMsg = msg;
     prevBlockTag = blockTag;
     cm.storeCacheBlock(msg);
-    // if it's an insert at the end, we haven't yet incremented size. otherwise
-    // we have
-    if (index == size())
+
+    // for non-tail inserts, we already increment the size on line 392
+    if (isTail) {
       siz++;
+    }
     PC2L_DEBUG_STOP_TIMER("insert(" << index << ", " << value << ")")
   }
 
