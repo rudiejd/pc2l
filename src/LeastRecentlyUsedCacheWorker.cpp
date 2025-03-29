@@ -76,7 +76,7 @@ void LeastRecentlyUsedCacheWorker::refer(const MessagePtr &msg) {
           (evicted->blockTag % (System::get().worldSize() - 1)) + 1;
       send(evicted, destRank);
     }
-  } else {
+  } else if (queue.size() > 0) {
     // If the block is present in the cache, we need to update its place in
     // the queue
     queue.erase(entry->second.placeInQueue);

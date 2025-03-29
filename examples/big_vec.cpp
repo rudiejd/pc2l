@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
   // Boilerplate code to get MPI up and running
   auto &pc2l = pc2l::System::get();
   pc2l.initialize(argc, argv);
+  pc2l.setCacheSize(10000);
   pc2l.start();
   ull num = strtoull(argv[1], NULL, 0);
 

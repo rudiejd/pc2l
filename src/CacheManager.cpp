@@ -38,6 +38,8 @@
 //---------------------------------------------------------------------
 #include "CacheManager.h"
 #include "Exception.h"
+#include "MPIHelper.h"
+#include <mpi.h>
 #include <thread>
 
 // namespace pc2l {
