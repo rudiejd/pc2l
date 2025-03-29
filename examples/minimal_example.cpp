@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
   pc2l.start();
 
   if (pc2l::MPI_GET_RANK() == 0) {
-    
-    pc2l::Vector<int, 8 * sizeof(int)> vec(100);
+
+    pc2l::Vector<int, 8 * sizeof(int)> vec;
 
     for (auto i = 0; i < 100; i++) {
       vec.push_back(i);
