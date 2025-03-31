@@ -22,7 +22,7 @@ jobs:
       run: cd ${{github.workspace}} && find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format --style=LLVM -i --dry-run -Werror
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build  -DPC2L_ENABLE_TESTS=true -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_BUILD_TYPE=Debug
+      run: cmake -B ${{github.workspace}}/build  -DPC2L_ENABLE_TESTS=true -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       # Build your program with the given configuration
