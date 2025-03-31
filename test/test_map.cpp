@@ -35,21 +35,34 @@
 //---------------------------------------------------------------------
 
 #include "Environment.h"
-#include <iostream>
 
 class UnorderedMapTest : public ::testing::Test {};
 
 int main(int argc, char *argv[]) {
-  for (int i = 0; i < argc; i++)
-    std::cout << argv[i] << std::endl;
+  auto cacheSize = 3 * (sizeof(pc2l::Message) + 4096);
+
   ::testing::InitGoogleTest(&argc, argv);
   auto &pc2l = pc2l::System::get();
+
+  pc2l.initialize(argc, argv);
+  pc2l.setCacheSize(cacheSize);
+  pc2l.start();
+
+  auto rank = pc2l::MPI_GET_RANK();
+
   auto env = new PC2LEnvironment();
-  pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 4096));
-  env->argc = argc;
-  env->argv = argv;
   ::testing::AddGlobalTestEnvironment(env);
-  return RUN_ALL_TESTS();
+
+  auto res = RUN_ALL_TESTS();
+
+  pc2l.stop();
+  pc2l.finalize();
+
+  if (rank == 0) {
+    return res;
+  } else {
+    return 0;
+  }
 }
 
 TEST_F(UnorderedMapTest, test_insert) {

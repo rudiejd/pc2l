@@ -35,22 +35,34 @@
 //---------------------------------------------------------------------
 
 #include "Environment.h"
-#include <iostream>
-#include <random>
 
 class PLRUTest : public ::testing::Test {};
 
 int main(int argc, char *argv[]) {
+  auto cacheSize = 3 * (sizeof(pc2l::Message) + 8 * sizeof(int));
+
   ::testing::InitGoogleTest(&argc, argv);
   auto &pc2l = pc2l::System::get();
-  pc2l.setCacheSize(3 * (sizeof(pc2l::Message) + 8 * sizeof(int)));
+
   pc2l.initialize(argc, argv);
-  pc2l.start(pc2l::System::PseudoLRU);
+  pc2l.setCacheSize(cacheSize);
+  pc2l.start();
+
+  auto rank = pc2l::MPI_GET_RANK();
+
   auto env = new PC2LEnvironment();
-  env->argc = argc;
-  env->argv = argv;
   ::testing::AddGlobalTestEnvironment(env);
-  return RUN_ALL_TESTS();
+
+  auto res = RUN_ALL_TESTS();
+
+  pc2l.stop();
+  pc2l.finalize();
+
+  if (rank == 0) {
+    return res;
+  } else {
+    return 0;
+  }
 }
 
 TEST_F(PLRUTest, test_plru_caching) {

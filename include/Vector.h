@@ -46,13 +46,10 @@
  */
 
 #include "CacheManager.h"
-#include "MPIHelper.h"
 #include "Message.h"
 #include "System.h"
-#include "Worker.h"
 #include <cmath>
 #include <iterator>
-#include <unordered_map>
 
 // namespace pc2l {
 BEGIN_NAMESPACE(pc2l);
