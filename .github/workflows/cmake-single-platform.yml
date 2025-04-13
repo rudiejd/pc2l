@@ -13,8 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: sudo apt-get -y install libopenmpi-dev libgtest-dev libbenchmark-dev && pip install clang-format
+    # - name: Install dependencies
+    #   run: sudo apt-get -y install libopenmpi-dev libgtest-dev libbenchmark-dev && pip install clang-format
 
     - name: Check formatting
       # Check that all of the source code is properly formatted with clang-format
