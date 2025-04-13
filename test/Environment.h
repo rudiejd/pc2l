@@ -2,6 +2,7 @@
 // Created by jd on 4/5/22.
 //
 
+#include "MPIHelper.h"
 #ifndef PC2L_ENVIRONMENT_H
 #include <gtest/gtest.h>
 #include <mpi.h>
@@ -17,8 +18,6 @@ pc2l::Vector<int, 8 * sizeof(int)> createRangeIntVec(int size) {
 
 class PC2LEnvironment : public ::testing::Environment {
 public:
-  int argc;
-  char **argv;
   // define characteristics of the PC2L instance we will use for testing
   // we use small block sizes here just to test that features are working
   // correctly. Tests for performance are conducted in the examples and/or
@@ -37,11 +36,7 @@ public:
       delete listeners.Release(listeners.default_result_printer());
     }
   }
-  void TearDown() override {
-    auto &pc2l = pc2l::System::get();
-    pc2l.stop();
-    pc2l.finalize();
-  }
+  void TearDown() override {}
 };
 #define PC2L_ENVIRONMENT_H
 
