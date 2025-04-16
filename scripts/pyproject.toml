@@ -1,0 +1,20 @@
+[project]
+name = "scripts"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "JD Rudie",email = "jd@rudiejd.io"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib (>=3.10.1,<4.0.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
