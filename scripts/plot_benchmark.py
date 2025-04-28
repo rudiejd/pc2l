@@ -2,6 +2,9 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 
+def strip_quotes(s):
+    return s.replace("'", "").replace('"', '')
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: ./plot_benchmark.py (benchmark output file)")
@@ -16,20 +19,30 @@ if __name__ == "__main__":
         benches = {}
         while line := f.readline():
             split_line = line.split(',')
-            name = split_line[0]
-            time = split_line[2]
+            print(split_line[0])
+            name_parts = split_line[0].split('/')
 
-            benches[name] = time
+            if len(name_parts) > 1:
+                name = strip_quotes(name_parts[0])
+                sample_size = strip_quotes(name_parts[1])
+                
+                time = split_line[2]
+
+                bench_times = benches.get(name, {}) 
+                bench_times[sample_size] = time
+
+                benches[name] = bench_times
+
+            print(benches)
 
 
         figure(figsize=(30, 30), dpi=80)
 
-        plt.bar(range(len(benches)), list(benches.values()), align='center')
-        plt.xticks(range(len(benches)), list(benches.keys()))
-        plt.savefig('benchmark.png')
-
+        for bench_name, bench_results in benches.items():
+            plt.bar(range(len(bench_results)), list(bench_results.values()), align='center')
+            plt.xticks(range(len(bench_results)), list(bench_results.keys()))
+            plt.savefig(f'{bench_name}_benchmark.png')
 
         
-
 
 

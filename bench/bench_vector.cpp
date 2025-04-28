@@ -4,6 +4,7 @@
 #include <numeric>
 #include <pc2l.h>
 
+// 100 MB blocks
 const auto BLOCK_SIZE = 100 * 1024 * 1024;
 
 // Benchmark pc2l::Vector.at(i) when block containing index i is currently on
@@ -82,10 +83,8 @@ BENCHMARK(BM_find_in_cache);
 
 int main(int argc, char **argv) {
   auto &pc2l = pc2l::System::get();
-  // Override the default block size to 8 ints
-  const int BlockSize = sizeof(int) * 8;
-  // set cache size to 3 blocks
-  pc2l.setCacheSize(3 * (BlockSize + sizeof(pc2l::Message)));
+  // set cache size to 20 mb
+  pc2l.setCacheSize(BLOCK_SIZE * 20);
   pc2l.initialize(argc, argv);
   pc2l.start();
 
