@@ -72,14 +72,14 @@ static void BM_std_sort(benchmark::State &state) {
 BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 10000000000);
 static void BM_find_in_cache(benchmark::State &state) {
   pc2l::Vector<int, BLOCK_SIZE> v;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < state.range(0); i++) {
     v.push_back(i);
   }
   while (state.KeepRunning()) {
-    std::find(v.begin(), v.end(), 99);
+    std::find(v.begin(), v.end(), state.range(0) / 2);
   }
 }
-BENCHMARK(BM_find_in_cache);
+BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 10000000000);
 
 int main(int argc, char **argv) {
   auto &pc2l = pc2l::System::get();
