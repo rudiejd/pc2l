@@ -2,6 +2,10 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 
+
+# in order to generate benchmark output file,
+# do BENCHMARK_FORMAT=csv mpirun -n (num processes) (benchname) 
+
 def strip_quotes(s):
     return s.replace("'", "").replace('"', '')
 
@@ -38,10 +42,14 @@ if __name__ == "__main__":
 
         figure(figsize=(30, 30), dpi=80)
 
+        plt.ylabel("Runtime")
+
+        xticks = [10 ** x for x in range(1, 13)]
+
         for bench_name, bench_results in benches.items():
-            plt.bar(range(len(bench_results)), list(bench_results.values()), align='center')
-            plt.xticks(range(len(bench_results)), list(bench_results.keys()))
-            plt.savefig(f'{bench_name}_benchmark.png')
+            plt.plot(xticks, bench_results, label=bench_name)
+
+        plt.savefig(f'{benchmark_file_name}.png')
 
         
 
