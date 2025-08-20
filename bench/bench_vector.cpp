@@ -21,7 +21,7 @@ static void BM_at(benchmark::State &state) {
     v.at(state.range(0));
   }
 }
-BENCHMARK(BM_at)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_at)->RangeMultiplier(10)->Range(10, 1'000'000'000'000);
 
 static void BM_insert(benchmark::State &state) {
   pc2l::Vector<int, BLOCK_SIZE> v;
@@ -32,7 +32,7 @@ static void BM_insert(benchmark::State &state) {
     v.push_back(1);
   }
 }
-BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 1'000'000'000'000);
 
 static void BM_insert_at_beginning(benchmark::State &state) {
   pc2l::Vector<int, BLOCK_SIZE> v;
@@ -43,7 +43,7 @@ static void BM_insert_at_beginning(benchmark::State &state) {
     v.insert(v.begin(), 1);
   }
 }
-BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 1'000'000'000'000);
 
 static void BM_find_middle(benchmark::State &state) {
   auto size = state.range(0);
@@ -57,7 +57,7 @@ static void BM_find_middle(benchmark::State &state) {
     std::find(v.begin(), v.end(), size / 2);
   }
 }
-BENCHMARK(BM_find_middle)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_find_middle)->RangeMultiplier(10)->Range(10, 1'000'000'000'000);
 
 static void BM_std_sort(benchmark::State &state) {
   pc2l::Vector<unsigned long long> vec;
@@ -69,7 +69,7 @@ static void BM_std_sort(benchmark::State &state) {
   }
 }
 
-BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 1'000'000'000'000);
 static void BM_find_in_cache(benchmark::State &state) {
   pc2l::Vector<int, BLOCK_SIZE> v;
   for (int i = 0; i < state.range(0); i++) {
@@ -79,7 +79,7 @@ static void BM_find_in_cache(benchmark::State &state) {
     std::find(v.begin(), v.end(), state.range(0) / 2);
   }
 }
-BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 1'000'000'000'000);
 
 int main(int argc, char **argv) {
   auto &pc2l = pc2l::System::get();
