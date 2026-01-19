@@ -14,7 +14,7 @@ def _():
 def _():
     for i in range(3, 9):
         print(i)
-    return (i,)
+    return
 
 
 @app.cell
@@ -33,16 +33,16 @@ def _(mo):
 
 
 @app.cell
-def _(i):
+def _():
     import duckdb
 
-    for j in range(3, 9):
+    for j in range(3, 6):
     	duckdb.sql(f"""
             INSERT INTO vector_bench
             SELECT 
                 unnest(benchmarks, recursive := true),
                 {j} AS 'procs',
-            FROM read_json('./bench_vector_{i}-procs.csv')
+            FROM read_json('./bench_vector_{j}-procs.csv')
         """)
     return
 
@@ -52,9 +52,9 @@ def _(mo, vector_bench):
     bench_df = mo.sql(
         f"""
         SELECT
-            REPLACE(STR_SPLIT(name, '/')[1], 'BM_', '') AS operationaaa,
+            REPLACE(STR_SPLIT(name, '/')[1], 'BM_', '') AS operation,
             STR_SPLIT(name, '/')[2] AS input_size,
-            ROUND(real_time / 1000, 2) AS real_time_millis,
+            real_time / 1000 AS real_time_millis,
             procs
         FROM
             vector_bench
@@ -82,7 +82,7 @@ def _(alt, bench_df):
     .mark_line(clip=True)
     .encode(
         x=alt.X(field='input_size', type='nominal', title='Input size (elements in vector)'),
-        y=alt.Y(field='real_time_millis', type='quantitative', title='Time (ms)').scale(domain=(0, 2000000)),
+        y=alt.Y(field='real_time_millis', type='quantitative', title='Time (ms)'),
         color=alt.Color(field='procs', type='nominal', title='MPI Processes'),
         column=alt.Column(field='operation', align='each', type='nominal', title='pc2l::Vector Function'),
         row=alt.Row(field='procs', align='each', title='MPI Processes'),
@@ -92,6 +92,8 @@ def _(alt, bench_df):
             alt.Tooltip(field='procs')
         ]
     )
+
+    .resolve_scale(y="independent")
     .properties(
         width=250,
         height=250,
