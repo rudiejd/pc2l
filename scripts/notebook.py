@@ -36,7 +36,7 @@ def _(mo):
 def _():
     import duckdb
 
-    for j in range(3, 6):
+    for j in range(3, 7):
     	duckdb.sql(f"""
             INSERT INTO vector_bench
             SELECT 
@@ -110,6 +110,7 @@ def _(alt, bench_df):
         labelColor='red',
         labelFontSize=14
     )
+    _chart.save('vector_benchmarks_scalability.png')
     _chart
     return
 

@@ -73,7 +73,26 @@ int main(int argc, char **argv) {
   // set cache size to 2 blocks / 20 MB
   pc2l.setCacheSize(2 * BLOCK_SIZE);
   pc2l.initialize(argc, argv);
-  pc2l.start();
+
+  auto es = pc2l::System::LeastFrequentlyUsed;
+  if (argc > 1) {
+    int strategy = std::stoi(argv[1]);
+    switch (strategy) {
+    case 1:
+      es = pc2l::System::MostRecentlyUsed;
+      std::cout << "Eviction strategy: Most Frequently Used" << std::endl;
+      break;
+    case 2:
+      es = pc2l::System::LeastFrequentlyUsed;
+      std::cout << "Eviction strategy: Least Frequently Used" << std::endl;
+      break;
+    case 3:
+      es = pc2l::System::PseudoLRU;
+      std::cout << "Eviction strategy: Pseudo-Least Recently Used" << std::endl;
+      break;
+    }
+  }
+  pc2l.start(es);
 
   benchmark::Initialize(&argc, argv);
   if (pc2l::MPI_GET_RANK() == 0) {
