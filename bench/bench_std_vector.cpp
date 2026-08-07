@@ -9,61 +9,50 @@ public:
 // the manager cache
 static void BM_at(benchmark::State &state) {
   std::vector<int> v;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < state.range(0); i++) {
     v.push_back(i);
   }
 
   while (state.KeepRunning()) {
-    v.at(state.range(0));
+    v.at(state.range(0) / 2);
   }
 }
-
-BENCHMARK(BM_at)
-    ->Args({99})
-    ->Args({98})
-    ->Args({97})
-    ->Args({96})
-    ->Args({95})
-    ->Args({94})
-    ->Args({93})
-    ->Args({92})
-    ->Args({91})
-    ->Args({90});
+BENCHMARK(BM_at)->RangeMultiplier(10)->Range(10, 10000000000);
 
 static void BM_insert(benchmark::State &state) {
   std::vector<int> v;
-  // so now the last 3 blocks will be in cache (default LRU strategy)
-  // this is [94-99], [89-93], [84-88]
-  // part that is timed is in this loop
+  for (int i = 0; i < state.range(0); i++) {
+    v.push_back(i);
+  }
+
   while (state.KeepRunning()) {
-    v.push_back(state.range(0));
+    v.push_back(1);
   }
 }
-
-BENCHMARK(BM_insert)->DenseRange(0, 10);
+BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 10000000000);
 
 static void BM_insert_at_beginning(benchmark::State &state) {
   std::vector<int> v;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < state.range(0); i++) {
     v.push_back(i);
   }
   while (state.KeepRunning()) {
-    v.insert(v.begin(), state.range(0));
+    v.insert(v.begin(), 1);
   }
 }
-
-BENCHMARK(BM_insert_at_beginning)->DenseRange(0, 10);
+BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 10000000000);
 
 static void BM_find_middle(benchmark::State &state) {
   std::vector<int> v;
-  for (int i = 0; i < 100; i++) {
+  auto size = state.range(0);
+  for (int i = 0; i < size; i++) {
     v.push_back(i);
   }
   while (state.KeepRunning()) {
-    std::find(v.begin(), v.end(), 50);
+    std::find(v.begin(), v.end(), size / 2);
   }
 }
-BENCHMARK(BM_find_middle);
+BENCHMARK(BM_find_middle)->RangeMultiplier(10)->Range(10, 10000000000);
 
 int main(int argc, char **argv) {
   benchmark::Initialize(&argc, argv);
