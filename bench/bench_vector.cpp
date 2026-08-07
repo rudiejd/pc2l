@@ -78,6 +78,10 @@ int main(int argc, char **argv) {
   if (argc > 1) {
     int strategy = std::stoi(argv[1]);
     switch (strategy) {
+    case 0:
+      es = pc2l::System::LeastRecentlyUsed;
+      std::cout << "Eviction strategy: Least Recently Used" << std::endl;
+      break;
     case 1:
       es = pc2l::System::MostRecentlyUsed;
       std::cout << "Eviction strategy: Most Frequently Used" << std::endl;
