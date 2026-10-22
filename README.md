@@ -6,9 +6,14 @@ Lab at Miami University. You can read more about the lab [here](http://www.pc2la
 
 
 # Development
-- You must be running linux, and you must have an MPI compiler installed 
+You must be running linux, and you must have an MPI compiler installed 
 and linked in your /usr/bin folder as `/usr/bin/mpicxx`. Many MPI 
 distributions have this as default behavior, but you should double check. 
+Python is also necessary if you wish to graph the benchmark outputs.
+
+For your convenience, a `mise.toml` file is provided which will allow you to
+easily install the necessary version `gcc`, `cmake`, and `python`.
+
 ## Dependencies
 - Google's [Benchmark library](https://github.com/google/benchmark) for framework-level benchmarks 
 - [GoogleTest](https://github.com/google/googletest) for running tests

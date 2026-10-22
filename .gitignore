@@ -16,3 +16,5 @@ _deps
 .idea
 .vscode
 .cache
+scripts/*png
+scripts/__marimo__

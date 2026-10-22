@@ -4,11 +4,14 @@
 #include <numeric>
 #include <pc2l.h>
 
+// 10 MB blocks
+const auto BLOCK_SIZE = 10 * 1024 * 1024;
+
 // Benchmark pc2l::Vector.at(i) when block containing index i is currently on
 // the manager cache
 static void BM_at(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
-  for (int i = 0; i < 100; i++) {
+  pc2l::Vector<int, BLOCK_SIZE> v;
+  for (int i = 0; i < state.range(0); i++) {
     v.insert(i, i);
   }
   // so now the last 3 blocks will be in cache (default LRU strategy)
@@ -18,97 +21,44 @@ static void BM_at(benchmark::State &state) {
     v.at(state.range(0));
   }
 }
-BENCHMARK(BM_at)->Args({0});
-
-static void BM_at_prefetch(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int), 5, pc2l::FORWARD_SEQUENTIAL> v;
-  for (int i = 0; i < 100; i++) {
-    v.insert(i, i);
-  }
-  // so now the last 3 blocks will be in cache (default LRU strategy)
-  // this is [94-99], [89-93], [84-88]
-  // part that is timed is in this loop
-  while (state.KeepRunning()) {
-    v.at(state.range(0));
-  }
-}
-BENCHMARK(BM_at_prefetch)->Args({0});
+BENCHMARK(BM_at)->RangeMultiplier(10)->Range(10, 1'000'000);
 
 static void BM_insert(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
+  pc2l::Vector<int, BLOCK_SIZE> v;
   // so now the last 3 blocks will be in cache (default LRU strategy)
   // this is [94-99], [89-93], [84-88]
   // part that is timed is in this loop
   while (state.KeepRunning()) {
-    v.push_back(state.range(0));
+    v.push_back(1);
   }
 }
-BENCHMARK(BM_insert)->Args({0});
-
-static void BM_replace(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
-  v.push_back(0);
-  while (state.KeepRunning()) {
-    v.replace(0, 1);
-  }
-}
-BENCHMARK(BM_replace);
-
-static void BM_replace_out_of_cache(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
-  for (size_t i = 0; i < 100; i++) {
-    v.push_back(i);
-  }
-
-  // the first block should be out of cache
-  while (state.KeepRunning()) {
-    v.replace(0, 1);
-  }
-}
-BENCHMARK(BM_replace_out_of_cache);
-
+BENCHMARK(BM_insert)->RangeMultiplier(10)->Range(10, 1'000'000);
 static void BM_insert_at_beginning(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
-  for (int i = 0; i < 100; i++) {
-    v.push_back(i);
-  }
-  while (state.KeepRunning()) {
-    v.insert(0, state.range(0));
-  }
-}
-BENCHMARK(BM_insert_at_beginning)->Args({0});
-
-static void BM_find_out_of_cache(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
+  pc2l::Vector<int, BLOCK_SIZE> v;
   for (int i = 0; i < state.range(0); i++) {
     v.push_back(i);
   }
   while (state.KeepRunning()) {
-    std::find(v.begin(), v.end(), state.range(0) / 2);
+    v.insert(v.begin(), 1);
   }
 }
-BENCHMARK(BM_find_out_of_cache)->RangeMultiplier(10)->Range(10, 10000000000);
 
-static void BM_project_euler(benchmark::State &state) {
-  pc2l::Vector<unsigned long long> vec(state.range(0));
+BENCHMARK(BM_insert_at_beginning)->RangeMultiplier(10)->Range(10, 1'000'000);
+static void BM_find_middle(benchmark::State &state) {
+  auto size = state.range(0);
 
+  pc2l::Vector<int, BLOCK_SIZE> v;
+  for (int i = 0; i < size; i++) {
+    v.push_back(i);
+  }
   while (state.KeepRunning()) {
-    // fill vector with values from 1 to n
-    std::iota(vec.begin(), vec.end(), 1);
-
-    // every number that does not have a 3 or 5 as a factor is set to 0
-    std::replace_if(
-        vec.begin(), vec.end(), [](auto i) { return !((i % 3) || (i % 5)); },
-        0);
-
-    // sum all elements in the vector
-    auto total = std::accumulate(vec.begin(), vec.end(), 0ULL);
+    std::find(v.begin(), v.end(), size / 2);
   }
 }
-BENCHMARK(BM_project_euler)->RangeMultiplier(10)->Range(10, 10000000000);
+BENCHMARK(BM_find_middle)->RangeMultiplier(10)->Range(10, 1'000'000);
 
 static void BM_std_sort(benchmark::State &state) {
-  pc2l::Vector<unsigned long long> vec;
+  pc2l::Vector<unsigned long long, BLOCK_SIZE> vec;
   for (auto i = 0; i < state.range(0); i++) {
     vec.push_back(i);
   }
@@ -116,27 +66,37 @@ static void BM_std_sort(benchmark::State &state) {
     std::sort(vec.begin(), vec.end());
   }
 }
-
-BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 10000000000);
-static void BM_find_in_cache(benchmark::State &state) {
-  pc2l::Vector<int, 8 * sizeof(int)> v;
-  for (int i = 0; i < 100; i++) {
-    v.push_back(i);
-  }
-  while (state.KeepRunning()) {
-    std::find(v.begin(), v.end(), 99);
-  }
-}
-BENCHMARK(BM_find_in_cache);
+BENCHMARK(BM_std_sort)->RangeMultiplier(10)->Range(10, 1'000'000);
 
 int main(int argc, char **argv) {
   auto &pc2l = pc2l::System::get();
-  // Override the default block size to 8 ints
-  const int BlockSize = sizeof(int) * 8;
-  // set cache size to 3 blocks
-  pc2l.setCacheSize(3 * (BlockSize + sizeof(pc2l::Message)));
+  // set cache size to 2 blocks / 20 MB
+  pc2l.setCacheSize(2 * BLOCK_SIZE);
   pc2l.initialize(argc, argv);
-  pc2l.start();
+
+  auto es = pc2l::System::LeastFrequentlyUsed;
+  if (argc > 1) {
+    int strategy = std::stoi(argv[1]);
+    switch (strategy) {
+    case 0:
+      es = pc2l::System::LeastRecentlyUsed;
+      std::cout << "Eviction strategy: Least Recently Used" << std::endl;
+      break;
+    case 1:
+      es = pc2l::System::MostRecentlyUsed;
+      std::cout << "Eviction strategy: Most Frequently Used" << std::endl;
+      break;
+    case 2:
+      es = pc2l::System::LeastFrequentlyUsed;
+      std::cout << "Eviction strategy: Least Frequently Used" << std::endl;
+      break;
+    case 3:
+      es = pc2l::System::PseudoLRU;
+      std::cout << "Eviction strategy: Pseudo-Least Recently Used" << std::endl;
+      break;
+    }
+  }
+  pc2l.start(es);
 
   benchmark::Initialize(&argc, argv);
   if (pc2l::MPI_GET_RANK() == 0) {
