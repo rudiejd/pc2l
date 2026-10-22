@@ -222,5 +222,45 @@ def _(bench_df):
     return (alt,)
 
 
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        CREATE TABLE formatted_results AS
+        SELECT
+            REPLACE(STR_SPLIT(name, '/') [1], 'BM_', '') AS 'Function',
+            STR_SPLIT(name, '/') [2] AS 'Input Size',
+            procs AS 'Processes',
+            cpu_time as 'CPU Time',
+            real_time as 'Clock Time',
+            strategy AS 'Cache Eviction Strategy'
+        FROM
+            read_csv('./strategy_processes_matrix_results.csv')
+        ORDER BY "Function", "Input Size", "Processes", "Cache Eviction Strategy"
+        """
+    )
+    return
+
+
+@app.cell
+def _(formatted_results, mo):
+    formatted_results_df = mo.sql(
+        f"""
+        SELECT * FROM formatted_results
+        """
+    )
+    return (formatted_results_df,)
+
+
+@app.cell
+def _(formatted_results_df):
+    # write results to latex table
+    df = formatted_results_df.to_pandas()
+    with open('./latex_table.tex', 'w') as f:
+        f.write(df.to_latex(index=False))
+    
+    return
+
+
 if __name__ == "__main__":
     app.run()

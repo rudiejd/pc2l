@@ -1,516 +1,516 @@
-\begin{tabular}{lrrllrrrrrrlrl}
+\begin{tabular}{llrrrl}
 \toprule
-name & family_index & per_family_instance_index & run_name & run_type & repetitions & repetition_index & threads & iterations & real_time & cpu_time & time_unit & procs & strategy \\
+Function & Input Size & Processes & CPU Time & Clock Time & Cache Eviction Strategy \\
 \midrule
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10794296 & 64.695150 & 64.694073 & ns & 2 & Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10785069 & 64.895023 & 64.892352 & ns & 2 & Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10808084 & 64.843605 & 64.841575 & ns & 2 & Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10815165 & 64.785897 & 64.784530 & ns & 2 & Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10813408 & 64.853757 & 64.853116 & ns & 2 & Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10814631 & 64.736671 & 64.735971 & ns & 2 & Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1691530 & 415.345319 & 415.333247 & ns & 2 & Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1686276 & 414.980635 & 414.975834 & ns & 2 & Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1686669 & 414.448628 & 414.427282 & ns & 2 & Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1681660 & 415.377193 & 415.360579 & ns & 2 & Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1597287 & 436.879541 & 436.869752 & ns & 2 & Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1602395 & 439.144551 & 439.122460 & ns & 2 & Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2828 & 697893.554808 & 697875.316832 & ns & 2 & Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2386 & 634333.360861 & 634307.258173 & ns & 2 & Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1362 & 824881.326734 & 824834.933186 & ns & 2 & Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 142 & 4937156.154995 & 4936691.894366 & ns & 2 & Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 48699379.358108 & 48699368.142857 & ns & 2 & Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 489880835.491931 & 489863359.000004 & ns & 2 & Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1471283 & 475.713663 & 475.683996 & ns & 2 & Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 186517 & 3749.602079 & 3749.495006 & ns & 2 & Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 19473 & 36075.263134 & 36073.398398 & ns & 2 & Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1974 & 358948.117022 & 358942.837386 & ns & 2 & Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 198 & 3531331.424260 & 3531195.545455 & ns & 2 & Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 20 & 35305043.499102 & 35302575.950000 & ns & 2 & Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 217350 & 3223.718279 & 3223.693968 & ns & 2 & Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6926 & 101003.894166 & 101001.426798 & ns & 2 & Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 443 & 1575664.747202 & 1575608.884876 & ns & 2 & Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 23822688.379180 & 23820880.172413 & ns & 2 & Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 295682002.993999 & 295674946.500000 & ns & 2 & Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3532817244.005855 & 3532672898.999991 & ns & 2 & Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10502085 & 66.573984 & 66.573130 & ns & 3 & Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10631756 & 66.674464 & 66.645224 & ns & 3 & Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10517868 & 66.667446 & 66.666384 & ns & 3 & Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10510374 & 66.680453 & 66.679534 & ns & 3 & Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10521541 & 66.708852 & 66.707381 & ns & 3 & Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10494689 & 66.569713 & 66.567325 & ns & 3 & Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1574569 & 447.745734 & 447.741860 & ns & 3 & Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1572032 & 447.834794 & 447.816233 & ns & 3 & Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1565551 & 446.406255 & 446.392001 & ns & 3 & Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1565702 & 447.134273 & 447.117237 & ns & 3 & Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1562390 & 446.455046 & 446.443168 & ns & 3 & Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1563119 & 447.742860 & 447.492244 & ns & 3 & Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2770 & 688320.917324 & 688204.697112 & ns & 3 & Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2367 & 633650.115759 & 633529.988171 & ns & 3 & Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1344 & 828260.965028 & 827871.266369 & ns & 3 & Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 140 & 4981370.357148 & 4979365.128571 & ns & 3 & Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 49439448.000547 & 49438354.214286 & ns & 3 & Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 495461874.990724 & 495262352.000005 & ns & 3 & Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1552505 & 456.048522 & 456.037885 & ns & 3 & Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 184569 & 3770.314419 & 3770.216656 & ns & 3 & Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 19513 & 35992.681136 & 35978.196843 & ns & 3 & Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1948 & 359264.678640 & 359264.712012 & ns & 3 & Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 200 & 3553585.469926 & 3553487.795000 & ns & 3 & Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 20 & 35563871.399791 & 35555317.900000 & ns & 3 & Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 215869 & 3234.862662 & 3234.865849 & ns & 3 & Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6868 & 102044.634388 & 102042.945545 & ns & 3 & Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 443 & 1579905.094820 & 1579859.480813 & ns & 3 & Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 23854939.276072 & 23854663.689655 & ns & 3 & Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 295368920.007604 & 295365655.499999 & ns & 3 & Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3574601114.989491 & 3574497518.000001 & ns & 3 & Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10609661 & 66.539701 & 66.538122 & ns & 3 & Most Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10564021 & 66.540282 & 66.538072 & ns & 3 & Most Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10522960 & 66.424252 & 66.422646 & ns & 3 & Most Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10651787 & 66.778549 & 66.778445 & ns & 3 & Most Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10438547 & 66.448184 & 66.444783 & ns & 3 & Most Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10530434 & 66.266502 & 66.265760 & ns & 3 & Most Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1584333 & 442.093788 & 442.082206 & ns & 3 & Most Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1592885 & 440.737631 & 440.730395 & ns & 3 & Most Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1579625 & 443.915860 & 443.905497 & ns & 3 & Most Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1578057 & 440.538424 & 440.514339 & ns & 3 & Most Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1579579 & 443.777308 & 443.769644 & ns & 3 & Most Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1578543 & 440.426108 & 440.414772 & ns & 3 & Most Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2798 & 693004.490708 & 692976.945318 & ns & 3 & Most Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2379 & 634135.792342 & 634123.652375 & ns & 3 & Most Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1355 & 822944.705533 & 822924.685609 & ns & 3 & Most Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 142 & 4938786.514071 & 4938624.992958 & ns & 3 & Most Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 49026346.358005 & 49024631.357143 & ns & 3 & Most Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 490579971.505213 & 490572320.500000 & ns & 3 & Most Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1457809 & 479.482907 & 479.480553 & ns & 3 & Most Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 184987 & 3771.364950 & 3771.247958 & ns & 3 & Most Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 19347 & 36216.353749 & 36216.132372 & ns & 3 & Most Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1945 & 359755.369148 & 359751.564010 & ns & 3 & Most Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 194 & 3600004.036100 & 3599941.381443 & ns & 3 & Most Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 20 & 35881129.899644 & 35880277.550000 & ns & 3 & Most Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 215429 & 3256.257092 & 3256.198618 & ns & 3 & Most Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6836 & 102350.074606 & 102345.398625 & ns & 3 & Most Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 439 & 1592921.913450 & 1592896.093394 & ns & 3 & Most Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 24078831.310456 & 24078489.413793 & ns & 3 & Most Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 298951326.505630 & 298942599.499995 & ns & 3 & Most Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3560155035.986099 & 3560105297.999996 & ns & 3 & Most Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10515558 & 66.375324 & 66.374817 & ns & 3 & Least Frequently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10667578 & 66.689153 & 66.687822 & ns & 3 & Least Frequently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10510337 & 66.514813 & 66.514342 & ns & 3 & Least Frequently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10531223 & 66.611906 & 66.611478 & ns & 3 & Least Frequently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10486074 & 66.626375 & 66.625212 & ns & 3 & Least Frequently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10492780 & 66.646077 & 66.643591 & ns & 3 & Least Frequently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1776779 & 394.872759 & 394.866228 & ns & 3 & Least Frequently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1779040 & 393.428007 & 393.420237 & ns & 3 & Least Frequently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1783734 & 394.713907 & 394.495971 & ns & 3 & Least Frequently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1780333 & 394.900808 & 394.689344 & ns & 3 & Least Frequently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1778163 & 395.284215 & 395.277176 & ns & 3 & Least Frequently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1773563 & 396.832421 & 396.832186 & ns & 3 & Least Frequently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3174 & 688164.655012 & 688154.987083 & ns & 3 & Least Frequently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2700 & 632304.648526 & 632293.569259 & ns & 3 & Least Frequently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 648035.380989 & 648029.997000 & ns & 3 & Least Frequently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 161 & 4358489.198866 & 4358393.062112 & ns & 3 & Least Frequently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 16 & 43097889.874844 & 43096988.437500 & ns & 3 & Least Frequently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 431231959.504658 & 431231792.000005 & ns & 3 & Least Frequently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1526563 & 460.296445 & 460.293734 & ns & 3 & Least Frequently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 186064 & 3790.890468 & 3790.774642 & ns & 3 & Least Frequently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 19359 & 36205.056615 & 36191.342941 & ns & 3 & Least Frequently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1952 & 358253.304303 & 358100.333504 & ns & 3 & Least Frequently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 196 & 3565841.112244 & 3565787.770408 & ns & 3 & Least Frequently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 20 & 35713652.000413 & 35712647.750000 & ns & 3 & Least Frequently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 214874 & 3254.333893 & 3253.039530 & ns & 3 & Least Frequently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6827 & 102683.404131 & 102680.180606 & ns & 3 & Least Frequently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 437 & 1598434.984014 & 1597802.430206 & ns & 3 & Least Frequently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 24163157.068964 & 24152926.379310 & ns & 3 & Least Frequently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 296036936.502787 & 296033391.999998 & ns & 3 & Least Frequently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3538073514.006101 & 3537979559.999997 & ns & 3 & Least Frequently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10492564 & 66.707379 & 66.678176 & ns & 3 & Pseudo-Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10500159 & 66.672259 & 66.671620 & ns & 3 & Pseudo-Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10871243 & 66.693555 & 66.692771 & ns & 3 & Pseudo-Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10621927 & 67.141304 & 67.140656 & ns & 3 & Pseudo-Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10533720 & 67.243555 & 67.243534 & ns & 3 & Pseudo-Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10557455 & 66.503441 & 66.501958 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1800245 & 388.092850 & 388.092965 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1803548 & 388.666528 & 388.662053 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1802629 & 388.411385 & 388.408753 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1799386 & 390.695091 & 390.681342 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1801220 & 390.813783 & 390.806074 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1800546 & 390.874696 & 390.863592 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3121 & 687142.371996 & 687133.389298 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2667 & 630396.395204 & 630385.567304 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 655071.649002 & 655043.174000 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 159 & 4404381.201266 & 4404347.679245 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 16 & 43745768.687586 & 43745812.812500 & ns & 3 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 436433021.997800 & 436426615.000002 & ns & 3 & Pseudo-Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1500763 & 460.509454 & 460.507209 & ns & 3 & Pseudo-Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 185408 & 3772.529422 & 3772.407836 & ns & 3 & Pseudo-Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 19436 & 35820.573575 & 35818.592097 & ns & 3 & Pseudo-Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1982 & 350070.898093 & 350066.546922 & ns & 3 & Pseudo-Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 197 & 3573467.649772 & 3571776.111675 & ns & 3 & Pseudo-Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 20 & 35765709.000407 & 35764636.600000 & ns & 3 & Pseudo-Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 215030 & 3250.741297 & 3250.616435 & ns & 3 & Pseudo-Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6863 & 101952.687015 & 101952.784059 & ns & 3 & Pseudo-Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 443 & 1581734.796864 & 1581669.478555 & ns & 3 & Pseudo-Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 24067152.517342 & 24066892.724138 & ns & 3 & Pseudo-Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 298922324.494924 & 298922257.500003 & ns & 3 & Pseudo-Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3554536701.005418 & 3554484325.999994 & ns & 3 & Pseudo-Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10274916 & 68.276594 & 68.274794 & ns & 4 & Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10282494 & 68.330875 & 68.330404 & ns & 4 & Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10224094 & 68.262371 & 68.260555 & ns & 4 & Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10246431 & 68.417074 & 68.414452 & ns & 4 & Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10247313 & 68.463965 & 68.462083 & ns & 4 & Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10257136 & 68.293527 & 68.290807 & ns & 4 & Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1532503 & 457.505998 & 457.501991 & ns & 4 & Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1527641 & 456.912424 & 456.904474 & ns & 4 & Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1534359 & 457.731032 & 457.727585 & ns & 4 & Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1528286 & 457.460776 & 457.451637 & ns & 4 & Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1535503 & 456.638253 & 456.632368 & ns & 4 & Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1540268 & 458.076630 & 458.077951 & ns & 4 & Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2663 & 690412.362742 & 690403.056327 & ns & 4 & Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2315 & 631897.192228 & 631870.443197 & ns & 4 & Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1320 & 834649.612101 & 834649.372727 & ns & 4 & Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 138 & 5082041.065232 & 5081989.623188 & ns & 4 & Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 51544878.999786 & 51544546.357143 & ns & 4 & Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 1 & 514836767.979432 & 514829486.000004 & ns & 4 & Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1487889 & 467.487795 & 467.488288 & ns & 4 & Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 181272 & 3862.992310 & 3862.960474 & ns & 4 & Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18777 & 37122.090430 & 37121.902700 & ns & 4 & Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1949 & 363892.263207 & 363746.818368 & ns & 4 & Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 192 & 3641066.406241 & 3640951.234375 & ns & 4 & Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36517196.578452 & 36497075.631579 & ns & 4 & Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 211235 & 3318.082851 & 3316.556361 & ns & 4 & Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6719 & 104198.574791 & 104156.348117 & ns & 4 & Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 435 & 1610345.802278 & 1610327.694253 & ns & 4 & Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 24306603.896046 & 24306601.620689 & ns & 4 & Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 304863227.502210 & 304855209.999999 & ns & 4 & Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3625412215.013057 & 3625346796.000001 & ns & 4 & Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10223073 & 68.233257 & 68.232530 & ns & 4 & Most Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10244179 & 68.631150 & 68.630297 & ns & 4 & Most Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10315447 & 67.831218 & 67.831360 & ns & 4 & Most Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10280756 & 68.437115 & 68.436619 & ns & 4 & Most Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10231576 & 68.391058 & 68.354395 & ns & 4 & Most Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10484810 & 67.701152 & 67.701150 & ns & 4 & Most Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1538822 & 456.830086 & 456.824952 & ns & 4 & Most Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1542637 & 456.061655 & 456.054600 & ns & 4 & Most Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1534235 & 457.841333 & 457.837161 & ns & 4 & Most Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1515548 & 461.292053 & 461.285571 & ns & 4 & Most Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1516436 & 461.491282 & 461.477957 & ns & 4 & Most Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1521807 & 461.725045 & 461.710636 & ns & 4 & Most Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2725 & 690704.777980 & 690674.101651 & ns & 4 & Most Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2331 & 637302.925783 & 637283.643501 & ns & 4 & Most Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1322 & 836101.351747 & 836057.124054 & ns & 4 & Most Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 139 & 5070549.007103 & 5070380.971223 & ns & 4 & Most Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 50516921.785727 & 50494469.714286 & ns & 4 & Most Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 505063016.491476 & 505056844.999999 & ns & 4 & Most Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1425948 & 489.985709 & 489.980746 & ns & 4 & Most Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 182037 & 3851.490082 & 3851.459917 & ns & 4 & Most Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18727 & 37057.267582 & 37056.213008 & ns & 4 & Most Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1908 & 369662.479564 & 369653.255241 & ns & 4 & Most Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 193 & 3628121.005248 & 3627897.036269 & ns & 4 & Most Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36286506.052803 & 36284890.789474 & ns & 4 & Most Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 211059 & 3314.203910 & 3314.088141 & ns & 4 & Most Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6729 & 103836.622533 & 103833.261852 & ns & 4 & Most Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 436 & 1614868.091732 & 1614798.183486 & ns & 4 & Most Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 24710299.500189 & 24710193.142857 & ns & 4 & Most Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 310490650.997963 & 310484594.000002 & ns & 4 & Most Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3589455697.976519 & 3589353818.000006 & ns & 4 & Most Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10243200 & 68.520311 & 68.519341 & ns & 4 & Least Frequently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10274862 & 68.443963 & 68.441810 & ns & 4 & Least Frequently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10226302 & 68.383984 & 68.381215 & ns & 4 & Least Frequently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10229501 & 68.183356 & 68.180090 & ns & 4 & Least Frequently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10249199 & 68.409918 & 68.409349 & ns & 4 & Least Frequently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10289584 & 67.985664 & 67.985385 & ns & 4 & Least Frequently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1727963 & 406.004539 & 405.998882 & ns & 4 & Least Frequently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1725930 & 404.036134 & 404.030816 & ns & 4 & Least Frequently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1678664 & 416.609999 & 416.600155 & ns & 4 & Least Frequently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1677611 & 417.437083 & 417.434116 & ns & 4 & Least Frequently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1676647 & 417.078140 & 417.072466 & ns & 4 & Least Frequently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1678131 & 418.854303 & 418.854657 & ns & 4 & Least Frequently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3101 & 690268.963236 & 690259.620445 & ns & 4 & Least Frequently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2624 & 622839.551453 & 622602.126905 & ns & 4 & Least Frequently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 659841.849993 & 659576.949000 & ns & 4 & Least Frequently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 158 & 4434836.784870 & 4433082.664557 & ns & 4 & Least Frequently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 16 & 43978018.498819 & 43957851.562499 & ns & 4 & Least Frequently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 440138641.497469 & 440132920.499998 & ns & 4 & Least Frequently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1463608 & 490.512885 & 490.509423 & ns & 4 & Least Frequently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 181061 & 3892.462375 & 3892.419698 & ns & 4 & Least Frequently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18888 & 37422.245712 & 37421.927838 & ns & 4 & Least Frequently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1920 & 366858.164064 & 366852.248958 & ns & 4 & Least Frequently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 193 & 3619092.233253 & 3618951.088083 & ns & 4 & Least Frequently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 20 & 35991667.499184 & 35973004.800000 & ns & 4 & Least Frequently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 211668 & 3306.975036 & 3306.914508 & ns & 4 & Least Frequently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6724 & 103951.454491 & 103950.110351 & ns & 4 & Least Frequently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 435 & 1609364.301154 & 1609332.365517 & ns & 4 & Least Frequently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 24358678.138454 & 24358393.413793 & ns & 4 & Least Frequently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 302476380.005828 & 302466983.499997 & ns & 4 & Least Frequently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3620395615.987946 & 3619287403.000001 & ns & 4 & Least Frequently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10305915 & 68.402063 & 68.402026 & ns & 4 & Pseudo-Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10241909 & 68.398430 & 68.398378 & ns & 4 & Pseudo-Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10298287 & 69.404452 & 69.402641 & ns & 4 & Pseudo-Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10339703 & 68.232153 & 68.230668 & ns & 4 & Pseudo-Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10251517 & 68.181486 & 68.177948 & ns & 4 & Pseudo-Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10229811 & 68.077797 & 68.076595 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1764373 & 396.730819 & 396.728021 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1764534 & 396.589448 & 396.587674 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1764078 & 397.599860 & 397.600180 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1767689 & 399.054632 & 399.046672 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1767996 & 399.549151 & 399.545076 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1754163 & 401.857046 & 401.843639 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3052 & 686935.294557 & 686930.452163 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2596 & 626998.555093 & 626994.840524 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 671090.328979 & 671069.410000 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 156 & 4510815.820443 & 4510698.403846 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 16 & 44829936.561655 & 44828845.000000 & ns & 4 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 448100078.996504 & 448090355.500000 & ns & 4 & Pseudo-Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1482804 & 478.899712 & 478.891655 & ns & 4 & Pseudo-Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 180495 & 3868.269365 & 3868.191994 & ns & 4 & Pseudo-Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18866 & 37180.601400 & 37178.846072 & ns & 4 & Pseudo-Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1911 & 361474.132913 & 361468.648875 & ns & 4 & Pseudo-Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 196 & 3569437.382590 & 3569408.438775 & ns & 4 & Pseudo-Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36088609.789180 & 36087775.684211 & ns & 4 & Pseudo-Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 212249 & 3303.174663 & 3303.097781 & ns & 4 & Pseudo-Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6742 & 104124.586768 & 104124.583803 & ns & 4 & Pseudo-Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 432 & 1610493.865748 & 1610465.067130 & ns & 4 & Pseudo-Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 29 & 24304806.206632 & 24304367.137931 & ns & 4 & Pseudo-Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 301102423.487464 & 301099252.000000 & ns & 4 & Pseudo-Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3595846528.012771 & 3595762644.999993 & ns & 4 & Pseudo-Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10235937 & 68.903507 & 68.902535 & ns & 5 & Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10135814 & 68.786180 & 68.785284 & ns & 5 & Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10120891 & 68.876935 & 68.876419 & ns & 5 & Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10226418 & 68.576707 & 68.575612 & ns & 5 & Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10096709 & 68.741783 & 68.740841 & ns & 5 & Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10142099 & 68.789306 & 68.786806 & ns & 5 & Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1503224 & 467.396732 & 467.393214 & ns & 5 & Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1518206 & 465.504227 & 465.499243 & ns & 5 & Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1492501 & 466.225421 & 466.222159 & ns & 5 & Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1497098 & 466.664238 & 466.654798 & ns & 5 & Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1499686 & 467.490690 & 467.482568 & ns & 5 & Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1485267 & 467.775796 & 467.503834 & ns & 5 & Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2697 & 688691.609567 & 688459.298851 & ns & 5 & Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2295 & 633883.694999 & 633641.543791 & ns & 5 & Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1314 & 843091.368337 & 842866.714612 & ns & 5 & Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 138 & 5116242.289870 & 5116214.347826 & ns & 5 & Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 50904062.572434 & 50902961.785714 & ns & 5 & Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 1 & 507123702.991521 & 507118284.000001 & ns & 5 & Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1407284 & 496.768474 & 496.764905 & ns & 5 & Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 178075 & 3903.695847 & 3902.141165 & ns & 5 & Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18778 & 37239.119821 & 37224.846096 & ns & 5 & Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1905 & 368937.265615 & 368786.124409 & ns & 5 & Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 195 & 3633717.128123 & 3633016.071795 & ns & 5 & Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36735728.263585 & 36734681.947369 & ns & 5 & Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 207102 & 3378.364849 & 3378.309282 & ns & 5 & Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6620 & 105428.086257 & 105426.700755 & ns & 5 & Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 428 & 1645716.352817 & 1645703.570093 & ns & 5 & Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 24885844.035972 & 24885085.750000 & ns & 5 & Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 305582794.491784 & 305568908.500000 & ns & 5 & Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3644730669.009732 & 3643997732.000001 & ns & 5 & Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10243172 & 68.876123 & 68.874468 & ns & 5 & Most Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10175842 & 69.664754 & 69.636345 & ns & 5 & Most Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10160737 & 68.617488 & 68.617502 & ns & 5 & Most Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10149148 & 69.170274 & 69.170273 & ns & 5 & Most Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10180259 & 68.719886 & 68.718758 & ns & 5 & Most Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10280479 & 68.785805 & 68.785300 & ns & 5 & Most Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1440356 & 485.752333 & 485.731426 & ns & 5 & Most Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1438998 & 485.880905 & 485.862458 & ns & 5 & Most Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1435191 & 487.448011 & 487.430244 & ns & 5 & Most Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1441351 & 484.971754 & 484.953506 & ns & 5 & Most Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1438147 & 485.529232 & 485.516383 & ns & 5 & Most Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1439180 & 485.658493 & 485.641840 & ns & 5 & Most Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2613 & 693612.466896 & 693596.643322 & ns & 5 & Most Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2194 & 630629.072477 & 630621.879216 & ns & 5 & Most Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1256 & 860999.127396 & 860980.317675 & ns & 5 & Most Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 133 & 5316293.819613 & 5316289.466165 & ns & 5 & Most Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 13 & 52740994.075206 & 52740608.307692 & ns & 5 & Most Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 1 & 524359264.993109 & 524359630.999996 & ns & 5 & Most Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1465033 & 476.673529 & 476.666430 & ns & 5 & Most Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 179823 & 3895.472192 & 3895.415408 & ns & 5 & Most Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18904 & 37109.853312 & 37109.522429 & ns & 5 & Most Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1906 & 364569.107021 & 364562.638510 & ns & 5 & Most Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 193 & 3624483.632042 & 3624456.782383 & ns & 5 & Most Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36589909.632886 & 36589130.894737 & ns & 5 & Most Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 209003 & 3351.589618 & 3351.447544 & ns & 5 & Most Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6571 & 106554.914774 & 106554.733526 & ns & 5 & Most Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 425 & 1655595.764682 & 1655582.235294 & ns & 5 & Most Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 24821576.429531 & 24821213.500000 & ns & 5 & Most Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 307678633.500473 & 307668853.999999 & ns & 5 & Most Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3666075943.008764 & 3665993284.999999 & ns & 5 & Most Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10239140 & 68.859065 & 68.857605 & ns & 5 & Least Frequently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10312603 & 69.082311 & 69.051162 & ns & 5 & Least Frequently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10028904 & 68.767251 & 68.736455 & ns & 5 & Least Frequently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10205826 & 68.880354 & 68.879954 & ns & 5 & Least Frequently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10166398 & 69.013516 & 69.013168 & ns & 5 & Least Frequently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10146880 & 68.886432 & 68.886434 & ns & 5 & Least Frequently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1727309 & 404.471491 & 404.471552 & ns & 5 & Least Frequently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1715525 & 407.786458 & 407.767866 & ns & 5 & Least Frequently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1718529 & 407.464092 & 407.454176 & ns & 5 & Least Frequently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1715200 & 409.638707 & 409.633867 & ns & 5 & Least Frequently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1717155 & 409.340273 & 409.326206 & ns & 5 & Least Frequently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1719923 & 408.556535 & 408.556963 & ns & 5 & Least Frequently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3072 & 689599.196941 & 689593.031250 & ns & 5 & Least Frequently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2618 & 627145.435446 & 627141.537433 & ns & 5 & Least Frequently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 668289.137015 & 668289.635000 & ns & 5 & Least Frequently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 156 & 4499410.987288 & 4499408.929487 & ns & 5 & Least Frequently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 16 & 44541707.124154 & 44540565.749999 & ns & 5 & Least Frequently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 456100141.498609 & 455911655.499996 & ns & 5 & Least Frequently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1461860 & 496.688597 & 496.681738 & ns & 5 & Least Frequently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 178332 & 3915.331875 & 3913.796038 & ns & 5 & Least Frequently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18830 & 37087.247212 & 37072.975571 & ns & 5 & Least Frequently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1925 & 364815.923642 & 364808.256623 & ns & 5 & Least Frequently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 190 & 3626832.136835 & 3626775.631579 & ns & 5 & Least Frequently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36413502.052279 & 36393888.473684 & ns & 5 & Least Frequently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 208860 & 3349.396787 & 3349.340190 & ns & 5 & Least Frequently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6651 & 105215.006466 & 105211.731920 & ns & 5 & Least Frequently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 430 & 1630874.041828 & 1630863.088372 & ns & 5 & Least Frequently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 24672011.929007 & 24671626.392857 & ns & 5 & Least Frequently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 305360242.506140 & 305348702.499998 & ns & 5 & Least Frequently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3692766642.983770 & 3692616887.000000 & ns & 5 & Least Frequently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10152086 & 69.039255 & 69.039323 & ns & 5 & Pseudo-Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10296895 & 68.989050 & 68.986697 & ns & 5 & Pseudo-Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10291834 & 69.015914 & 69.015910 & ns & 5 & Pseudo-Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10134022 & 69.088712 & 69.086399 & ns & 5 & Pseudo-Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10182501 & 69.565543 & 69.565494 & ns & 5 & Pseudo-Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10198770 & 68.982888 & 68.982386 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1745548 & 401.734553 & 401.721437 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1742381 & 402.240258 & 402.236394 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1742780 & 401.929892 & 401.919860 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1739216 & 404.162339 & 403.934266 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1741056 & 405.005210 & 405.002614 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1741865 & 404.633322 & 404.633756 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3030 & 686009.096369 & 685997.929043 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2595 & 631991.112138 & 631977.205780 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 677987.511997 & 677666.630000 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 154 & 4553900.136387 & 4553834.688312 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 15 & 45263035.601238 & 45263053.066667 & ns & 5 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 453791357.504088 & 453595914.499999 & ns & 5 & Pseudo-Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1480773 & 474.193452 & 474.190600 & ns & 5 & Pseudo-Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 178887 & 3905.613197 & 3905.555406 & ns & 5 & Pseudo-Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18804 & 37190.007019 & 37174.516273 & ns & 5 & Pseudo-Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1913 & 364493.296914 & 364483.719289 & ns & 5 & Pseudo-Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 192 & 3615523.145830 & 3615394.651042 & ns & 5 & Pseudo-Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36301793.262522 & 36301266.421052 & ns & 5 & Pseudo-Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 200853 & 3487.000169 & 3486.945149 & ns & 5 & Pseudo-Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6402 & 109472.427207 & 109466.575758 & ns & 5 & Pseudo-Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 413 & 1694318.738492 & 1694275.305085 & ns & 5 & Pseudo-Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 25313762.357525 & 25313147.607143 & ns & 5 & Pseudo-Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 313023775.990587 & 313014619.999997 & ns & 5 & Pseudo-Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3719240264.006658 & 3719134603.000001 & ns & 5 & Pseudo-Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10073405 & 69.687012 & 69.685807 & ns & 6 & Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10121725 & 69.517948 & 69.518033 & ns & 6 & Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10021070 & 70.025403 & 70.025292 & ns & 6 & Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10115389 & 70.311095 & 70.310344 & ns & 6 & Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10066299 & 69.923978 & 69.922822 & ns & 6 & Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10133266 & 69.412962 & 69.411470 & ns & 6 & Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1482354 & 470.802371 & 470.802099 & ns & 6 & Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1466871 & 476.946858 & 476.946779 & ns & 6 & Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1501495 & 480.612258 & 480.600533 & ns & 6 & Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1479131 & 481.181851 & 481.177827 & ns & 6 & Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1478629 & 477.185610 & 477.178412 & ns & 6 & Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1478686 & 479.302932 & 479.075311 & ns & 6 & Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2668 & 691792.236881 & 691783.121814 & ns & 6 & Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2249 & 630381.321913 & 630379.021787 & ns & 6 & Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1300 & 850499.934615 & 850489.131538 & ns & 6 & Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 137 & 5151300.729944 & 5151167.328467 & ns & 6 & Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 51507899.427504 & 51507463.142857 & ns & 6 & Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 1 & 513784239.999950 & 513783781.000001 & ns & 6 & Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1468969 & 494.176252 & 494.176130 & ns & 6 & Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 175984 & 3981.099788 & 3981.096895 & ns & 6 & Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18397 & 38050.051204 & 38049.860521 & ns & 6 & Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1894 & 370007.337369 & 369999.293559 & ns & 6 & Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 189 & 3710071.867789 & 3709993.677249 & ns & 6 & Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 36873314.105354 & 36865131.684211 & ns & 6 & Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 205708 & 3403.947596 & 3403.930081 & ns & 6 & Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6548 & 106674.793984 & 106674.588119 & ns & 6 & Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 423 & 1655008.527175 & 1655005.416076 & ns & 6 & Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 25105564.928838 & 25105558.678571 & ns & 6 & Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 310069628.001656 & 310069853.999998 & ns & 6 & Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3699444489.000598 & 3699423250.000010 & ns & 6 & Least Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10083780 & 70.159366 & 70.158960 & ns & 6 & Most Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10028382 & 69.752156 & 69.752223 & ns & 6 & Most Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10006606 & 70.035057 & 69.975368 & ns & 6 & Most Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10110056 & 69.532462 & 69.532460 & ns & 6 & Most Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 9991131 & 70.056531 & 70.022706 & ns & 6 & Most Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 9969650 & 69.896764 & 69.896730 & ns & 6 & Most Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1470659 & 476.678557 & 476.667374 & ns & 6 & Most Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1457114 & 478.696385 & 478.686403 & ns & 6 & Most Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1461847 & 476.317468 & 476.116079 & ns & 6 & Most Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1472015 & 476.063946 & 475.978165 & ns & 6 & Most Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1465003 & 477.540552 & 477.448735 & ns & 6 & Most Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1479182 & 479.148579 & 479.096708 & ns & 6 & Most Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2641 & 689893.319578 & 689889.697842 & ns & 6 & Most Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2233 & 627535.234217 & 627526.327810 & ns & 6 & Most Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1288 & 848179.016300 & 848141.161491 & ns & 6 & Most Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 134 & 5207905.313434 & 5206715.940299 & ns & 6 & Most Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 14 & 51706924.573019 & 51703118.785715 & ns & 6 & Most Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 1 & 516428387.985798 & 516428406.000003 & ns & 6 & Most Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1440123 & 485.016203 & 484.954873 & ns & 6 & Most Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 177441 & 3963.353537 & 3962.447259 & ns & 6 & Most Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18511 & 38356.133866 & 38352.575928 & ns & 6 & Most Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1852 & 378989.351512 & 378882.375810 & ns & 6 & Most Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 186 & 3739800.177432 & 3739030.112903 & ns & 6 & Most Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 37759020.684079 & 37745933.578947 & ns & 6 & Most Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 205519 & 3409.622789 & 3409.583562 & ns & 6 & Most Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6550 & 106968.474965 & 106967.957863 & ns & 6 & Most Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 422 & 1658058.113772 & 1658045.604265 & ns & 6 & Most Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 25048908.392949 & 25045131.250000 & ns & 6 & Most Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 310714963.503415 & 310692353.499995 & ns & 6 & Most Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3763403010.001639 & 3763045449.000003 & ns & 6 & Most Recently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10024985 & 69.835387 & 69.834758 & ns & 6 & Least Frequently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 10094484 & 69.739745 & 69.736415 & ns & 6 & Least Frequently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10040202 & 70.052714 & 70.052740 & ns & 6 & Least Frequently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10036018 & 69.985844 & 69.985360 & ns & 6 & Least Frequently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10120632 & 69.678159 & 69.677516 & ns & 6 & Least Frequently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10042752 & 69.718854 & 69.717893 & ns & 6 & Least Frequently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1676796 & 416.742049 & 416.738291 & ns & 6 & Least Frequently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1680213 & 417.657633 & 417.657974 & ns & 6 & Least Frequently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1677654 & 417.247818 & 417.241873 & ns & 6 & Least Frequently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1679404 & 417.063477 & 417.063518 & ns & 6 & Least Frequently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1674559 & 417.075738 & 417.068718 & ns & 6 & Least Frequently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1678963 & 417.246151 & 417.239073 & ns & 6 & Least Frequently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 3011 & 686929.327468 & 686921.746264 & ns & 6 & Least Frequently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2571 & 628896.660047 & 628888.226760 & ns & 6 & Least Frequently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 681708.446005 & 681684.967000 & ns & 6 & Least Frequently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 153 & 4569886.431472 & 4569770.843137 & ns & 6 & Least Frequently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 15 & 45405732.333893 & 45405095.466667 & ns & 6 & Least Frequently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 455004027.506220 & 454997684.000006 & ns & 6 & Least Frequently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1434946 & 485.559856 & 485.540677 & ns & 6 & Least Frequently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 174760 & 3979.694867 & 3979.641846 & ns & 6 & Least Frequently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18355 & 38223.262980 & 38222.381367 & ns & 6 & Least Frequently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1863 & 375896.792804 & 375891.017177 & ns & 6 & Least Frequently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 189 & 3723131.195690 & 3723060.386243 & ns & 6 & Least Frequently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 37473797.157872 & 37472950.684210 & ns & 6 & Least Frequently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 202929 & 3453.944261 & 3453.852756 & ns & 6 & Least Frequently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6474 & 108539.006644 & 108535.845382 & ns & 6 & Least Frequently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 417 & 1685811.498784 & 1685737.657074 & ns & 6 & Least Frequently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 25471781.642409 & 25471166.785714 & ns & 6 & Least Frequently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 315854957.501870 & 315836835.500001 & ns & 6 & Least Frequently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3762209955.981234 & 3762156365.999999 & ns & 6 & Least Frequently Used \\
-BM_at/10 & 0 & 0 & BM_at/10 & iteration & 1 & 0 & 1 & 10108518 & 69.894506 & 69.893864 & ns & 6 & Pseudo-Least Recently Used \\
-BM_at/100 & 0 & 1 & BM_at/100 & iteration & 1 & 0 & 1 & 9966119 & 69.913073 & 69.912560 & ns & 6 & Pseudo-Least Recently Used \\
-BM_at/1000 & 0 & 2 & BM_at/1000 & iteration & 1 & 0 & 1 & 10201014 & 69.917028 & 69.916022 & ns & 6 & Pseudo-Least Recently Used \\
-BM_at/10000 & 0 & 3 & BM_at/10000 & iteration & 1 & 0 & 1 & 10105543 & 69.427782 & 69.427299 & ns & 6 & Pseudo-Least Recently Used \\
-BM_at/100000 & 0 & 4 & BM_at/100000 & iteration & 1 & 0 & 1 & 10026220 & 69.885960 & 69.884371 & ns & 6 & Pseudo-Least Recently Used \\
-BM_at/1000000 & 0 & 5 & BM_at/1000000 & iteration & 1 & 0 & 1 & 10060862 & 69.541919 & 69.541939 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert/10 & 1 & 0 & BM_insert/10 & iteration & 1 & 0 & 1 & 1707249 & 410.105825 & 410.102272 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert/100 & 1 & 1 & BM_insert/100 & iteration & 1 & 0 & 1 & 1705483 & 411.036938 & 410.800401 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert/1000 & 1 & 2 & BM_insert/1000 & iteration & 1 & 0 & 1 & 1715046 & 408.532187 & 408.522026 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert/10000 & 1 & 3 & BM_insert/10000 & iteration & 1 & 0 & 1 & 1704817 & 412.937546 & 412.927602 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert/100000 & 1 & 4 & BM_insert/100000 & iteration & 1 & 0 & 1 & 1705635 & 413.481208 & 413.482043 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert/1000000 & 1 & 5 & BM_insert/1000000 & iteration & 1 & 0 & 1 & 1706262 & 412.564177 & 412.558512 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10 & 2 & 0 & BM_insert_at_beginning/10 & iteration & 1 & 0 & 1 & 2958 & 686010.806627 & 685974.422921 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100 & 2 & 1 & BM_insert_at_beginning/100 & iteration & 1 & 0 & 1 & 2529 & 630893.853302 & 630884.443654 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000 & 2 & 2 & BM_insert_at_beginning/1000 & iteration & 1 & 0 & 1 & 1000 & 696989.143995 & 696988.931000 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/10000 & 2 & 3 & BM_insert_at_beginning/10000 & iteration & 1 & 0 & 1 & 151 & 4643961.404056 & 4641992.721854 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/100000 & 2 & 4 & BM_insert_at_beginning/100000 & iteration & 1 & 0 & 1 & 15 & 46051491.734882 & 46029172.133333 & ns & 6 & Pseudo-Least Recently Used \\
-BM_insert_at_beginning/1000000 & 2 & 5 & BM_insert_at_beginning/1000000 & iteration & 1 & 0 & 1 & 2 & 458084265.002981 & 458084253.500004 & ns & 6 & Pseudo-Least Recently Used \\
-BM_find_middle/10 & 3 & 0 & BM_find_middle/10 & iteration & 1 & 0 & 1 & 1428665 & 489.730179 & 489.730209 & ns & 6 & Pseudo-Least Recently Used \\
-BM_find_middle/100 & 3 & 1 & BM_find_middle/100 & iteration & 1 & 0 & 1 & 177686 & 3956.011261 & 3955.983218 & ns & 6 & Pseudo-Least Recently Used \\
-BM_find_middle/1000 & 3 & 2 & BM_find_middle/1000 & iteration & 1 & 0 & 1 & 18473 & 37830.094733 & 37829.355925 & ns & 6 & Pseudo-Least Recently Used \\
-BM_find_middle/10000 & 3 & 3 & BM_find_middle/10000 & iteration & 1 & 0 & 1 & 1901 & 369512.349829 & 369505.811152 & ns & 6 & Pseudo-Least Recently Used \\
-BM_find_middle/100000 & 3 & 4 & BM_find_middle/100000 & iteration & 1 & 0 & 1 & 190 & 3716097.552617 & 3716000.636842 & ns & 6 & Pseudo-Least Recently Used \\
-BM_find_middle/1000000 & 3 & 5 & BM_find_middle/1000000 & iteration & 1 & 0 & 1 & 19 & 37150012.263354 & 37132075.684211 & ns & 6 & Pseudo-Least Recently Used \\
-BM_std_sort/10 & 4 & 0 & BM_std_sort/10 & iteration & 1 & 0 & 1 & 205637 & 3404.479481 & 3404.480463 & ns & 6 & Pseudo-Least Recently Used \\
-BM_std_sort/100 & 4 & 1 & BM_std_sort/100 & iteration & 1 & 0 & 1 & 6572 & 106811.943698 & 106770.242848 & ns & 6 & Pseudo-Least Recently Used \\
-BM_std_sort/1000 & 4 & 2 & BM_std_sort/1000 & iteration & 1 & 0 & 1 & 423 & 1659643.271857 & 1658872.964539 & ns & 6 & Pseudo-Least Recently Used \\
-BM_std_sort/10000 & 4 & 3 & BM_std_sort/10000 & iteration & 1 & 0 & 1 & 28 & 25190257.964173 & 25178659.178571 & ns & 6 & Pseudo-Least Recently Used \\
-BM_std_sort/100000 & 4 & 4 & BM_std_sort/100000 & iteration & 1 & 0 & 1 & 2 & 311062241.496984 & 310873095.999995 & ns & 6 & Pseudo-Least Recently Used \\
-BM_std_sort/1000000 & 4 & 5 & BM_std_sort/1000000 & iteration & 1 & 0 & 1 & 1 & 3697723981.982563 & 3696964891.999997 & ns & 6 & Pseudo-Least Recently Used \\
+at & 10 & 2 & 64.694073 & 64.695150 & Least Recently Used \\
+at & 10 & 3 & 66.374817 & 66.375324 & Least Frequently Used \\
+at & 10 & 3 & 66.573130 & 66.573984 & Least Recently Used \\
+at & 10 & 3 & 66.538122 & 66.539701 & Most Recently Used \\
+at & 10 & 3 & 66.678176 & 66.707379 & Pseudo-Least Recently Used \\
+at & 10 & 4 & 68.519341 & 68.520311 & Least Frequently Used \\
+at & 10 & 4 & 68.274794 & 68.276594 & Least Recently Used \\
+at & 10 & 4 & 68.232530 & 68.233257 & Most Recently Used \\
+at & 10 & 4 & 68.402026 & 68.402063 & Pseudo-Least Recently Used \\
+at & 10 & 5 & 68.857605 & 68.859065 & Least Frequently Used \\
+at & 10 & 5 & 68.902535 & 68.903507 & Least Recently Used \\
+at & 10 & 5 & 68.874468 & 68.876123 & Most Recently Used \\
+at & 10 & 5 & 69.039323 & 69.039255 & Pseudo-Least Recently Used \\
+at & 10 & 6 & 69.834758 & 69.835387 & Least Frequently Used \\
+at & 10 & 6 & 69.685807 & 69.687012 & Least Recently Used \\
+at & 10 & 6 & 70.158960 & 70.159366 & Most Recently Used \\
+at & 10 & 6 & 69.893864 & 69.894506 & Pseudo-Least Recently Used \\
+at & 100 & 2 & 64.892352 & 64.895023 & Least Recently Used \\
+at & 100 & 3 & 66.687822 & 66.689153 & Least Frequently Used \\
+at & 100 & 3 & 66.645224 & 66.674464 & Least Recently Used \\
+at & 100 & 3 & 66.538072 & 66.540282 & Most Recently Used \\
+at & 100 & 3 & 66.671620 & 66.672259 & Pseudo-Least Recently Used \\
+at & 100 & 4 & 68.441810 & 68.443963 & Least Frequently Used \\
+at & 100 & 4 & 68.330404 & 68.330875 & Least Recently Used \\
+at & 100 & 4 & 68.630297 & 68.631150 & Most Recently Used \\
+at & 100 & 4 & 68.398378 & 68.398430 & Pseudo-Least Recently Used \\
+at & 100 & 5 & 69.051162 & 69.082311 & Least Frequently Used \\
+at & 100 & 5 & 68.785284 & 68.786180 & Least Recently Used \\
+at & 100 & 5 & 69.636345 & 69.664754 & Most Recently Used \\
+at & 100 & 5 & 68.986697 & 68.989050 & Pseudo-Least Recently Used \\
+at & 100 & 6 & 69.736415 & 69.739745 & Least Frequently Used \\
+at & 100 & 6 & 69.518033 & 69.517948 & Least Recently Used \\
+at & 100 & 6 & 69.752223 & 69.752156 & Most Recently Used \\
+at & 100 & 6 & 69.912560 & 69.913073 & Pseudo-Least Recently Used \\
+at & 1000 & 2 & 64.841575 & 64.843605 & Least Recently Used \\
+at & 1000 & 3 & 66.514342 & 66.514813 & Least Frequently Used \\
+at & 1000 & 3 & 66.666384 & 66.667446 & Least Recently Used \\
+at & 1000 & 3 & 66.422646 & 66.424252 & Most Recently Used \\
+at & 1000 & 3 & 66.692771 & 66.693555 & Pseudo-Least Recently Used \\
+at & 1000 & 4 & 68.381215 & 68.383984 & Least Frequently Used \\
+at & 1000 & 4 & 68.260555 & 68.262371 & Least Recently Used \\
+at & 1000 & 4 & 67.831360 & 67.831218 & Most Recently Used \\
+at & 1000 & 4 & 69.402641 & 69.404452 & Pseudo-Least Recently Used \\
+at & 1000 & 5 & 68.736455 & 68.767251 & Least Frequently Used \\
+at & 1000 & 5 & 68.876419 & 68.876935 & Least Recently Used \\
+at & 1000 & 5 & 68.617502 & 68.617488 & Most Recently Used \\
+at & 1000 & 5 & 69.015910 & 69.015914 & Pseudo-Least Recently Used \\
+at & 1000 & 6 & 70.052740 & 70.052714 & Least Frequently Used \\
+at & 1000 & 6 & 70.025292 & 70.025403 & Least Recently Used \\
+at & 1000 & 6 & 69.975368 & 70.035057 & Most Recently Used \\
+at & 1000 & 6 & 69.916022 & 69.917028 & Pseudo-Least Recently Used \\
+at & 10000 & 2 & 64.784530 & 64.785897 & Least Recently Used \\
+at & 10000 & 3 & 66.611478 & 66.611906 & Least Frequently Used \\
+at & 10000 & 3 & 66.679534 & 66.680453 & Least Recently Used \\
+at & 10000 & 3 & 66.778445 & 66.778549 & Most Recently Used \\
+at & 10000 & 3 & 67.140656 & 67.141304 & Pseudo-Least Recently Used \\
+at & 10000 & 4 & 68.180090 & 68.183356 & Least Frequently Used \\
+at & 10000 & 4 & 68.414452 & 68.417074 & Least Recently Used \\
+at & 10000 & 4 & 68.436619 & 68.437115 & Most Recently Used \\
+at & 10000 & 4 & 68.230668 & 68.232153 & Pseudo-Least Recently Used \\
+at & 10000 & 5 & 68.879954 & 68.880354 & Least Frequently Used \\
+at & 10000 & 5 & 68.575612 & 68.576707 & Least Recently Used \\
+at & 10000 & 5 & 69.170273 & 69.170274 & Most Recently Used \\
+at & 10000 & 5 & 69.086399 & 69.088712 & Pseudo-Least Recently Used \\
+at & 10000 & 6 & 69.985360 & 69.985844 & Least Frequently Used \\
+at & 10000 & 6 & 70.310344 & 70.311095 & Least Recently Used \\
+at & 10000 & 6 & 69.532460 & 69.532462 & Most Recently Used \\
+at & 10000 & 6 & 69.427299 & 69.427782 & Pseudo-Least Recently Used \\
+at & 100000 & 2 & 64.853116 & 64.853757 & Least Recently Used \\
+at & 100000 & 3 & 66.625212 & 66.626375 & Least Frequently Used \\
+at & 100000 & 3 & 66.707381 & 66.708852 & Least Recently Used \\
+at & 100000 & 3 & 66.444783 & 66.448184 & Most Recently Used \\
+at & 100000 & 3 & 67.243534 & 67.243555 & Pseudo-Least Recently Used \\
+at & 100000 & 4 & 68.409349 & 68.409918 & Least Frequently Used \\
+at & 100000 & 4 & 68.462083 & 68.463965 & Least Recently Used \\
+at & 100000 & 4 & 68.354395 & 68.391058 & Most Recently Used \\
+at & 100000 & 4 & 68.177948 & 68.181486 & Pseudo-Least Recently Used \\
+at & 100000 & 5 & 69.013168 & 69.013516 & Least Frequently Used \\
+at & 100000 & 5 & 68.740841 & 68.741783 & Least Recently Used \\
+at & 100000 & 5 & 68.718758 & 68.719886 & Most Recently Used \\
+at & 100000 & 5 & 69.565494 & 69.565543 & Pseudo-Least Recently Used \\
+at & 100000 & 6 & 69.677516 & 69.678159 & Least Frequently Used \\
+at & 100000 & 6 & 69.922822 & 69.923978 & Least Recently Used \\
+at & 100000 & 6 & 70.022706 & 70.056531 & Most Recently Used \\
+at & 100000 & 6 & 69.884371 & 69.885960 & Pseudo-Least Recently Used \\
+at & 1000000 & 2 & 64.735971 & 64.736671 & Least Recently Used \\
+at & 1000000 & 3 & 66.643591 & 66.646077 & Least Frequently Used \\
+at & 1000000 & 3 & 66.567325 & 66.569713 & Least Recently Used \\
+at & 1000000 & 3 & 66.265760 & 66.266502 & Most Recently Used \\
+at & 1000000 & 3 & 66.501958 & 66.503441 & Pseudo-Least Recently Used \\
+at & 1000000 & 4 & 67.985385 & 67.985664 & Least Frequently Used \\
+at & 1000000 & 4 & 68.290807 & 68.293527 & Least Recently Used \\
+at & 1000000 & 4 & 67.701150 & 67.701152 & Most Recently Used \\
+at & 1000000 & 4 & 68.076595 & 68.077797 & Pseudo-Least Recently Used \\
+at & 1000000 & 5 & 68.886434 & 68.886432 & Least Frequently Used \\
+at & 1000000 & 5 & 68.786806 & 68.789306 & Least Recently Used \\
+at & 1000000 & 5 & 68.785300 & 68.785805 & Most Recently Used \\
+at & 1000000 & 5 & 68.982386 & 68.982888 & Pseudo-Least Recently Used \\
+at & 1000000 & 6 & 69.717893 & 69.718854 & Least Frequently Used \\
+at & 1000000 & 6 & 69.411470 & 69.412962 & Least Recently Used \\
+at & 1000000 & 6 & 69.896730 & 69.896764 & Most Recently Used \\
+at & 1000000 & 6 & 69.541939 & 69.541919 & Pseudo-Least Recently Used \\
+find_middle & 10 & 2 & 475.683996 & 475.713663 & Least Recently Used \\
+find_middle & 10 & 3 & 460.293734 & 460.296445 & Least Frequently Used \\
+find_middle & 10 & 3 & 456.037885 & 456.048522 & Least Recently Used \\
+find_middle & 10 & 3 & 479.480553 & 479.482907 & Most Recently Used \\
+find_middle & 10 & 3 & 460.507209 & 460.509454 & Pseudo-Least Recently Used \\
+find_middle & 10 & 4 & 490.509423 & 490.512885 & Least Frequently Used \\
+find_middle & 10 & 4 & 467.488288 & 467.487795 & Least Recently Used \\
+find_middle & 10 & 4 & 489.980746 & 489.985709 & Most Recently Used \\
+find_middle & 10 & 4 & 478.891655 & 478.899712 & Pseudo-Least Recently Used \\
+find_middle & 10 & 5 & 496.681738 & 496.688597 & Least Frequently Used \\
+find_middle & 10 & 5 & 496.764905 & 496.768474 & Least Recently Used \\
+find_middle & 10 & 5 & 476.666430 & 476.673529 & Most Recently Used \\
+find_middle & 10 & 5 & 474.190600 & 474.193452 & Pseudo-Least Recently Used \\
+find_middle & 10 & 6 & 485.540677 & 485.559856 & Least Frequently Used \\
+find_middle & 10 & 6 & 494.176130 & 494.176252 & Least Recently Used \\
+find_middle & 10 & 6 & 484.954873 & 485.016203 & Most Recently Used \\
+find_middle & 10 & 6 & 489.730209 & 489.730179 & Pseudo-Least Recently Used \\
+find_middle & 100 & 2 & 3749.495006 & 3749.602079 & Least Recently Used \\
+find_middle & 100 & 3 & 3790.774642 & 3790.890468 & Least Frequently Used \\
+find_middle & 100 & 3 & 3770.216656 & 3770.314419 & Least Recently Used \\
+find_middle & 100 & 3 & 3771.247958 & 3771.364950 & Most Recently Used \\
+find_middle & 100 & 3 & 3772.407836 & 3772.529422 & Pseudo-Least Recently Used \\
+find_middle & 100 & 4 & 3892.419698 & 3892.462375 & Least Frequently Used \\
+find_middle & 100 & 4 & 3862.960474 & 3862.992310 & Least Recently Used \\
+find_middle & 100 & 4 & 3851.459917 & 3851.490082 & Most Recently Used \\
+find_middle & 100 & 4 & 3868.191994 & 3868.269365 & Pseudo-Least Recently Used \\
+find_middle & 100 & 5 & 3913.796038 & 3915.331875 & Least Frequently Used \\
+find_middle & 100 & 5 & 3902.141165 & 3903.695847 & Least Recently Used \\
+find_middle & 100 & 5 & 3895.415408 & 3895.472192 & Most Recently Used \\
+find_middle & 100 & 5 & 3905.555406 & 3905.613197 & Pseudo-Least Recently Used \\
+find_middle & 100 & 6 & 3979.641846 & 3979.694867 & Least Frequently Used \\
+find_middle & 100 & 6 & 3981.096895 & 3981.099788 & Least Recently Used \\
+find_middle & 100 & 6 & 3962.447259 & 3963.353537 & Most Recently Used \\
+find_middle & 100 & 6 & 3955.983218 & 3956.011261 & Pseudo-Least Recently Used \\
+find_middle & 1000 & 2 & 36073.398398 & 36075.263134 & Least Recently Used \\
+find_middle & 1000 & 3 & 36191.342941 & 36205.056615 & Least Frequently Used \\
+find_middle & 1000 & 3 & 35978.196843 & 35992.681136 & Least Recently Used \\
+find_middle & 1000 & 3 & 36216.132372 & 36216.353749 & Most Recently Used \\
+find_middle & 1000 & 3 & 35818.592097 & 35820.573575 & Pseudo-Least Recently Used \\
+find_middle & 1000 & 4 & 37421.927838 & 37422.245712 & Least Frequently Used \\
+find_middle & 1000 & 4 & 37121.902700 & 37122.090430 & Least Recently Used \\
+find_middle & 1000 & 4 & 37056.213008 & 37057.267582 & Most Recently Used \\
+find_middle & 1000 & 4 & 37178.846072 & 37180.601400 & Pseudo-Least Recently Used \\
+find_middle & 1000 & 5 & 37072.975571 & 37087.247212 & Least Frequently Used \\
+find_middle & 1000 & 5 & 37224.846096 & 37239.119821 & Least Recently Used \\
+find_middle & 1000 & 5 & 37109.522429 & 37109.853312 & Most Recently Used \\
+find_middle & 1000 & 5 & 37174.516273 & 37190.007019 & Pseudo-Least Recently Used \\
+find_middle & 1000 & 6 & 38222.381367 & 38223.262980 & Least Frequently Used \\
+find_middle & 1000 & 6 & 38049.860521 & 38050.051204 & Least Recently Used \\
+find_middle & 1000 & 6 & 38352.575928 & 38356.133866 & Most Recently Used \\
+find_middle & 1000 & 6 & 37829.355925 & 37830.094733 & Pseudo-Least Recently Used \\
+find_middle & 10000 & 2 & 358942.837386 & 358948.117022 & Least Recently Used \\
+find_middle & 10000 & 3 & 358100.333504 & 358253.304303 & Least Frequently Used \\
+find_middle & 10000 & 3 & 359264.712012 & 359264.678640 & Least Recently Used \\
+find_middle & 10000 & 3 & 359751.564010 & 359755.369148 & Most Recently Used \\
+find_middle & 10000 & 3 & 350066.546922 & 350070.898093 & Pseudo-Least Recently Used \\
+find_middle & 10000 & 4 & 366852.248958 & 366858.164064 & Least Frequently Used \\
+find_middle & 10000 & 4 & 363746.818368 & 363892.263207 & Least Recently Used \\
+find_middle & 10000 & 4 & 369653.255241 & 369662.479564 & Most Recently Used \\
+find_middle & 10000 & 4 & 361468.648875 & 361474.132913 & Pseudo-Least Recently Used \\
+find_middle & 10000 & 5 & 364808.256623 & 364815.923642 & Least Frequently Used \\
+find_middle & 10000 & 5 & 368786.124409 & 368937.265615 & Least Recently Used \\
+find_middle & 10000 & 5 & 364562.638510 & 364569.107021 & Most Recently Used \\
+find_middle & 10000 & 5 & 364483.719289 & 364493.296914 & Pseudo-Least Recently Used \\
+find_middle & 10000 & 6 & 375891.017177 & 375896.792804 & Least Frequently Used \\
+find_middle & 10000 & 6 & 369999.293559 & 370007.337369 & Least Recently Used \\
+find_middle & 10000 & 6 & 378882.375810 & 378989.351512 & Most Recently Used \\
+find_middle & 10000 & 6 & 369505.811152 & 369512.349829 & Pseudo-Least Recently Used \\
+find_middle & 100000 & 2 & 3531195.545455 & 3531331.424260 & Least Recently Used \\
+find_middle & 100000 & 3 & 3565787.770408 & 3565841.112244 & Least Frequently Used \\
+find_middle & 100000 & 3 & 3553487.795000 & 3553585.469926 & Least Recently Used \\
+find_middle & 100000 & 3 & 3599941.381443 & 3600004.036100 & Most Recently Used \\
+find_middle & 100000 & 3 & 3571776.111675 & 3573467.649772 & Pseudo-Least Recently Used \\
+find_middle & 100000 & 4 & 3618951.088083 & 3619092.233253 & Least Frequently Used \\
+find_middle & 100000 & 4 & 3640951.234375 & 3641066.406241 & Least Recently Used \\
+find_middle & 100000 & 4 & 3627897.036269 & 3628121.005248 & Most Recently Used \\
+find_middle & 100000 & 4 & 3569408.438775 & 3569437.382590 & Pseudo-Least Recently Used \\
+find_middle & 100000 & 5 & 3626775.631579 & 3626832.136835 & Least Frequently Used \\
+find_middle & 100000 & 5 & 3633016.071795 & 3633717.128123 & Least Recently Used \\
+find_middle & 100000 & 5 & 3624456.782383 & 3624483.632042 & Most Recently Used \\
+find_middle & 100000 & 5 & 3615394.651042 & 3615523.145830 & Pseudo-Least Recently Used \\
+find_middle & 100000 & 6 & 3723060.386243 & 3723131.195690 & Least Frequently Used \\
+find_middle & 100000 & 6 & 3709993.677249 & 3710071.867789 & Least Recently Used \\
+find_middle & 100000 & 6 & 3739030.112903 & 3739800.177432 & Most Recently Used \\
+find_middle & 100000 & 6 & 3716000.636842 & 3716097.552617 & Pseudo-Least Recently Used \\
+find_middle & 1000000 & 2 & 35302575.950000 & 35305043.499102 & Least Recently Used \\
+find_middle & 1000000 & 3 & 35712647.750000 & 35713652.000413 & Least Frequently Used \\
+find_middle & 1000000 & 3 & 35555317.900000 & 35563871.399791 & Least Recently Used \\
+find_middle & 1000000 & 3 & 35880277.550000 & 35881129.899644 & Most Recently Used \\
+find_middle & 1000000 & 3 & 35764636.600000 & 35765709.000407 & Pseudo-Least Recently Used \\
+find_middle & 1000000 & 4 & 35973004.800000 & 35991667.499184 & Least Frequently Used \\
+find_middle & 1000000 & 4 & 36497075.631579 & 36517196.578452 & Least Recently Used \\
+find_middle & 1000000 & 4 & 36284890.789474 & 36286506.052803 & Most Recently Used \\
+find_middle & 1000000 & 4 & 36087775.684211 & 36088609.789180 & Pseudo-Least Recently Used \\
+find_middle & 1000000 & 5 & 36393888.473684 & 36413502.052279 & Least Frequently Used \\
+find_middle & 1000000 & 5 & 36734681.947369 & 36735728.263585 & Least Recently Used \\
+find_middle & 1000000 & 5 & 36589130.894737 & 36589909.632886 & Most Recently Used \\
+find_middle & 1000000 & 5 & 36301266.421052 & 36301793.262522 & Pseudo-Least Recently Used \\
+find_middle & 1000000 & 6 & 37472950.684210 & 37473797.157872 & Least Frequently Used \\
+find_middle & 1000000 & 6 & 36865131.684211 & 36873314.105354 & Least Recently Used \\
+find_middle & 1000000 & 6 & 37745933.578947 & 37759020.684079 & Most Recently Used \\
+find_middle & 1000000 & 6 & 37132075.684211 & 37150012.263354 & Pseudo-Least Recently Used \\
+insert & 10 & 2 & 415.333247 & 415.345319 & Least Recently Used \\
+insert & 10 & 3 & 394.866228 & 394.872759 & Least Frequently Used \\
+insert & 10 & 3 & 447.741860 & 447.745734 & Least Recently Used \\
+insert & 10 & 3 & 442.082206 & 442.093788 & Most Recently Used \\
+insert & 10 & 3 & 388.092965 & 388.092850 & Pseudo-Least Recently Used \\
+insert & 10 & 4 & 405.998882 & 406.004539 & Least Frequently Used \\
+insert & 10 & 4 & 457.501991 & 457.505998 & Least Recently Used \\
+insert & 10 & 4 & 456.824952 & 456.830086 & Most Recently Used \\
+insert & 10 & 4 & 396.728021 & 396.730819 & Pseudo-Least Recently Used \\
+insert & 10 & 5 & 404.471552 & 404.471491 & Least Frequently Used \\
+insert & 10 & 5 & 467.393214 & 467.396732 & Least Recently Used \\
+insert & 10 & 5 & 485.731426 & 485.752333 & Most Recently Used \\
+insert & 10 & 5 & 401.721437 & 401.734553 & Pseudo-Least Recently Used \\
+insert & 10 & 6 & 416.738291 & 416.742049 & Least Frequently Used \\
+insert & 10 & 6 & 470.802099 & 470.802371 & Least Recently Used \\
+insert & 10 & 6 & 476.667374 & 476.678557 & Most Recently Used \\
+insert & 10 & 6 & 410.102272 & 410.105825 & Pseudo-Least Recently Used \\
+insert & 100 & 2 & 414.975834 & 414.980635 & Least Recently Used \\
+insert & 100 & 3 & 393.420237 & 393.428007 & Least Frequently Used \\
+insert & 100 & 3 & 447.816233 & 447.834794 & Least Recently Used \\
+insert & 100 & 3 & 440.730395 & 440.737631 & Most Recently Used \\
+insert & 100 & 3 & 388.662053 & 388.666528 & Pseudo-Least Recently Used \\
+insert & 100 & 4 & 404.030816 & 404.036134 & Least Frequently Used \\
+insert & 100 & 4 & 456.904474 & 456.912424 & Least Recently Used \\
+insert & 100 & 4 & 456.054600 & 456.061655 & Most Recently Used \\
+insert & 100 & 4 & 396.587674 & 396.589448 & Pseudo-Least Recently Used \\
+insert & 100 & 5 & 407.767866 & 407.786458 & Least Frequently Used \\
+insert & 100 & 5 & 465.499243 & 465.504227 & Least Recently Used \\
+insert & 100 & 5 & 485.862458 & 485.880905 & Most Recently Used \\
+insert & 100 & 5 & 402.236394 & 402.240258 & Pseudo-Least Recently Used \\
+insert & 100 & 6 & 417.657974 & 417.657633 & Least Frequently Used \\
+insert & 100 & 6 & 476.946779 & 476.946858 & Least Recently Used \\
+insert & 100 & 6 & 478.686403 & 478.696385 & Most Recently Used \\
+insert & 100 & 6 & 410.800401 & 411.036938 & Pseudo-Least Recently Used \\
+insert & 1000 & 2 & 414.427282 & 414.448628 & Least Recently Used \\
+insert & 1000 & 3 & 394.495971 & 394.713907 & Least Frequently Used \\
+insert & 1000 & 3 & 446.392001 & 446.406255 & Least Recently Used \\
+insert & 1000 & 3 & 443.905497 & 443.915860 & Most Recently Used \\
+insert & 1000 & 3 & 388.408753 & 388.411385 & Pseudo-Least Recently Used \\
+insert & 1000 & 4 & 416.600155 & 416.609999 & Least Frequently Used \\
+insert & 1000 & 4 & 457.727585 & 457.731032 & Least Recently Used \\
+insert & 1000 & 4 & 457.837161 & 457.841333 & Most Recently Used \\
+insert & 1000 & 4 & 397.600180 & 397.599860 & Pseudo-Least Recently Used \\
+insert & 1000 & 5 & 407.454176 & 407.464092 & Least Frequently Used \\
+insert & 1000 & 5 & 466.222159 & 466.225421 & Least Recently Used \\
+insert & 1000 & 5 & 487.430244 & 487.448011 & Most Recently Used \\
+insert & 1000 & 5 & 401.919860 & 401.929892 & Pseudo-Least Recently Used \\
+insert & 1000 & 6 & 417.241873 & 417.247818 & Least Frequently Used \\
+insert & 1000 & 6 & 480.600533 & 480.612258 & Least Recently Used \\
+insert & 1000 & 6 & 476.116079 & 476.317468 & Most Recently Used \\
+insert & 1000 & 6 & 408.522026 & 408.532187 & Pseudo-Least Recently Used \\
+insert & 10000 & 2 & 415.360579 & 415.377193 & Least Recently Used \\
+insert & 10000 & 3 & 394.689344 & 394.900808 & Least Frequently Used \\
+insert & 10000 & 3 & 447.117237 & 447.134273 & Least Recently Used \\
+insert & 10000 & 3 & 440.514339 & 440.538424 & Most Recently Used \\
+insert & 10000 & 3 & 390.681342 & 390.695091 & Pseudo-Least Recently Used \\
+insert & 10000 & 4 & 417.434116 & 417.437083 & Least Frequently Used \\
+insert & 10000 & 4 & 457.451637 & 457.460776 & Least Recently Used \\
+insert & 10000 & 4 & 461.285571 & 461.292053 & Most Recently Used \\
+insert & 10000 & 4 & 399.046672 & 399.054632 & Pseudo-Least Recently Used \\
+insert & 10000 & 5 & 409.633867 & 409.638707 & Least Frequently Used \\
+insert & 10000 & 5 & 466.654798 & 466.664238 & Least Recently Used \\
+insert & 10000 & 5 & 484.953506 & 484.971754 & Most Recently Used \\
+insert & 10000 & 5 & 403.934266 & 404.162339 & Pseudo-Least Recently Used \\
+insert & 10000 & 6 & 417.063518 & 417.063477 & Least Frequently Used \\
+insert & 10000 & 6 & 481.177827 & 481.181851 & Least Recently Used \\
+insert & 10000 & 6 & 475.978165 & 476.063946 & Most Recently Used \\
+insert & 10000 & 6 & 412.927602 & 412.937546 & Pseudo-Least Recently Used \\
+insert & 100000 & 2 & 436.869752 & 436.879541 & Least Recently Used \\
+insert & 100000 & 3 & 395.277176 & 395.284215 & Least Frequently Used \\
+insert & 100000 & 3 & 446.443168 & 446.455046 & Least Recently Used \\
+insert & 100000 & 3 & 443.769644 & 443.777308 & Most Recently Used \\
+insert & 100000 & 3 & 390.806074 & 390.813783 & Pseudo-Least Recently Used \\
+insert & 100000 & 4 & 417.072466 & 417.078140 & Least Frequently Used \\
+insert & 100000 & 4 & 456.632368 & 456.638253 & Least Recently Used \\
+insert & 100000 & 4 & 461.477957 & 461.491282 & Most Recently Used \\
+insert & 100000 & 4 & 399.545076 & 399.549151 & Pseudo-Least Recently Used \\
+insert & 100000 & 5 & 409.326206 & 409.340273 & Least Frequently Used \\
+insert & 100000 & 5 & 467.482568 & 467.490690 & Least Recently Used \\
+insert & 100000 & 5 & 485.516383 & 485.529232 & Most Recently Used \\
+insert & 100000 & 5 & 405.002614 & 405.005210 & Pseudo-Least Recently Used \\
+insert & 100000 & 6 & 417.068718 & 417.075738 & Least Frequently Used \\
+insert & 100000 & 6 & 477.178412 & 477.185610 & Least Recently Used \\
+insert & 100000 & 6 & 477.448735 & 477.540552 & Most Recently Used \\
+insert & 100000 & 6 & 413.482043 & 413.481208 & Pseudo-Least Recently Used \\
+insert & 1000000 & 2 & 439.122460 & 439.144551 & Least Recently Used \\
+insert & 1000000 & 3 & 396.832186 & 396.832421 & Least Frequently Used \\
+insert & 1000000 & 3 & 447.492244 & 447.742860 & Least Recently Used \\
+insert & 1000000 & 3 & 440.414772 & 440.426108 & Most Recently Used \\
+insert & 1000000 & 3 & 390.863592 & 390.874696 & Pseudo-Least Recently Used \\
+insert & 1000000 & 4 & 418.854657 & 418.854303 & Least Frequently Used \\
+insert & 1000000 & 4 & 458.077951 & 458.076630 & Least Recently Used \\
+insert & 1000000 & 4 & 461.710636 & 461.725045 & Most Recently Used \\
+insert & 1000000 & 4 & 401.843639 & 401.857046 & Pseudo-Least Recently Used \\
+insert & 1000000 & 5 & 408.556963 & 408.556535 & Least Frequently Used \\
+insert & 1000000 & 5 & 467.503834 & 467.775796 & Least Recently Used \\
+insert & 1000000 & 5 & 485.641840 & 485.658493 & Most Recently Used \\
+insert & 1000000 & 5 & 404.633756 & 404.633322 & Pseudo-Least Recently Used \\
+insert & 1000000 & 6 & 417.239073 & 417.246151 & Least Frequently Used \\
+insert & 1000000 & 6 & 479.075311 & 479.302932 & Least Recently Used \\
+insert & 1000000 & 6 & 479.096708 & 479.148579 & Most Recently Used \\
+insert & 1000000 & 6 & 412.558512 & 412.564177 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10 & 2 & 697875.316832 & 697893.554808 & Least Recently Used \\
+insert_at_beginning & 10 & 3 & 688154.987083 & 688164.655012 & Least Frequently Used \\
+insert_at_beginning & 10 & 3 & 688204.697112 & 688320.917324 & Least Recently Used \\
+insert_at_beginning & 10 & 3 & 692976.945318 & 693004.490708 & Most Recently Used \\
+insert_at_beginning & 10 & 3 & 687133.389298 & 687142.371996 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10 & 4 & 690259.620445 & 690268.963236 & Least Frequently Used \\
+insert_at_beginning & 10 & 4 & 690403.056327 & 690412.362742 & Least Recently Used \\
+insert_at_beginning & 10 & 4 & 690674.101651 & 690704.777980 & Most Recently Used \\
+insert_at_beginning & 10 & 4 & 686930.452163 & 686935.294557 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10 & 5 & 689593.031250 & 689599.196941 & Least Frequently Used \\
+insert_at_beginning & 10 & 5 & 688459.298851 & 688691.609567 & Least Recently Used \\
+insert_at_beginning & 10 & 5 & 693596.643322 & 693612.466896 & Most Recently Used \\
+insert_at_beginning & 10 & 5 & 685997.929043 & 686009.096369 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10 & 6 & 686921.746264 & 686929.327468 & Least Frequently Used \\
+insert_at_beginning & 10 & 6 & 691783.121814 & 691792.236881 & Least Recently Used \\
+insert_at_beginning & 10 & 6 & 689889.697842 & 689893.319578 & Most Recently Used \\
+insert_at_beginning & 10 & 6 & 685974.422921 & 686010.806627 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100 & 2 & 634307.258173 & 634333.360861 & Least Recently Used \\
+insert_at_beginning & 100 & 3 & 632293.569259 & 632304.648526 & Least Frequently Used \\
+insert_at_beginning & 100 & 3 & 633529.988171 & 633650.115759 & Least Recently Used \\
+insert_at_beginning & 100 & 3 & 634123.652375 & 634135.792342 & Most Recently Used \\
+insert_at_beginning & 100 & 3 & 630385.567304 & 630396.395204 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100 & 4 & 622602.126905 & 622839.551453 & Least Frequently Used \\
+insert_at_beginning & 100 & 4 & 631870.443197 & 631897.192228 & Least Recently Used \\
+insert_at_beginning & 100 & 4 & 637283.643501 & 637302.925783 & Most Recently Used \\
+insert_at_beginning & 100 & 4 & 626994.840524 & 626998.555093 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100 & 5 & 627141.537433 & 627145.435446 & Least Frequently Used \\
+insert_at_beginning & 100 & 5 & 633641.543791 & 633883.694999 & Least Recently Used \\
+insert_at_beginning & 100 & 5 & 630621.879216 & 630629.072477 & Most Recently Used \\
+insert_at_beginning & 100 & 5 & 631977.205780 & 631991.112138 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100 & 6 & 628888.226760 & 628896.660047 & Least Frequently Used \\
+insert_at_beginning & 100 & 6 & 630379.021787 & 630381.321913 & Least Recently Used \\
+insert_at_beginning & 100 & 6 & 627526.327810 & 627535.234217 & Most Recently Used \\
+insert_at_beginning & 100 & 6 & 630884.443654 & 630893.853302 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000 & 2 & 824834.933186 & 824881.326734 & Least Recently Used \\
+insert_at_beginning & 1000 & 3 & 648029.997000 & 648035.380989 & Least Frequently Used \\
+insert_at_beginning & 1000 & 3 & 827871.266369 & 828260.965028 & Least Recently Used \\
+insert_at_beginning & 1000 & 3 & 822924.685609 & 822944.705533 & Most Recently Used \\
+insert_at_beginning & 1000 & 3 & 655043.174000 & 655071.649002 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000 & 4 & 659576.949000 & 659841.849993 & Least Frequently Used \\
+insert_at_beginning & 1000 & 4 & 834649.372727 & 834649.612101 & Least Recently Used \\
+insert_at_beginning & 1000 & 4 & 836057.124054 & 836101.351747 & Most Recently Used \\
+insert_at_beginning & 1000 & 4 & 671069.410000 & 671090.328979 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000 & 5 & 668289.635000 & 668289.137015 & Least Frequently Used \\
+insert_at_beginning & 1000 & 5 & 842866.714612 & 843091.368337 & Least Recently Used \\
+insert_at_beginning & 1000 & 5 & 860980.317675 & 860999.127396 & Most Recently Used \\
+insert_at_beginning & 1000 & 5 & 677666.630000 & 677987.511997 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000 & 6 & 681684.967000 & 681708.446005 & Least Frequently Used \\
+insert_at_beginning & 1000 & 6 & 850489.131538 & 850499.934615 & Least Recently Used \\
+insert_at_beginning & 1000 & 6 & 848141.161491 & 848179.016300 & Most Recently Used \\
+insert_at_beginning & 1000 & 6 & 696988.931000 & 696989.143995 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10000 & 2 & 4936691.894366 & 4937156.154995 & Least Recently Used \\
+insert_at_beginning & 10000 & 3 & 4358393.062112 & 4358489.198866 & Least Frequently Used \\
+insert_at_beginning & 10000 & 3 & 4979365.128571 & 4981370.357148 & Least Recently Used \\
+insert_at_beginning & 10000 & 3 & 4938624.992958 & 4938786.514071 & Most Recently Used \\
+insert_at_beginning & 10000 & 3 & 4404347.679245 & 4404381.201266 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10000 & 4 & 4433082.664557 & 4434836.784870 & Least Frequently Used \\
+insert_at_beginning & 10000 & 4 & 5081989.623188 & 5082041.065232 & Least Recently Used \\
+insert_at_beginning & 10000 & 4 & 5070380.971223 & 5070549.007103 & Most Recently Used \\
+insert_at_beginning & 10000 & 4 & 4510698.403846 & 4510815.820443 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10000 & 5 & 4499408.929487 & 4499410.987288 & Least Frequently Used \\
+insert_at_beginning & 10000 & 5 & 5116214.347826 & 5116242.289870 & Least Recently Used \\
+insert_at_beginning & 10000 & 5 & 5316289.466165 & 5316293.819613 & Most Recently Used \\
+insert_at_beginning & 10000 & 5 & 4553834.688312 & 4553900.136387 & Pseudo-Least Recently Used \\
+insert_at_beginning & 10000 & 6 & 4569770.843137 & 4569886.431472 & Least Frequently Used \\
+insert_at_beginning & 10000 & 6 & 5151167.328467 & 5151300.729944 & Least Recently Used \\
+insert_at_beginning & 10000 & 6 & 5206715.940299 & 5207905.313434 & Most Recently Used \\
+insert_at_beginning & 10000 & 6 & 4641992.721854 & 4643961.404056 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100000 & 2 & 48699368.142857 & 48699379.358108 & Least Recently Used \\
+insert_at_beginning & 100000 & 3 & 43096988.437500 & 43097889.874844 & Least Frequently Used \\
+insert_at_beginning & 100000 & 3 & 49438354.214286 & 49439448.000547 & Least Recently Used \\
+insert_at_beginning & 100000 & 3 & 49024631.357143 & 49026346.358005 & Most Recently Used \\
+insert_at_beginning & 100000 & 3 & 43745812.812500 & 43745768.687586 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100000 & 4 & 43957851.562499 & 43978018.498819 & Least Frequently Used \\
+insert_at_beginning & 100000 & 4 & 51544546.357143 & 51544878.999786 & Least Recently Used \\
+insert_at_beginning & 100000 & 4 & 50494469.714286 & 50516921.785727 & Most Recently Used \\
+insert_at_beginning & 100000 & 4 & 44828845.000000 & 44829936.561655 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100000 & 5 & 44540565.749999 & 44541707.124154 & Least Frequently Used \\
+insert_at_beginning & 100000 & 5 & 50902961.785714 & 50904062.572434 & Least Recently Used \\
+insert_at_beginning & 100000 & 5 & 52740608.307692 & 52740994.075206 & Most Recently Used \\
+insert_at_beginning & 100000 & 5 & 45263053.066667 & 45263035.601238 & Pseudo-Least Recently Used \\
+insert_at_beginning & 100000 & 6 & 45405095.466667 & 45405732.333893 & Least Frequently Used \\
+insert_at_beginning & 100000 & 6 & 51507463.142857 & 51507899.427504 & Least Recently Used \\
+insert_at_beginning & 100000 & 6 & 51703118.785715 & 51706924.573019 & Most Recently Used \\
+insert_at_beginning & 100000 & 6 & 46029172.133333 & 46051491.734882 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000000 & 2 & 489863359.000005 & 489880835.491931 & Least Recently Used \\
+insert_at_beginning & 1000000 & 3 & 431231792.000005 & 431231959.504657 & Least Frequently Used \\
+insert_at_beginning & 1000000 & 3 & 495262352.000005 & 495461874.990724 & Least Recently Used \\
+insert_at_beginning & 1000000 & 3 & 490572320.500000 & 490579971.505213 & Most Recently Used \\
+insert_at_beginning & 1000000 & 3 & 436426615.000002 & 436433021.997800 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000000 & 4 & 440132920.499998 & 440138641.497469 & Least Frequently Used \\
+insert_at_beginning & 1000000 & 4 & 514829486.000004 & 514836767.979432 & Least Recently Used \\
+insert_at_beginning & 1000000 & 4 & 505056844.999999 & 505063016.491476 & Most Recently Used \\
+insert_at_beginning & 1000000 & 4 & 448090355.500000 & 448100078.996504 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000000 & 5 & 455911655.499996 & 456100141.498609 & Least Frequently Used \\
+insert_at_beginning & 1000000 & 5 & 507118284.000001 & 507123702.991521 & Least Recently Used \\
+insert_at_beginning & 1000000 & 5 & 524359630.999996 & 524359264.993109 & Most Recently Used \\
+insert_at_beginning & 1000000 & 5 & 453595914.499999 & 453791357.504088 & Pseudo-Least Recently Used \\
+insert_at_beginning & 1000000 & 6 & 454997684.000006 & 455004027.506220 & Least Frequently Used \\
+insert_at_beginning & 1000000 & 6 & 513783781.000001 & 513784239.999950 & Least Recently Used \\
+insert_at_beginning & 1000000 & 6 & 516428406.000003 & 516428387.985798 & Most Recently Used \\
+insert_at_beginning & 1000000 & 6 & 458084253.500004 & 458084265.002981 & Pseudo-Least Recently Used \\
+std_sort & 10 & 2 & 3223.693968 & 3223.718279 & Least Recently Used \\
+std_sort & 10 & 3 & 3253.039530 & 3254.333893 & Least Frequently Used \\
+std_sort & 10 & 3 & 3234.865849 & 3234.862662 & Least Recently Used \\
+std_sort & 10 & 3 & 3256.198618 & 3256.257092 & Most Recently Used \\
+std_sort & 10 & 3 & 3250.616435 & 3250.741297 & Pseudo-Least Recently Used \\
+std_sort & 10 & 4 & 3306.914508 & 3306.975036 & Least Frequently Used \\
+std_sort & 10 & 4 & 3316.556361 & 3318.082851 & Least Recently Used \\
+std_sort & 10 & 4 & 3314.088141 & 3314.203910 & Most Recently Used \\
+std_sort & 10 & 4 & 3303.097781 & 3303.174663 & Pseudo-Least Recently Used \\
+std_sort & 10 & 5 & 3349.340190 & 3349.396787 & Least Frequently Used \\
+std_sort & 10 & 5 & 3378.309282 & 3378.364849 & Least Recently Used \\
+std_sort & 10 & 5 & 3351.447544 & 3351.589618 & Most Recently Used \\
+std_sort & 10 & 5 & 3486.945149 & 3487.000169 & Pseudo-Least Recently Used \\
+std_sort & 10 & 6 & 3453.852756 & 3453.944261 & Least Frequently Used \\
+std_sort & 10 & 6 & 3403.930081 & 3403.947596 & Least Recently Used \\
+std_sort & 10 & 6 & 3409.583562 & 3409.622789 & Most Recently Used \\
+std_sort & 10 & 6 & 3404.480463 & 3404.479481 & Pseudo-Least Recently Used \\
+std_sort & 100 & 2 & 101001.426798 & 101003.894166 & Least Recently Used \\
+std_sort & 100 & 3 & 102680.180606 & 102683.404131 & Least Frequently Used \\
+std_sort & 100 & 3 & 102042.945545 & 102044.634388 & Least Recently Used \\
+std_sort & 100 & 3 & 102345.398625 & 102350.074606 & Most Recently Used \\
+std_sort & 100 & 3 & 101952.784059 & 101952.687015 & Pseudo-Least Recently Used \\
+std_sort & 100 & 4 & 103950.110351 & 103951.454491 & Least Frequently Used \\
+std_sort & 100 & 4 & 104156.348117 & 104198.574791 & Least Recently Used \\
+std_sort & 100 & 4 & 103833.261852 & 103836.622533 & Most Recently Used \\
+std_sort & 100 & 4 & 104124.583803 & 104124.586768 & Pseudo-Least Recently Used \\
+std_sort & 100 & 5 & 105211.731920 & 105215.006466 & Least Frequently Used \\
+std_sort & 100 & 5 & 105426.700755 & 105428.086257 & Least Recently Used \\
+std_sort & 100 & 5 & 106554.733526 & 106554.914774 & Most Recently Used \\
+std_sort & 100 & 5 & 109466.575758 & 109472.427207 & Pseudo-Least Recently Used \\
+std_sort & 100 & 6 & 108535.845382 & 108539.006644 & Least Frequently Used \\
+std_sort & 100 & 6 & 106674.588119 & 106674.793984 & Least Recently Used \\
+std_sort & 100 & 6 & 106967.957863 & 106968.474965 & Most Recently Used \\
+std_sort & 100 & 6 & 106770.242848 & 106811.943698 & Pseudo-Least Recently Used \\
+std_sort & 1000 & 2 & 1575608.884876 & 1575664.747202 & Least Recently Used \\
+std_sort & 1000 & 3 & 1597802.430206 & 1598434.984014 & Least Frequently Used \\
+std_sort & 1000 & 3 & 1579859.480813 & 1579905.094820 & Least Recently Used \\
+std_sort & 1000 & 3 & 1592896.093394 & 1592921.913450 & Most Recently Used \\
+std_sort & 1000 & 3 & 1581669.478555 & 1581734.796864 & Pseudo-Least Recently Used \\
+std_sort & 1000 & 4 & 1609332.365517 & 1609364.301154 & Least Frequently Used \\
+std_sort & 1000 & 4 & 1610327.694253 & 1610345.802278 & Least Recently Used \\
+std_sort & 1000 & 4 & 1614798.183486 & 1614868.091732 & Most Recently Used \\
+std_sort & 1000 & 4 & 1610465.067130 & 1610493.865748 & Pseudo-Least Recently Used \\
+std_sort & 1000 & 5 & 1630863.088372 & 1630874.041828 & Least Frequently Used \\
+std_sort & 1000 & 5 & 1645703.570093 & 1645716.352817 & Least Recently Used \\
+std_sort & 1000 & 5 & 1655582.235294 & 1655595.764682 & Most Recently Used \\
+std_sort & 1000 & 5 & 1694275.305085 & 1694318.738492 & Pseudo-Least Recently Used \\
+std_sort & 1000 & 6 & 1685737.657074 & 1685811.498784 & Least Frequently Used \\
+std_sort & 1000 & 6 & 1655005.416076 & 1655008.527175 & Least Recently Used \\
+std_sort & 1000 & 6 & 1658045.604265 & 1658058.113772 & Most Recently Used \\
+std_sort & 1000 & 6 & 1658872.964539 & 1659643.271857 & Pseudo-Least Recently Used \\
+std_sort & 10000 & 2 & 23820880.172413 & 23822688.379180 & Least Recently Used \\
+std_sort & 10000 & 3 & 24152926.379310 & 24163157.068964 & Least Frequently Used \\
+std_sort & 10000 & 3 & 23854663.689655 & 23854939.276072 & Least Recently Used \\
+std_sort & 10000 & 3 & 24078489.413793 & 24078831.310456 & Most Recently Used \\
+std_sort & 10000 & 3 & 24066892.724138 & 24067152.517342 & Pseudo-Least Recently Used \\
+std_sort & 10000 & 4 & 24358393.413793 & 24358678.138454 & Least Frequently Used \\
+std_sort & 10000 & 4 & 24306601.620689 & 24306603.896046 & Least Recently Used \\
+std_sort & 10000 & 4 & 24710193.142857 & 24710299.500189 & Most Recently Used \\
+std_sort & 10000 & 4 & 24304367.137931 & 24304806.206632 & Pseudo-Least Recently Used \\
+std_sort & 10000 & 5 & 24671626.392857 & 24672011.929007 & Least Frequently Used \\
+std_sort & 10000 & 5 & 24885085.750000 & 24885844.035972 & Least Recently Used \\
+std_sort & 10000 & 5 & 24821213.500000 & 24821576.429531 & Most Recently Used \\
+std_sort & 10000 & 5 & 25313147.607143 & 25313762.357525 & Pseudo-Least Recently Used \\
+std_sort & 10000 & 6 & 25471166.785714 & 25471781.642409 & Least Frequently Used \\
+std_sort & 10000 & 6 & 25105558.678571 & 25105564.928838 & Least Recently Used \\
+std_sort & 10000 & 6 & 25045131.250000 & 25048908.392949 & Most Recently Used \\
+std_sort & 10000 & 6 & 25178659.178571 & 25190257.964173 & Pseudo-Least Recently Used \\
+std_sort & 100000 & 2 & 295674946.500000 & 295682002.993999 & Least Recently Used \\
+std_sort & 100000 & 3 & 296033391.999998 & 296036936.502787 & Least Frequently Used \\
+std_sort & 100000 & 3 & 295365655.499999 & 295368920.007604 & Least Recently Used \\
+std_sort & 100000 & 3 & 298942599.499995 & 298951326.505630 & Most Recently Used \\
+std_sort & 100000 & 3 & 298922257.500003 & 298922324.494924 & Pseudo-Least Recently Used \\
+std_sort & 100000 & 4 & 302466983.499997 & 302476380.005828 & Least Frequently Used \\
+std_sort & 100000 & 4 & 304855209.999999 & 304863227.502210 & Least Recently Used \\
+std_sort & 100000 & 4 & 310484594.000002 & 310490650.997963 & Most Recently Used \\
+std_sort & 100000 & 4 & 301099252.000000 & 301102423.487464 & Pseudo-Least Recently Used \\
+std_sort & 100000 & 5 & 305348702.499998 & 305360242.506140 & Least Frequently Used \\
+std_sort & 100000 & 5 & 305568908.500000 & 305582794.491784 & Least Recently Used \\
+std_sort & 100000 & 5 & 307668853.999999 & 307678633.500473 & Most Recently Used \\
+std_sort & 100000 & 5 & 313014619.999997 & 313023775.990587 & Pseudo-Least Recently Used \\
+std_sort & 100000 & 6 & 315836835.500001 & 315854957.501870 & Least Frequently Used \\
+std_sort & 100000 & 6 & 310069853.999998 & 310069628.001656 & Least Recently Used \\
+std_sort & 100000 & 6 & 310692353.499995 & 310714963.503415 & Most Recently Used \\
+std_sort & 100000 & 6 & 310873095.999995 & 311062241.496984 & Pseudo-Least Recently Used \\
+std_sort & 1000000 & 2 & 3532672898.999991 & 3532817244.005855 & Least Recently Used \\
+std_sort & 1000000 & 3 & 3537979559.999997 & 3538073514.006101 & Least Frequently Used \\
+std_sort & 1000000 & 3 & 3574497518.000001 & 3574601114.989491 & Least Recently Used \\
+std_sort & 1000000 & 3 & 3560105297.999996 & 3560155035.986099 & Most Recently Used \\
+std_sort & 1000000 & 3 & 3554484325.999994 & 3554536701.005418 & Pseudo-Least Recently Used \\
+std_sort & 1000000 & 4 & 3619287403.000001 & 3620395615.987946 & Least Frequently Used \\
+std_sort & 1000000 & 4 & 3625346796.000002 & 3625412215.013057 & Least Recently Used \\
+std_sort & 1000000 & 4 & 3589353818.000006 & 3589455697.976519 & Most Recently Used \\
+std_sort & 1000000 & 4 & 3595762644.999993 & 3595846528.012771 & Pseudo-Least Recently Used \\
+std_sort & 1000000 & 5 & 3692616887.000000 & 3692766642.983770 & Least Frequently Used \\
+std_sort & 1000000 & 5 & 3643997732.000002 & 3644730669.009732 & Least Recently Used \\
+std_sort & 1000000 & 5 & 3665993284.999999 & 3666075943.008764 & Most Recently Used \\
+std_sort & 1000000 & 5 & 3719134603.000000 & 3719240264.006658 & Pseudo-Least Recently Used \\
+std_sort & 1000000 & 6 & 3762156365.999999 & 3762209955.981234 & Least Frequently Used \\
+std_sort & 1000000 & 6 & 3699423250.000010 & 3699444489.000598 & Least Recently Used \\
+std_sort & 1000000 & 6 & 3763045449.000003 & 3763403010.001639 & Most Recently Used \\
+std_sort & 1000000 & 6 & 3696964891.999997 & 3697723981.982563 & Pseudo-Least Recently Used \\
 \bottomrule
 \end{tabular}
